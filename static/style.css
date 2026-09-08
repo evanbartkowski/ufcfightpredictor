@@ -148,3 +148,12 @@ footer .footer-contact{justify-content:center;gap:12px;padding:16px 0 22px;margi
 .footer-contact-label{font:400 12px/1.6 system-ui;letter-spacing:.2px;color:#a6a8b8;margin-right:6px}
 .footer-contact-label strong{font-weight:650;color:#e7ddf7;text-shadow:0 0 16px #bc96ed45;margin-left:4px}
 @media(max-width:520px){.footer-contact-label{flex-basis:100%;text-align:center;margin:0 0 3px}footer .footer-contact{gap:10px}}
+
+.top-right.update-status{display:flex;color:#a8c8ff;font:600 11px/1.4 system-ui;letter-spacing:.4px;padding:8px 12px;border:1px solid #33415c;border-radius:999px;background:#182034}
+.update-status .dot{background:#91b8f3;box-shadow:0 0 9px #91b8f380}
+.update-status.is-delayed{color:#e9bf83;border-color:#58452e;background:#261f18}
+.update-status.is-delayed .dot{background:#e9bf83;box-shadow:0 0 9px #e9bf8360}
+@media(max-width:520px){.top-right.update-status{font-size:10px;padding:7px 9px;gap:6px;letter-spacing:0}.brand-wordmark{font-size:15px}}
+
+.model-intro .active-model{display:block;font-size:12px;line-height:1.6;color:#cfb6ef;margin:12px 0 3px;font-weight:650}
+.model-intro .model-estimator{display:block;font:10px/1.7 monospace;color:#a8c8ff;margin-bottom:10px;overflow-wrap:anywhere}

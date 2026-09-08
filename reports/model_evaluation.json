@@ -1,0 +1,75 @@
+{
+  "baseline": {
+    "name": "Logistic regression",
+    "metrics": {
+      "accuracy": 0.6109324758842444,
+      "brier": 0.23507346572002075,
+      "log_loss": 0.6625691583995447,
+      "elo_accuracy": 0.5607717041800643,
+      "majority_accuracy": 0.4855305466237942,
+      "test_fights": 1555,
+      "test_start": "2023-08-26",
+      "test_end": "2026-09-05",
+      "training_fights": 7427,
+      "validation_log_loss": {
+        "Logistic regression": 0.6726370390837187,
+        "Gradient boosting": 0.6776998515097638
+      }
+    }
+  },
+  "candidate": {
+    "name": "Logistic regression (recent performance)",
+    "metrics": {
+      "accuracy": 0.6077170418006431,
+      "brier": 0.2348419996869248,
+      "log_loss": 0.6620189207843302,
+      "elo_accuracy": 0.5607717041800643,
+      "majority_accuracy": 0.4855305466237942,
+      "test_fights": 1555,
+      "test_start": "2023-08-26",
+      "test_end": "2026-09-05",
+      "training_fights": 7427,
+      "validation_log_loss": {
+        "Logistic regression (baseline)": 0.6829343744762455,
+        "Logistic regression (baseline, stronger regularization)": 0.6828991501173777,
+        "Logistic regression (recent performance)": 0.6824961522556166,
+        "Logistic regression (recent performance, stronger regularization)": 0.6827135850558795,
+        "Gradient boosting (baseline)": 0.6858467955193382
+      },
+      "validation_fold_log_loss": {
+        "Logistic regression (baseline)": [
+          0.6932366486634448,
+          0.682929435681573,
+          0.6726370390837187
+        ],
+        "Logistic regression (baseline, stronger regularization)": [
+          0.6888654705037178,
+          0.6837961594526089,
+          0.6760358203958063
+        ],
+        "Logistic regression (recent performance)": [
+          0.6925615558866345,
+          0.6831755443511326,
+          0.6717513565290827
+        ],
+        "Logistic regression (recent performance, stronger regularization)": [
+          0.6889761860675335,
+          0.6842336701549707,
+          0.6749308989451347
+        ],
+        "Gradient boosting (baseline)": [
+          0.6959871594162326,
+          0.6838533756320186,
+          0.6776998515097638
+        ]
+      },
+      "validation_scheme": "Three expanding windows; final 20% held out"
+    }
+  },
+  "notes": [
+    "Same chronological holdout for both models; candidate selected without its results.",
+    "Small improvement in log loss and Brier score; winner accuracy decreased.",
+    "Holdout has now been inspected and must not be treated as a fresh benchmark for further tuning.",
+    "No historical career snapshot statistics or sportsbook odds were added as model inputs."
+  ]
+}

@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 
 from app import create_app
-from predictor.model import features, predict, replay, train
+from predictor.model import FEATURES, features, predict, replay, train
 from predictor.service import Service
 from predictor.source import parse_card, parse_events, parse_fighter
 from predictor.store import Store, bout_id, identity
@@ -27,7 +27,7 @@ def test_no_future_or_same_day_outcome_leakage():
     rows, _ = replay([first, same, later])
     altered, _ = replay([dict(first,winner='blue'), same, dict(later,winner='blue')])
     for i in (0,1):
-        np.testing.assert_array_equal(rows[i][1], np.zeros(9))
+        np.testing.assert_array_equal(rows[i][1], np.zeros(len(FEATURES)))
         np.testing.assert_array_equal(rows[i][1], altered[i][1])
     assert not np.array_equal(rows[-1][1], altered[-1][1])
     # Changing the held-out bout's own result never changes its input.
@@ -186,3 +186,20 @@ def test_evaluation_independent_of_winner_first_layout(bundle):
         fights.append(f)
     reordered=train(fights)
     assert reordered['metrics']==bundle['metrics']
+
+
+def test_recent_features_only_use_earlier_outcomes():
+    rows,states=replay([fight('2020-01-01'),fight('2020-02-01')])
+    names=dict(zip(FEATURES,rows[1][1]))
+    assert names['Recent overperformance'] == pytest.approx(1)
+    assert names['Finish loss rate'] < 0
+    assert names['Recent three form'] > 0
+    assert len(states['alice']['residuals']) == 2
+
+
+def test_holdout_outcomes_cannot_select_model(bundle):
+    fights=[fight((date(2020,1,1)+timedelta(days=i*7)).isoformat(),winner='red' if i%3 else 'blue') for i in range(80)]
+    for f in fights[64:]: f['winner']='blue' if f['winner']=='red' else 'red'
+    changed=train(fights)
+    assert changed['name']==bundle['name']
+    assert changed['metrics']['validation_fold_log_loss']==bundle['metrics']['validation_fold_log_loss']

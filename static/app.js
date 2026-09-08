@@ -97,9 +97,18 @@ function cardSections(fights) {
     return `<section class="card-section" aria-label="${label}"><div class="card-section-heading"><h4>${label}</h4><span>${group.length} ${group.length===1?'bout':'bouts'}</span></div>${key==='unassigned'?'<p class="section-note">The published schedule does not yet confirm these card placements.</p>':'<p class="section-note">Grouped by scheduled broadcast start times. Card placement may change.</p>'}<div class="fight-grid">${group.map(f=>card(f,true)).join('')}</div></section>`;
   }).join('');
 }
+function updateStatus(label, warning=false) {
+  const badge=$('update-status');
+  if(!badge) return;
+  $('update-label').textContent=label;
+  badge.classList.toggle('is-delayed',warning);
+}
 function render() {
   const m = data.model;
-  if(m) $('model-summary').textContent = `${m.name}, trained on ${m.metrics.training_fights.toLocaleString()} confirmed UFC win/loss results through ${day(m.through)}. It compares pre-fight records, opponent strength, recent form, and finish rates, then retrains when results change.`;
+  if(m) {
+    const estimator=m.name.startsWith('Gradient boosting')?'HistGradientBoostingClassifier':'LogisticRegression';
+    $('model-summary').innerHTML = `Compares logistic regression and gradient-boosted decision trees using chronological validation.<strong class="active-model">Model used: ${esc(m.name)}</strong><span class="model-estimator">scikit-learn ${estimator}</span>Trained on ${m.metrics.training_fights.toLocaleString()} confirmed UFC win/loss results, using prior records, opponent strength, recent form, and finishes.`;
+  }
   $('accuracy').textContent = pct(m?.metrics.accuracy);
   $('test-count').textContent = m ? `${m.metrics.test_fights.toLocaleString()} fights · ${day(m.metrics.test_start)}–${day(m.metrics.test_end)}` : 'Model pending';
   $('fight-count').textContent = data.total_fights.toLocaleString();
@@ -116,6 +125,9 @@ function render() {
   $('notice').classList.toggle('warning',Boolean(!data.status.running && (error || stale)));
   $('notice').textContent = data.status.running ? 'Refreshing fight data in the background. Saved data remains available.' : error ? 'Fight data is delayed. Showing saved data; retrying automatically.' : stale ? 'Showing saved data. A fresh update is pending.' : `Fight data up to date / ${stamp(data.status.last_sync)}`;
   $('notice').textContent += profileWarning;
+  const oddsLate=!data.odds_status.checked_at || Date.now()-Date.parse(data.odds_status.checked_at)>data.refresh.odds_seconds*2000;
+  const delayed=Boolean(error || stale || data.odds_status.error || oddsLate || data.profile_errors?.length);
+  updateStatus(data.refresh.automatic===false?'Auto-updates off':data.status.running || data.odds_status.running?'Refreshing data':delayed?'Data delayed':'Data up to date',data.refresh.automatic===false || (!(data.status.running || data.odds_status.running) && delayed));
   if(data.refresh.automatic===false){$('notice').classList.add('warning');$('notice').textContent += ' Automatic server updates are disabled.';}
   $('card-count').textContent = data.upcoming.length;
   const expanded = new Set([...document.querySelectorAll('#cards .fight-card')].flatMap(c=>[...c.querySelectorAll('details')].map((d,i)=>d.open?c.dataset.fightId+'|'+i:null).filter(Boolean)));
@@ -129,7 +141,7 @@ function render() {
   document.querySelectorAll('#cards .fight-card').forEach(c=>c.querySelectorAll('details').forEach((d,i)=>{d.open=expanded.has(c.dataset.fightId+'|'+i);}));
   $('fighter-list').innerHTML = data.fighters.map(f=>`<option value="${esc(f.name)}"></option>`).join('');
   $('results-list').innerHTML = data.results.length ? data.results.map(r=>`<article class="result"><div><h3>${esc(r.red)} vs. ${esc(r.blue)}</h3><p>${esc(day(r.date))} · Predicted ${esc(r.pick)} (${pct(r.confidence)}) · ${r.actual_winner?'Winner: '+esc(r.actual_winner):'Draw / no contest — unscored'}</p></div><span class="badge ${r.correct===false?'miss':''}">${r.correct===null?'UNSCORED':r.correct?'CORRECT':'MISSED'}</span></article>`).join('') : empty('A record earned in real fights','Once a saved forecast settles, the original pick and the actual result appear here. Historical test scores are tracked separately.');
-  if(m) $('model-info').innerHTML = `<div class="model-grid"><div class="info-box"><h3>${esc(m.name)}</h3><div class="stat-row"><span>Results through</span><strong>${esc(day(m.through))}</strong></div><div class="stat-row"><span>Holdout accuracy</span><strong>${pct(m.metrics.accuracy)}</strong></div><div class="stat-row"><span>Elo baseline accuracy</span><strong>${pct(m.metrics.elo_accuracy)}</strong></div><div class="stat-row"><span>Majority baseline accuracy</span><strong>${pct(m.metrics.majority_accuracy)}</strong></div><div class="stat-row"><span>Brier score · lower is better</span><strong>${m.metrics.brier.toFixed(3)}</strong></div><div class="stat-row"><span>Log loss · lower is better</span><strong>${m.metrics.log_loss.toFixed(3)}</strong></div><p>Model choice uses the middle 15% of event dates. The final 20% is reserved for evaluation. The serving model is then fitted on all confirmed results.</p></div><div class="info-box"><h3>A continuous learning loop</h3><ol><li>Fetch announced cards and refresh fighter profiles.</li><li>Refresh the forecast until event start; keep its earlier versions.</li><li>Wait for an official win, loss, draw, or no contest.</li><li>Score the original forecast and rebuild pre-fight features.</li><li>Retrain on confirmed outcomes for future matchups.</li></ol><p>Features for a fight only include earlier dates. Draws and no contests are excluded from binary training. Swapping fighter order preserves the forecast.</p><p>The bundled record begins in 2010 and ends in 2024. Missing early careers and new UFC entrants reduce confidence. Current striking and grappling profiles are context, not historical model inputs.</p></div></div>`;
+  if(m) $('model-info').innerHTML = `<div class="model-grid"><div class="info-box"><h3>${esc(m.name)}</h3><div class="stat-row"><span>Results through</span><strong>${esc(day(m.through))}</strong></div><div class="stat-row"><span>Holdout accuracy</span><strong>${pct(m.metrics.accuracy)}</strong></div><div class="stat-row"><span>Elo baseline accuracy</span><strong>${pct(m.metrics.elo_accuracy)}</strong></div><div class="stat-row"><span>Majority baseline accuracy</span><strong>${pct(m.metrics.majority_accuracy)}</strong></div><div class="stat-row"><span>Brier score · lower is better</span><strong>${m.metrics.brier.toFixed(3)}</strong></div><div class="stat-row"><span>Log loss · lower is better</span><strong>${m.metrics.log_loss.toFixed(3)}</strong></div><p>Model choice uses three expanding chronological validation windows. The final 20% of event dates is reserved for evaluation. The serving model is then fitted on all confirmed results.</p></div><div class="info-box"><h3>A continuous learning loop</h3><ol><li>Fetch announced cards and refresh fighter profiles.</li><li>Refresh the forecast until event start; keep its earlier versions.</li><li>Wait for an official win, loss, draw, or no contest.</li><li>Score the original forecast and rebuild pre-fight features.</li><li>Retrain on confirmed outcomes for future matchups.</li></ol><p>Features for a fight only include earlier dates. Draws and no contests are excluded from binary training. Swapping fighter order preserves the forecast.</p><p>The bundled record begins in 2010 and ends in 2024. Missing early careers and new UFC entrants reduce confidence. Current striking and grappling profiles are context, not historical model inputs.</p></div></div>`;
   document.querySelectorAll('[data-open-lab]').forEach(b=>b.addEventListener('click',()=>showTab('matchup')));
 }
 let loading=false;
@@ -137,7 +149,7 @@ async function load() {
   if(loading) return;
   loading=true;
   try { const r=await fetch('/api/dashboard',{cache:'no-store',signal:AbortSignal.timeout(20000)});if(!r.ok)throw Error('Dashboard is unavailable');data=await r.json();render(); if(activeMatchup && !$('matchup').hidden) await refreshMatchup(); }
-  catch(e){$('notice').classList.add('warning');$('notice').textContent='Connection interrupted. Showing any saved data; retrying automatically.';}
+  catch(e){updateStatus('Connection lost',true);$('notice').classList.add('warning');$('notice').textContent='Connection interrupted. Showing any saved data; retrying automatically.';}
   finally{loading=false;}
 }
 async function refreshMatchup() {
