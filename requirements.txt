@@ -1,0 +1,8 @@
+Flask>=3.1,<4
+waitress>=3.0,<4
+numpy>=2.0,<3
+scikit-learn>=1.6,<2
+requests>=2.32,<3
+beautifulsoup4>=4.12,<5
+joblib>=1.4,<2
+playwright>=1.50,<2
