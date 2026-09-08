@@ -157,3 +157,54 @@ footer .footer-contact{justify-content:center;gap:12px;padding:16px 0 22px;margi
 
 .model-intro .active-model{display:block;font-size:12px;line-height:1.6;color:#cfb6ef;margin:12px 0 3px;font-weight:650}
 .model-intro .model-estimator{display:block;font:10px/1.7 monospace;color:#a8c8ff;margin-bottom:10px;overflow-wrap:anywhere}
+
+/* Editorial model summary with focused color and glow. */
+.model-intro{max-width:370px;padding:22px 24px;border:1px solid #5d3d635c;border-radius:12px;background:linear-gradient(145deg,#191623ee,#111724eb);box-shadow:0 12px 35px #00000024}
+.hero .model-intro p{font-size:12px;line-height:1.75}
+.model-overview,.model-training,.model-inputs{display:block}
+.model-overview{color:#bcc1d1}
+.glow-rose{color:#ffa0b2;text-shadow:0 0 15px #ff64704d;font-weight:650}
+.glow-violet{color:#d4afff;text-shadow:0 0 15px #b17bfa4d;font-weight:650}
+.glow-blue{color:#a3d7ff;text-shadow:0 0 16px #70bcff50;font-weight:650}
+.model-selection{display:block;border-left:2px solid #d391d2;padding:2px 0 2px 13px;margin:17px 0;background:linear-gradient(90deg,#bc76e00c,transparent)}
+.model-kicker{display:block;font:600 9px/1.5 system-ui;letter-spacing:1.8px;color:#bba4cd}
+.model-intro .active-model{font-size:21px;line-height:1.3;letter-spacing:-.4px;color:#f0d5ff;text-shadow:0 0 20px #c084fc55;margin:5px 0}
+.model-intro .model-estimator{font-size:9px;color:#9da9c2;margin:0}
+.model-training{color:#c5cad8}
+.model-inputs{color:#aeb6cd;font-size:10px;line-height:1.9;margin-top:6px}
+.model-inputs>span{color:#d698b8;padding:0 4px}
+@media(max-width:760px){.model-intro{max-width:none;padding:18px 20px}.hero .model-intro p{font-size:12px}.model-intro .active-model{font-size:20px}}
+
+/* A useful shortcut to the next scheduled card. */
+.next-event-link{display:flex;align-items:center;gap:11px;padding:9px 15px 9px 10px;border:1px solid #76435170;border-radius:10px;background:linear-gradient(120deg,#2a1926,#171b2b);text-decoration:none;box-shadow:0 0 22px #e2668f0b}
+.next-event-icon{display:grid;place-items:center;width:30px;height:30px;border-radius:7px;background:#ed759518;color:#ffadbd;font-size:20px;text-shadow:0 0 12px #ff759578}
+.next-event-label{display:block;font:600 8px/1.4 system-ui;letter-spacing:1.8px;color:#c69eaf;margin-bottom:2px}
+.next-event-link strong{display:block;font:650 13px/1.3 system-ui;color:#e8dcfa;text-shadow:0 0 12px #bd8be74a}
+.next-event-link:hover{border-color:#e193b3;background:linear-gradient(120deg,#352032,#1d2338)}
+@media(max-width:520px){.next-event-link{padding:7px 10px 7px 8px;gap:8px}.next-event-icon{width:25px;height:25px;font-size:17px}.next-event-link strong{font-size:12px}.next-event-label{font-size:7px;letter-spacing:1.3px}}
+
+/* Specific training inputs, organized into quiet, readable rows. */
+.model-intro{max-width:410px}
+.model-inputs{margin-top:12px}
+.model-inputs>.model-input-row{display:block;padding:7px 0;color:#adb7cb;border-top:1px solid #b2a1ce16;line-height:1.6}
+.model-input-row b{display:block;font-size:10px;letter-spacing:.2px;color:#b8caf0;font-weight:600;margin-bottom:2px}
+.model-input-row>span{display:block;font-size:11px;color:#b0b8cc}
+.model-input-note{display:block;margin-top:9px;font-size:10px;line-height:1.6;color:#9ca4ba}
+.hero{gap:32px}
+/* A compact schedule toolbar instead of another dominant title. */
+#upcoming>.section-heading{margin:18px 0 12px;gap:14px;align-items:center;padding:0 0 12px;border-bottom:1px solid #2c2e3c80}
+#upcoming>.section-heading .eyebrow{display:none}
+#upcoming>.section-heading h2{font-size:15px;font-weight:550;letter-spacing:.1px;color:#aeb8cd;line-height:1.4}
+#upcoming #event-filter{min-height:34px;padding:7px 10px;font-size:11px;background:#12151e;border-color:#303344;border-radius:6px;max-width:280px}
+#upcoming .event-heading{margin:16px 0 8px}
+#upcoming .event-heading h3{font-size:14px;font-weight:600;color:#d0d6e3}
+#upcoming .event-heading .tag{font-size:9px;background:#1b2232;color:#a8b5cc;padding:3px 7px}
+#upcoming .card-section-heading{margin:14px 0 5px}
+#upcoming .card-section-heading h4{font-size:12px;font-weight:600;text-shadow:none;letter-spacing:.2px}
+#upcoming .section-note{font-size:10px;margin-bottom:12px;color:#949eb3}
+@media(max-width:760px){.model-intro{max-width:none}.hero{gap:24px}#upcoming #event-filter{max-width:65%;font-size:10px}#upcoming>.section-heading h2{font-size:13px}}
+
+.model-inputs.compact-inputs{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;margin-top:10px}
+.model-inputs.compact-inputs>span{padding:0;color:#b4bfd5;font-size:10px;line-height:1.5}
+.model-inputs.compact-inputs>span:before{content:"";display:inline-block;width:3px;height:3px;border-radius:50%;background:#cc9cca;margin:0 6px 2px 0}
+@media(max-width:360px){.model-inputs.compact-inputs{grid-template-columns:1fr}}
