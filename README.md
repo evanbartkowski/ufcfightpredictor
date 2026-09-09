@@ -2,6 +2,12 @@
 
 A UFC prediction website rebuilt from the original notebook: upcoming cards, winner probabilities, current fighter profiles, a custom matchup lab, and an honest prediction record.
 
+# Quick Turn on & Off
+
+.\start.ps1
+
+Stop-Process -Id (Get-NetTCPConnection -LocalPort 8000).OwningProcess -Force
+
 ## Run on Windows
 
 Install Python 3.12 or newer, then run from this repository:
