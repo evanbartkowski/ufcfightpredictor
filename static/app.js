@@ -254,9 +254,9 @@ function render() {
   const m = data.model;
   if (m) {
     $('model-summary').innerHTML = `
-      <span class="model-overview">MMA Cipher synthesizes an advanced multi-model ensemble combining gradient-boosted decision trees, LightGBM, regularized logistic, and random forests.</span>
+      <span class="model-overview">MMA Cipher runs an advanced prediction algorithm combining gradient-boosted decision trees, LightGBM, regularized logistic, and random forests.</span>
       <span class="model-selection">
-        <span class="model-kicker">ACTIVE ENSEMBLE</span>
+        <span class="model-kicker">PREDICTION ALGORITHM</span>
         <strong class="active-model">${esc(m.name)}</strong>
         <span class="model-estimator">Out-of-Fold Nelder-Mead Optimization · Schema v${esc(m.schema)}</span>
       </span>
@@ -264,7 +264,7 @@ function render() {
       <span class="model-inputs compact-inputs" role="list" aria-label="Feature engineering">
         <span role="listitem">Opponent-adjusted Elo</span>
         <span role="listitem">Age differential</span>
-        <span role="listitem">Height &amp; reach reach differential</span>
+        <span role="listitem">Height &amp; reach differential</span>
         <span role="listitem">Striking pace &amp; accuracy</span>
         <span role="listitem">Takedown success &amp; volume</span>
         <span role="listitem">Finish resistance &amp; durability</span>
@@ -277,9 +277,9 @@ function render() {
   $('live-accuracy').textContent = pct(data.live_accuracy);
   $('live-count').textContent = data.scored_predictions ? `${data.scored_predictions} settled forecasts` : 'Awaiting settled forecasts';
   $('last-sync').textContent = data.status.last_sync ? new Date(data.status.last_sync).toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit',second:'2-digit'}) : 'Not yet';
-  const refreshHours = Math.round((data.refresh?.stats_seconds || 21600) / 3600);
-  const cadenceLabel = refreshHours >= 1 ? `${refreshHours} ${refreshHours === 1 ? 'hour' : 'hours'}` : `${Math.round(data.refresh.stats_seconds / 60)} min`;
-  $('sync-state').textContent = data.status.running ? data.status.phase : `Cards & stats every ${cadenceLabel}`;
+  const pullInterval = getDynamicPullInterval(data?.upcoming);
+  const isFightCadence = pullInterval <= 6 * 3600 * 1000;
+  $('sync-state').textContent = data.status.running ? data.status.phase : (isFightCadence ? 'Fight day: updating every 6h' : 'Updating every 24h (6h on fight day)');
   const stale = !data.status.last_sync || Date.now() - Date.parse(data.status.last_sync) > (data.refresh.stats_seconds * 2000);
   const lastFailure = data.status.last_error;
   const error = data.status.error || (lastFailure && (!data.status.last_sync || Date.parse(lastFailure.at) > Date.parse(data.status.last_sync)) ? lastFailure.message : null);
@@ -353,11 +353,32 @@ function render() {
   document.querySelectorAll('[data-open-lab]').forEach(b => b.addEventListener('click', () => showTab('matchup')));
 }
 
-const PULL_INTERVAL_MS = 6 * 60 * 60 * 1000;
+const PULL_INTERVAL_DEFAULT_MS = 24 * 60 * 60 * 1000; // 24 hours
+const PULL_INTERVAL_FIGHT_DAY_MS = 6 * 60 * 60 * 1000; // 6 hours on fight day / before card starts
 const CACHE_KEY = 'mma_cipher_dashboard';
 const CACHE_TIME_KEY = 'mma_cipher_last_pull';
 const LEGACY_CACHE_KEY = 'mma_oracle_dashboard';
 const LEGACY_CACHE_TIME_KEY = 'mma_oracle_last_pull';
+
+function getDynamicPullInterval(upcomingList) {
+  if (!upcomingList || !upcomingList.length) return PULL_INTERVAL_DEFAULT_MS;
+  const now = Date.now();
+  const today = new Date().toISOString().slice(0, 10);
+  const next = upcomingList.find(f => {
+    const state = f.odds?.state;
+    const start = Date.parse(f.odds?.start_at || f.start_at);
+    return state !== 'post' && (Number.isFinite(start) ? start > now - 4 * 3600 * 1000 : f.date >= today);
+  });
+  if (!next) return PULL_INTERVAL_DEFAULT_MS;
+  const isFightDay = next.date === today;
+  const startMs = Date.parse(next.odds?.start_at || next.start_at);
+  const hoursToStart = Number.isFinite(startMs) ? (startMs - now) / 3600000 : 999;
+  // Day of the fight, or within 6 hours before fight card starts: 6-hour refresh
+  if (isFightDay || (hoursToStart > 0 && hoursToStart <= 6)) {
+    return PULL_INTERVAL_FIGHT_DAY_MS;
+  }
+  return PULL_INTERVAL_DEFAULT_MS;
+}
 
 function getCachedPredictions() {
   try {
@@ -387,7 +408,9 @@ function saveCachedPredictions(d) {
 
 function shouldPull() {
   const cached = getCachedPredictions();
-  return !cached || (Date.now() - cached.timestamp >= PULL_INTERVAL_MS);
+  if (!cached) return true;
+  const interval = getDynamicPullInterval(cached.data?.upcoming);
+  return (Date.now() - cached.timestamp >= interval);
 }
 
 let loading = false;
@@ -395,8 +418,9 @@ async function load(force = false) {
   if (loading) return;
   const now = Date.now();
   const cached = getCachedPredictions();
+  const pullInterval = getDynamicPullInterval(cached?.data?.upcoming);
 
-  if (!force && cached && (now - cached.timestamp < PULL_INTERVAL_MS)) {
+  if (!force && cached && (now - cached.timestamp < pullInterval)) {
     if (!data) {
       data = cached.data;
       render();

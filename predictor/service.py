@@ -243,13 +243,25 @@ class Service:
                 self.profile_lock.release()
         threading.Thread(target=worker, daemon=True).start()
 
+    def get_dynamic_sync_interval(self):
+        """Dynamic sync interval: 6 hours (21600s) on fight day, 24 hours (86400s) otherwise."""
+        today = datetime.now(timezone.utc).date().isoformat()
+        upcoming = self.store.meta('upcoming', [])
+        earliest_upcoming = min((f['date'] for f in upcoming if f.get('date')), default=None)
+        if earliest_upcoming:
+            days_away = (datetime.fromisoformat(earliest_upcoming).date() - datetime.fromisoformat(today).date()).days
+            if days_away <= 0:
+                return 21600  # 6 hours on fight day
+        return 86400  # 24 hours ordinarily
+
     def scheduler(self, interval):
         while True:
             try:
                 self.start_sync()
             except Exception:
                 log.exception('Could not start data refresh; retrying next interval')
-            threading.Event().wait(interval)
+            wait_sec = self.get_dynamic_sync_interval()
+            threading.Event().wait(wait_sec)
 
     def dashboard(self):
         today = datetime.now(timezone.utc).date().isoformat()
@@ -293,11 +305,12 @@ class Service:
                 'weights': bundle.get('weights'),
                 'candidate_models': list(bundle.get('models', {}).keys()) if bundle.get('models') else ['HistGradientBoosting', 'Logistic Regression', 'LightGBM', 'Random Forest']
             }
+        dynamic_interval = self.get_dynamic_sync_interval()
         return dict(upcoming=sorted(upcoming, key=lambda f:f['date']), results=sorted(results, key=lambda f:f['date'], reverse=True),
                     fighters=sorted(self.store.rows('fighters'), key=lambda f:f['name']),
                     model=model_info,
                     status=dict(self.status, last_sync=self.store.meta('last_sync'), last_error=self.store.meta('sync_error')),
-                    refresh=dict(stats_seconds=self.sync_interval, odds_seconds=self.odds_interval, browser_seconds=21600,
+                    refresh=dict(stats_seconds=dynamic_interval, odds_seconds=self.odds_interval, browser_seconds=dynamic_interval,
                                  automatic=self.auto_updates),
                     odds_status=dict(self.odds_status, checked_at=self.store.meta('odds_checked_at'),
                                      last_sync=self.store.meta('odds_last_sync'), error=self.store.meta('odds_error')),
