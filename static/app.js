@@ -857,6 +857,8 @@ function profile(name) {
   </div>`;
 }
 
+const openUndercardSections = new Set();
+
 function cardSections(fights) {
   const favs = getFavorites();
   let filtered = fights;
@@ -879,7 +881,41 @@ function cardSections(fights) {
   return sections.map(([key, label]) => {
     const group = filtered.filter(f => (f.odds?.card_section || 'unassigned') === key);
     if (!group.length) return '';
-    return `<section class="card-section" aria-label="${label}"><div class="card-section-heading"><h4>${label}</h4><span>${group.length} ${group.length===1?'bout':'bouts'}</span></div>${key==='unassigned'?'<p class="section-note">The published schedule does not yet confirm these card placements.</p>':'<p class="section-note">Grouped by scheduled broadcast start times. Card placement may change.</p>'}<div class="fight-grid">${group.map((f, i) => card(f, true, f.id === mainBoutId || Boolean(f.is_main_event) || (key === 'main' && i === 0))).join('')}</div></section>`;
+    if (key === 'main') {
+      return `<section class="card-section" aria-label="${label}">
+        <div class="card-section-heading">
+          <h4>${label}</h4>
+          <span>${group.length} ${group.length===1?'bout':'bouts'}</span>
+        </div>
+        <p class="section-note">Grouped by scheduled broadcast start times. Card placement may change.</p>
+        <div class="fight-grid">${group.map((f, i) => card(f, true, f.id === mainBoutId || Boolean(f.is_main_event) || i === 0)).join('')}</div>
+      </section>`;
+    }
+
+    const isFilterActive = (currentCardFilter !== 'all');
+    const wasOpen = openUndercardSections.has(label);
+    const isOpen = isFilterActive || wasOpen;
+
+    return `<details class="undercard-dropdown card-section" aria-label="${label}" ${isOpen ? 'open' : ''}>
+      <summary class="undercard-summary">
+        <div class="undercard-summary-info">
+          <span class="undercard-pill-tag">⚡ UNDERCARD</span>
+          <div class="undercard-heading-group">
+            <h4 class="undercard-title">${label}</h4>
+            <span class="undercard-bouts-badge">${group.length} ${group.length===1?'bout':'bouts'}</span>
+          </div>
+        </div>
+        <div class="undercard-summary-action">
+          <span class="undercard-action-hint show-text">Click to show undercard</span>
+          <span class="undercard-action-hint hide-text">Click to hide undercard</span>
+          <span class="undercard-chevron" aria-hidden="true">▾</span>
+        </div>
+      </summary>
+      <div class="undercard-content">
+        ${key==='unassigned'?'<p class="section-note">The published schedule does not yet confirm these card placements.</p>':'<p class="section-note">Grouped by scheduled broadcast start times. Card placement may change.</p>'}
+        <div class="fight-grid">${group.map(f => card(f, true, false)).join('')}</div>
+      </div>
+    </details>`;
   }).join('');
 }
 
@@ -946,6 +982,16 @@ function attachCardListeners() {
       if (fid) {
         if (d.open) openComparisonFightIds.add(fid);
         else openComparisonFightIds.delete(fid);
+      }
+    };
+  });
+  // Track open undercard dropdown menus
+  document.querySelectorAll('details.undercard-dropdown').forEach(d => {
+    d.ontoggle = () => {
+      const label = d.getAttribute('aria-label');
+      if (label) {
+        if (d.open) openUndercardSections.add(label);
+        else openUndercardSections.delete(label);
       }
     };
   });
