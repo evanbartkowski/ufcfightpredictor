@@ -16,7 +16,7 @@ with sync_playwright() as p:
     assert dashboard.headers['cache-control'] == 'no-store'
     assert page.locator('#odds-sync').is_visible()
     live = dashboard.json()
-    assert live['refresh']['odds_seconds'] == 900
+    assert live['refresh']['odds_seconds'] in (900, 10800)
     assert live['refresh']['stats_seconds'] in (21600, 86400)
     assert live['refresh']['browser_seconds'] in (21600, 86400)
     if live['upcoming'] and live['upcoming'][0]['odds'].get('available'):
@@ -31,6 +31,9 @@ with sync_playwright() as p:
     assert page.locator('.fight-card').count() >= first_count
     page.locator('#event-filter').select_option(first_event)
     if page.locator('.fight-card').count():
+        expand_btn = page.locator('.expand-card-btn').first
+        if expand_btn.is_visible():
+            expand_btn.click()
         page.get_by_text('Compare current fighter stats', exact=True).first.click()
         assert page.locator('.profile').first.is_visible()
         awaitable = page.evaluate('load()')

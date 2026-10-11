@@ -102,84 +102,83 @@ function updateFavCounts() {
 }
 
 // ==========================================
-// Beat the AI — Community Predictions
+// Community Predictions & Consensus
 // ==========================================
+const COMMUNITY_VOTES_KEY = 'mma_cipher_community_votes';
+const USER_PICKS_KEY = 'mma_cipher_user_picks';
+
 function getUserPicks() {
   try {
-    const raw = localStorage.getItem('mma_cipher_user_picks');
+    const raw = localStorage.getItem(USER_PICKS_KEY);
     return raw ? JSON.parse(raw) : {};
   } catch (_) {
     return {};
   }
 }
 
-function setUserPick(fightId, side) {
-  const picks = getUserPicks();
-  if (picks[fightId] === side) {
-    delete picks[fightId];
-  } else {
-    picks[fightId] = side;
-  }
+function getCommunityVotes() {
   try {
-    localStorage.setItem('mma_cipher_user_picks', JSON.stringify(picks));
-  } catch (_) {}
-  updateUserScorecard();
-  renderCardPickButtons(fightId);
+    const raw = localStorage.getItem(COMMUNITY_VOTES_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch (_) {
+    return {};
+  }
 }
 
-function updateUserScorecard() {
-  const picks = getUserPicks();
-  const pickKeys = Object.keys(picks);
-  const total = pickKeys.length;
-  if ($('sc-total')) $('sc-total').textContent = total;
-
-  if (!data) return;
-  const settledFights = {};
-  (data.results || []).forEach(r => {
-    if (r.id) settledFights[r.id] = r;
-  });
-
-  let settled = 0;
-  let correct = 0;
-  let streak = 0;
-
-  pickKeys.forEach(k => {
-    const f = settledFights[k];
-    if (f && f.actual_winner) {
-      settled++;
-      const pickedFighter = picks[k] === 'red' ? f.red : f.blue;
-      const isCorrect = (f.actual_winner === pickedFighter);
-      if (isCorrect) {
-        correct++;
-        streak++;
-      } else {
-        streak = 0;
-      }
-    }
-  });
-
-  if ($('sc-settled')) $('sc-settled').textContent = settled;
-  if ($('sc-correct')) $('sc-correct').textContent = correct;
-  if ($('sc-accuracy')) $('sc-accuracy').textContent = settled > 0 ? `${((correct / settled) * 100).toFixed(1)}%` : '—';
-  if ($('sc-streak')) $('sc-streak').textContent = streak > 0 ? `${streak}W` : '0W';
+function saveCommunityVotes(votes) {
+  try {
+    localStorage.setItem(COMMUNITY_VOTES_KEY, JSON.stringify(votes));
+  } catch (_) {}
 }
 
 function getCommunityConsensus(f) {
-  let hash = 0;
-  const str = (f.id || '') + (f.red || '') + (f.blue || '');
-  for (let i = 0; i < str.length; i++) hash = (hash * 31 + str.charCodeAt(i)) % 10000;
-  const variance = (hash % 16 - 8) / 100;
-  const baseRed = f.red_probability || 0.5;
-  const userPick = getUserPicks()[f.id];
-  let redPct = Math.max(0.20, Math.min(0.80, baseRed + variance));
-  if (userPick === 'red') redPct = Math.min(0.85, redPct + 0.03);
-  if (userPick === 'blue') redPct = Math.max(0.15, redPct - 0.03);
-  const totalVotes = 950 + (hash % 1100);
+  const fightId = f.id || `${f.red}_${f.blue}`;
+  const votes = getCommunityVotes();
+  // Starts strictly at 50/50% baseline
+  const current = votes[fightId] || { red: 50, blue: 50 };
+  const rVotes = Math.max(0, current.red ?? 50);
+  const bVotes = Math.max(0, current.blue ?? 50);
+  const total = rVotes + bVotes;
+  const redPct = total > 0 ? (rVotes / total) : 0.50;
+  const bluePct = 1.0 - redPct;
+
   return {
     red: redPct,
-    blue: 1.0 - redPct,
-    totalVotes
+    blue: bluePct,
+    redVotes: rVotes,
+    blueVotes: bVotes,
+    totalVotes: total
   };
+}
+
+function setUserPick(fightId, side) {
+  const picks = getUserPicks();
+  const votes = getCommunityVotes();
+  if (!votes[fightId]) {
+    votes[fightId] = { red: 50, blue: 50 };
+  }
+
+  const prevPick = picks[fightId];
+  if (prevPick === side) {
+    // Deselect pick
+    delete picks[fightId];
+    if (side === 'red') votes[fightId].red = Math.max(50, votes[fightId].red - 1);
+    if (side === 'blue') votes[fightId].blue = Math.max(50, votes[fightId].blue - 1);
+  } else {
+    // Switch or apply new pick
+    if (prevPick === 'red') votes[fightId].red = Math.max(50, votes[fightId].red - 1);
+    if (prevPick === 'blue') votes[fightId].blue = Math.max(50, votes[fightId].blue - 1);
+    picks[fightId] = side;
+    if (side === 'red') votes[fightId].red += 1;
+    if (side === 'blue') votes[fightId].blue += 1;
+  }
+
+  try {
+    localStorage.setItem(USER_PICKS_KEY, JSON.stringify(picks));
+    saveCommunityVotes(votes);
+  } catch (_) {}
+
+  renderCardPickButtons(fightId);
 }
 
 // ==========================================
@@ -410,29 +409,35 @@ function renderUserPickButtons(f) {
   const userPick = getUserPicks()[f.id];
   const comm = getCommunityConsensus(f);
   const isLocked = f.locked || false;
+  const redLast = esc(f.red.split(' ').pop());
+  const blueLast = esc(f.blue.split(' ').pop());
+  const redPct = Math.round(comm.red * 100);
+  const bluePct = Math.round(comm.blue * 100);
 
   return `
     <div class="user-pick-container" id="pick-box-${esc(f.id)}">
       <div class="user-pick-header">
-        <span>BEAT THE AI · YOUR PICK</span>
-        <span>${isLocked ? 'PICKS LOCKED' : 'SELECT WINNER'}</span>
+        <span class="user-pick-tag"><span class="pulse-dot"></span> COMMUNITY CONSENSUS</span>
+        <span class="user-pick-action">${userPick ? (userPick === 'red' ? 'PICKED ' + redLast.toUpperCase() : 'PICKED ' + blueLast.toUpperCase()) : 'SELECT WINNER'}</span>
       </div>
       <div class="user-pick-btns">
-        <button class="pick-btn ${userPick==='red'?'selected-red':''}" data-pick-fight="${esc(f.id)}" data-pick-side="red" ${isLocked?'disabled':''}>
-          <span>${esc(f.red)}</span>
+        <button class="pick-btn ${userPick==='red'?'selected-red':''}" data-pick-fight="${esc(f.id)}" data-pick-side="red" ${isLocked?'disabled':''} aria-label="Vote for ${esc(f.red)}">
+          <span class="pick-btn-name">${esc(f.red)}</span>
+          <span class="pick-btn-pct">${redPct}%</span>
           <span class="pick-status-icon">${userPick==='red'?'✓':'+'}</span>
         </button>
-        <button class="pick-btn ${userPick==='blue'?'selected-blue':''}" data-pick-fight="${esc(f.id)}" data-pick-side="blue" ${isLocked?'disabled':''}>
-          <span>${esc(f.blue)}</span>
+        <button class="pick-btn ${userPick==='blue'?'selected-blue':''}" data-pick-fight="${esc(f.id)}" data-pick-side="blue" ${isLocked?'disabled':''} aria-label="Vote for ${esc(f.blue)}">
+          <span class="pick-btn-name">${esc(f.blue)}</span>
+          <span class="pick-btn-pct">${bluePct}%</span>
           <span class="pick-status-icon">${userPick==='blue'?'✓':'+'}</span>
         </button>
       </div>
       <div class="community-vs-ai">
         <div class="cvsa-labels">
-          <span>AI: ${esc(f.pick)} (${pct(f.confidence)})</span>
-          <span>Community: ${(comm.red*100).toFixed(0)}% / ${(comm.blue*100).toFixed(0)}% (${comm.totalVotes} picks)</span>
+          <span>AI Forecast: <strong>${esc(f.pick)}</strong> (${pct(f.confidence)})</span>
+          <span>Community: <strong>${redPct}%</strong> ${redLast} &middot; <strong>${bluePct}%</strong> ${blueLast}</span>
         </div>
-        <div class="cvsa-bar">
+        <div class="cvsa-bar" role="progressbar" aria-label="Community split: ${redPct}% ${redLast} vs ${bluePct}% ${blueLast}">
           <div class="cvsa-fill" style="width: ${(comm.red * 100).toFixed(1)}%"></div>
         </div>
       </div>
@@ -693,11 +698,61 @@ function renderPerformanceSnapshot(redName, blueName) {
   `;
 }
 
+const expandedFightIds = new Set();
+const openComparisonFightIds = new Set();
+
+function quickOddsBar(f) {
+  const o = f.odds;
+  if (!o || !o.available || !o.books || !o.books.length) return '';
+  const bestBook = o.books[0];
+  const redPrice = line(bestBook.red);
+  const bluePrice = line(bestBook.blue);
+  return `
+    <div class="quick-odds-bar">
+      <div class="quick-odds-label">
+        <span class="odds-live-dot"></span>
+        <span>${esc(bestBook.name || 'Sportsbook')} Moneyline</span>
+      </div>
+      <div class="odds-prices">
+        <strong title="${esc(f.red)}">${redPrice}</strong>
+        <strong title="${esc(f.blue)}">${bluePrice}</strong>
+      </div>
+    </div>
+  `;
+}
+
+function toggleCardDrawer(fightId) {
+  const drawer = $(`drawer-${fightId}`);
+  const btn = document.querySelector(`[data-toggle-drawer="${fightId}"]`);
+  if (!drawer || !btn) return;
+  const isOpening = drawer.hidden;
+  if (isOpening) {
+    drawer.hidden = false;
+    expandedFightIds.add(fightId);
+    btn.setAttribute('aria-expanded', 'true');
+    btn.classList.add('is-expanded');
+    const label = btn.querySelector('.expand-label');
+    const icon = btn.querySelector('.expand-icon');
+    if (label) label.textContent = 'Hide Deep Analysis';
+    if (icon) icon.textContent = '▴';
+  } else {
+    drawer.hidden = true;
+    expandedFightIds.delete(fightId);
+    btn.setAttribute('aria-expanded', 'false');
+    btn.classList.remove('is-expanded');
+    const label = btn.querySelector('.expand-label');
+    const icon = btn.querySelector('.expand-icon');
+    if (label) label.textContent = 'Deep Fight Analysis & Stats';
+    if (icon) icon.textContent = '▾';
+  }
+}
+
 function card(f, withProfiles=false, isMainEvent=false) {
   const pending = f.prediction_pending;
   const edge = modelEdge(f);
   const isUpset = Boolean(f.upset_radar?.is_candidate || edge);
   const favs = getFavorites();
+  const isExpanded = expandedFightIds.has(f.id);
 
   return `<article class="fight-card${isMainEvent ? ' is-main-event' : ''}${isWomensFight(f)?' womens-fight':''}${edge?' has-model-edge':''}${isUpset?' is-upset-card':''}" data-fight-id="${esc(f.id || 'custom')}">
     <div class="fight-top">
@@ -746,19 +801,31 @@ function card(f, withProfiles=false, isMainEvent=false) {
         <div><span class="pick-label">PROJECTED WINNER</span><strong>${esc(f.pick)}</strong></div>
         <span class="pick-conf">\u2197 ${pct(f.confidence)}</span>
       </div>
-      ${renderUserPickButtons(f)}
-      ${renderMethod(f)}
-      ${renderExplanation(f)}
-      ${renderEnsemble(f)}
     `}
-    ${renderTape(f)}
-    ${oddsPanel(f)}
-    ${f.low_history?'<div class="low-history">Limited history: at least one fighter has fewer than 3 recorded bouts.</div>':''}
-    ${!pending?`<div class="forecast-meta">${f.issued_at?'Prediction updated '+esc(stamp(f.issued_at)):'MMA Cipher Ensemble prediction'}</div>`:''}
-    <div class="card-footer-actions">
-      <button class="share-card-btn" data-share-id="${esc(f.id)}"><span>⎘</span> Share Prediction</button>
+    ${quickOddsBar(f)}
+    <div class="card-expand-bar">
+      <button class="expand-card-btn ${isExpanded?'is-expanded':''}" data-toggle-drawer="${esc(f.id)}" aria-expanded="${isExpanded}">
+        <span class="expand-label">${isExpanded?'Hide Deep Analysis':'Deep Fight Analysis & Stats'}</span>
+        <span class="expand-icon">${isExpanded?'▴':'▾'}</span>
+      </button>
     </div>
-    ${withProfiles?`<details class="stats-comparison-details"><summary>Compare current fighter stats</summary>${renderPerformanceSnapshot(f.red, f.blue)}<div class="comparison">${profile(f.red)}${profile(f.blue)}</div></details>`:''}</article>`;
+    <div class="card-details-drawer ${isExpanded?'is-open':''}" id="drawer-${esc(f.id)}" ${isExpanded?'':'hidden'}>
+      ${!pending ? `
+        ${renderUserPickButtons(f)}
+        ${renderMethod(f)}
+        ${renderExplanation(f)}
+        ${renderEnsemble(f)}
+      ` : ''}
+      ${renderTape(f)}
+      ${oddsPanel(f)}
+      ${f.low_history?'<div class="low-history">Limited history: at least one fighter has fewer than 3 recorded bouts.</div>':''}
+      ${!pending?`<div class="forecast-meta">${f.issued_at?'Prediction updated '+esc(stamp(f.issued_at)):'MMA Cipher Ensemble prediction'}</div>`:''}
+      <div class="card-footer-actions">
+        <button class="share-card-btn" data-share-id="${esc(f.id)}"><span>⎘</span> Share Prediction</button>
+      </div>
+      ${withProfiles?`<details class="stats-comparison-details" ${openComparisonFightIds.has(f.id)?'open':''}><summary>Compare current fighter stats</summary>${renderPerformanceSnapshot(f.red, f.blue)}<div class="comparison">${profile(f.red)}${profile(f.blue)}</div></details>`:''}
+    </div>
+  </article>`;
 }
 
 function profile(name) {
@@ -857,11 +924,29 @@ function attachCardListeners() {
       setUserPick(b.dataset.pickFight, b.dataset.pickSide);
     };
   });
+  // Expand / collapse drawer buttons
+  document.querySelectorAll('.expand-card-btn').forEach(b => {
+    b.onclick = (e) => {
+      e.stopPropagation();
+      toggleCardDrawer(b.dataset.toggleDrawer);
+    };
+  });
   // Share prediction buttons
   document.querySelectorAll('.share-card-btn').forEach(b => {
     b.onclick = (e) => {
       e.stopPropagation();
       openShareModal(b.dataset.shareId);
+    };
+  });
+  // Track open comparison details
+  document.querySelectorAll('.stats-comparison-details').forEach(d => {
+    d.ontoggle = () => {
+      const cardEl = d.closest('[data-fight-id]');
+      const fid = cardEl?.dataset?.fightId;
+      if (fid) {
+        if (d.open) openComparisonFightIds.add(fid);
+        else openComparisonFightIds.delete(fid);
+      }
     };
   });
 }
@@ -920,7 +1005,6 @@ function render() {
   const upsetCount = data.upcoming.filter(f => f.upset_radar?.is_candidate || modelEdge(f)).length;
   if ($('upset-pill-count')) $('upset-pill-count').textContent = upsetCount;
   updateFavCounts();
-  updateUserScorecard();
 
   const expanded = new Set([...document.querySelectorAll('#cards .fight-card')].flatMap(c => [...c.querySelectorAll('details')].map((d, i) => d.open ? c.dataset.fightId + '|' + i : null).filter(Boolean)));
   const groups = data.upcoming.reduce((groups, f) => {
@@ -1589,34 +1673,47 @@ function shouldPull() {
 }
 
 let loading = false;
+let hasInitialNetworkSynced = false;
+
 async function load(force = false) {
   if (loading) return;
   const now = Date.now();
   const cached = getCachedPredictions();
-  const pullInterval = getDynamicPullInterval(cached?.data?.upcoming);
 
-  if (!force && cached && (now - cached.timestamp < pullInterval)) {
-    if (!data) {
-      data = cached.data;
-      if (data?.images) fighterImagesMap = data.images;
-      await initFighterImages();
-      render();
-    }
+  // 1. Instant paint from cache so user experiences zero wait time
+  if (!data && cached) {
+    data = cached.data;
+    if (data?.images) fighterImagesMap = data.images;
+    initFighterImages().then(() => {});
+    render();
+  }
+
+  // 2. Determine if network fetch is needed:
+  // Forced, or initial page load/reload, or cache has reached dynamic expiration
+  const pullInterval = getDynamicPullInterval(data?.upcoming || cached?.data?.upcoming);
+  const isCacheExpired = !cached || (now - cached.timestamp >= pullInterval);
+  const shouldFetchNetwork = force || !hasInitialNetworkSynced || isCacheExpired;
+
+  if (!shouldFetchNetwork) {
     if (activeMatchup && !$('matchup').hidden) await refreshMatchup();
     return;
   }
 
   loading = true;
   try {
-    const r = await fetch('/api/dashboard', { cache: 'no-store', signal: AbortSignal.timeout(20000) });
+    const bust = Date.now();
+    const r = await fetch(`/api/dashboard?_t=${bust}`, { cache: 'no-store', signal: AbortSignal.timeout(20000) });
     if (!r.ok) throw Error('Dashboard is unavailable');
-    data = await r.json();
+    const freshData = await r.json();
+    data = freshData;
+    hasInitialNetworkSynced = true;
     if (data?.images) fighterImagesMap = data.images;
     else await initFighterImages();
     saveCachedPredictions(data);
     render();
     if (activeMatchup && !$('matchup').hidden) await refreshMatchup();
   } catch (e) {
+    hasInitialNetworkSynced = true;
     if (!data && cached) {
       data = cached.data;
       if (data?.images) fighterImagesMap = data.images;

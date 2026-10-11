@@ -27,7 +27,7 @@ class Service:
         self.background_lock = threading.Lock()
         self.odds_source = odds_source or ESPNOdds()
         self.sync_interval = max(180, int(os.environ.get('SYNC_INTERVAL_SECONDS', '21600')))
-        self.odds_interval = max(60, int(os.environ.get('ODDS_INTERVAL_SECONDS', '900')))
+        self.odds_interval = max(60, int(os.environ.get('ODDS_INTERVAL_SECONDS', '10800')))
         self.odds_status = dict(running=False, error=None)
         self.bundle = None
         self.model_path = store.directory / 'model.joblib'

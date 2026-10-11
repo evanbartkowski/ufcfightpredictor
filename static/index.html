@@ -2,16 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <link rel="icon" type="image/svg+xml" href="/cipher-mark.svg">
   <meta name="theme-color" content="#06070a">
   <meta name="description" content="MMA Cipher — Next-generation UFC fight forecasting, multi-model AI ensemble consensus, pre-bout statistical telemetry, and verified performance tracking.">
   <title>MMA Cipher — AI Fight Intelligence & UFC Predictions</title>
-  <link rel="stylesheet" href="/style.css?v=11">
+  <link rel="stylesheet" href="/style.css?v=13">
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js" defer></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js" defer></script>
   <script src="/firebase.js" defer></script>
-  <script src="/app.js?v=11" defer></script>
+  <script src="/app.js?v=13" defer></script>
 </head>
 <body>
   <header class="topbar">
@@ -67,20 +70,6 @@
       <button class="tab" data-tab="model" aria-pressed="false">Inside the Algorithm</button>
     </nav>
     <section id="upcoming" class="panel">
-      <!-- Beat the AI / Community Scorecard Strip -->
-      <div id="user-scorecard" class="user-scorecard" aria-label="Your prediction tracking">
-        <div class="scorecard-kicker">
-          <span class="scorecard-dot"></span>
-          <span>BEAT THE AI · COMMUNITY PICKS</span>
-        </div>
-        <div class="scorecard-metrics">
-          <div><span class="sc-label">PICKS SAVED</span><strong id="sc-total">0</strong></div>
-          <div><span class="sc-label">SETTLED</span><strong id="sc-settled">0</strong></div>
-          <div><span class="sc-label">CORRECT</span><strong id="sc-correct">0</strong></div>
-          <div><span class="sc-label">ACCURACY</span><strong id="sc-accuracy">—</strong></div>
-          <div><span class="sc-label">CURRENT STREAK</span><strong id="sc-streak" class="streak-glow">0W</strong></div>
-        </div>
-      </div>
       <div class="section-heading">
         <div>
           <div class="eyebrow">NEXT IN THE OCTAGON</div>
