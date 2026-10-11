@@ -8,21 +8,24 @@ import json
 from collections import defaultdict
 from datetime import date
 from itertools import groupby
+import math
 
 import numpy as np
 from scipy.optimize import minimize
-from sklearn.compose import ColumnTransformer
-from sklearn.ensemble import ExtraTreesClassifier, HistGradientBoostingClassifier, RandomForestClassifier
+from sklearn.ensemble import HistGradientBoostingClassifier, RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, brier_score_loss, log_loss
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 import lightgbm as lgb
+import xgboost as xgb
 
 from .store import identity, now
 
 FEATURES = [
     'Elo',
+    'Striking Elo',
+    'Grappling Elo',
     'Recorded wins',
     'Recorded losses',
     'Win streak',
@@ -45,18 +48,33 @@ FEATURES = [
     'Takedown rate differential',
     'Takedown accuracy differential',
     'Submission attempt differential',
-    'Total rounds differential'
+    'Total rounds differential',
+    'Age cliff differential',
+    'Longest win streak differential',
+    'Title bouts differential',
+    'KO wins differential',
+    'Submission wins differential',
+    'Decision dominance differential',
+    'Reach stance interaction',
+    'Takedown threat interaction',
+    'Ranking differential',
+    'Five round experience',
+    'Ape index differential',
+    'Market implied edge',
+    'Market logit'
 ]
-SCHEMA = 4
+SCHEMA = 5
 
 
 def fresh():
     """Default baseline career and physical state for an unrecorded fighter."""
     return dict(
-        elo=1500., wins=0, losses=0, streak=0, recent=[], ko=0, sub=0, dec=0,
-        last=None, residuals=[], finish_losses=0, total_rounds=0,
-        age=30.0, height=175.0, reach=175.0, stance_val=0.0,
-        sig_str_landed=3.5, sig_str_acc=0.45, td_landed=1.5, td_acc=0.40, sub_att=0.5
+        elo=1500., str_elo=1500., grap_elo=1500.,
+        wins=0, losses=0, streak=0, recent=[], recent3=[],
+        ko=0, sub=0, dec=0, last=None, residuals=[], finish_losses=0, total_rounds=0,
+        age=30.0, height=175.0, reach=175.0, weight=155.0, stance='Orthodox',
+        sig_str_landed=3.5, sig_str_acc=0.45, td_landed=1.5, td_acc=0.40, sub_att=0.5,
+        longest_streak=0, title_bouts=0, rank=16.0
     )
 
 
@@ -69,15 +87,19 @@ def _safe_float(val, default):
         return float(default)
 
 
-def vector(state, day, attributes=None):
-    """Generate a single fighter's pre-bout feature vector."""
+def compute_fighter_vector(state, day, attrs=None):
+    """Compute individual fighter state values prior to bout date."""
     n = state['wins'] + state['losses']
     rest = min((date.fromisoformat(day) - date.fromisoformat(state['last'])).days, 1095) if state.get('last') else 365
-    attrs = attributes or {}
+    attrs = attrs or {}
+
+    decay = 0.95 if rest > 450 else 1.0
+    elo_adj = 1500.0 + (state.get('elo', 1500.0) - 1500.0) * decay
 
     age = _safe_float(attrs.get('age'), state.get('age', 30.0))
     height = _safe_float(attrs.get('height'), state.get('height', 175.0))
     reach = _safe_float(attrs.get('reach'), state.get('reach', 175.0))
+    weight = _safe_float(attrs.get('weight'), state.get('weight', 155.0))
     stance = attrs.get('stance') or state.get('stance', 'Orthodox')
     st_val = 1.0 if 'southpaw' in str(stance).lower() else (0.5 if 'switch' in str(stance).lower() else 0.0)
 
@@ -86,19 +108,60 @@ def vector(state, day, attributes=None):
     td_land = _safe_float(attrs.get('td_landed'), state.get('td_landed', 1.5))
     td_pct = _safe_float(attrs.get('td_pct'), state.get('td_acc', 0.40))
     sub_att = _safe_float(attrs.get('sub_att'), state.get('sub_att', 0.5))
-    total_rounds = float(state.get('total_rounds', 0))
 
-    return np.array([
-        state['elo'], state['wins'], state['losses'], state['streak'],
-        (sum(state['recent']) + 1) / (len(state['recent']) + 2),
-        state['ko'] / max(n, 1), state['sub'] / max(n, 1), n, rest,
-        np.mean(state['residuals']) if state['residuals'] else 0.,
-        (state['wins'] + 2) / (n + 4), state['finish_losses'] / (n + 4),
-        (sum(state.get('recent3', state['recent'][-3:])) + 1) / (len(state.get('recent3', state['recent'][-3:])) + 2),
-        np.log1p(rest),
-        age, height, reach, st_val,
-        sig_str, sig_acc, td_land, td_pct, sub_att, total_rounds
-    ], dtype=float)
+    is_light = 1.0 if weight <= 170.0 else 0.0
+    age_cliff = max(0.0, age - 35.0) * (1.5 if is_light else 0.8)
+
+    longest_streak = float(attrs.get('longest_streak') if attrs.get('longest_streak') is not None else state.get('longest_streak', state.get('streak', 0)))
+    title_bouts = float(attrs.get('title_bouts') if attrs.get('title_bouts') is not None else state.get('title_bouts', 0))
+    ko_wins = float(attrs.get('ko_wins') if attrs.get('ko_wins') is not None else state.get('ko', 0))
+    sub_wins = float(attrs.get('sub_wins') if attrs.get('sub_wins') is not None else state.get('sub', 0))
+    dec_wins = float(attrs.get('dec_wins') if attrs.get('dec_wins') is not None else state.get('dec', 0))
+
+    rk = _safe_float(attrs.get('rank'), state.get('rank', 16.0))
+    if rk == 0.0:
+        rk = 0.5
+    elif rk > 15.0 or rk < 0.0:
+        rk = 16.0
+
+    ape_idx = (reach / max(height, 100.0)) - 1.0
+
+    return {
+        'elo': elo_adj,
+        'str_elo': state.get('str_elo', 1500.0),
+        'grap_elo': state.get('grap_elo', 1500.0),
+        'wins': state['wins'],
+        'losses': state['losses'],
+        'streak': state['streak'],
+        'recent_form': (sum(state['recent']) + 1) / (len(state['recent']) + 2),
+        'ko_rate': state['ko'] / max(n, 1),
+        'sub_rate': state['sub'] / max(n, 1),
+        'n': n,
+        'rest': rest,
+        'residual': np.mean(state['residuals']) if state['residuals'] else 0.,
+        'smoothed_win_rate': (state['wins'] + 2) / (n + 4),
+        'finish_loss_rate': state['finish_losses'] / (n + 4),
+        'recent3_form': (sum(state.get('recent3', state['recent'][-3:])) + 1) / (len(state.get('recent3', state['recent'][-3:])) + 2),
+        'log_inactivity': np.log1p(rest),
+        'age': age,
+        'height': height,
+        'reach': reach,
+        'stance_val': st_val,
+        'sig_str': sig_str,
+        'sig_acc': sig_acc,
+        'td_land': td_land,
+        'td_pct': td_pct,
+        'sub_att': sub_att,
+        'rounds': state.get('total_rounds', 0),
+        'age_cliff': age_cliff,
+        'longest_streak': longest_streak,
+        'title_bouts': title_bouts,
+        'ko_wins': ko_wins,
+        'sub_wins': sub_wins,
+        'dec_wins': dec_wins,
+        'rank': rk,
+        'ape_idx': ape_idx
+    }
 
 
 def features(states, red, blue, day, bout_meta=None):
@@ -108,138 +171,207 @@ def features(states, red, blue, day, bout_meta=None):
         'age': meta.get('red_age'),
         'height': meta.get('red_height'),
         'reach': meta.get('red_reach'),
+        'weight': meta.get('red_weight'),
         'stance': meta.get('red_stance'),
         'sig_str_landed': meta.get('red_sig_str_landed'),
         'sig_str_pct': meta.get('red_sig_str_pct'),
         'td_landed': meta.get('red_td_landed'),
         'td_pct': meta.get('red_td_pct'),
-        'sub_att': meta.get('red_sub_att')
+        'sub_att': meta.get('red_sub_att'),
+        'longest_streak': meta.get('red_longest_streak'),
+        'title_bouts': meta.get('red_title_bouts'),
+        'ko_wins': meta.get('red_ko_wins'),
+        'sub_wins': meta.get('red_sub_wins'),
+        'dec_wins': meta.get('red_dec_wins'),
+        'rank': meta.get('red_rank')
     }
     blue_attrs = {
         'age': meta.get('blue_age'),
         'height': meta.get('blue_height'),
         'reach': meta.get('blue_reach'),
+        'weight': meta.get('blue_weight'),
         'stance': meta.get('blue_stance'),
         'sig_str_landed': meta.get('blue_sig_str_landed'),
         'sig_str_pct': meta.get('blue_sig_str_pct'),
         'td_landed': meta.get('blue_td_landed'),
         'td_pct': meta.get('blue_td_pct'),
-        'sub_att': meta.get('blue_sub_att')
+        'sub_att': meta.get('blue_sub_att'),
+        'longest_streak': meta.get('blue_longest_streak'),
+        'title_bouts': meta.get('blue_title_bouts'),
+        'ko_wins': meta.get('blue_ko_wins'),
+        'sub_wins': meta.get('blue_sub_wins'),
+        'dec_wins': meta.get('blue_dec_wins'),
+        'rank': meta.get('blue_rank')
     }
-    vec_red = vector(states.get(identity(red), fresh()), day, red_attrs)
-    vec_blue = vector(states.get(identity(blue), fresh()), day, blue_attrs)
-    return vec_red - vec_blue
+
+    r = compute_fighter_vector(states.get(identity(red), fresh()), day, red_attrs)
+    b = compute_fighter_vector(states.get(identity(blue), fresh()), day, blue_attrs)
+
+    reach_diff = r['reach'] - b['reach']
+    open_stance = 1.0 if ((r['stance_val'] > 0 and b['stance_val'] == 0) or (b['stance_val'] > 0 and r['stance_val'] == 0)) else 0.0
+    reach_open_stance = reach_diff * open_stance
+
+    td_threat = (r['td_land'] * (1.0 - b['td_pct'])) - (b['td_land'] * (1.0 - r['td_pct']))
+    rank_diff = b['rank'] - r['rank']
+
+    n_rounds = _safe_float(meta.get('total_rounds'), 3.0)
+    exp_diff = r['n'] - b['n']
+    five_rounds_exp = (exp_diff / max(abs(exp_diff) + 1.0, 1.0)) if n_rounds >= 5.0 else 0.0
+
+    # Market Odds
+    red_odds = _safe_float(meta.get('red_odds'), None) if meta.get('red_odds') is not None else None
+    blue_odds = _safe_float(meta.get('blue_odds'), None) if meta.get('blue_odds') is not None else None
+
+    if red_odds is None and 'odds' in meta and isinstance(meta['odds'], dict):
+        books = meta['odds'].get('books', [])
+        if books and isinstance(books[0], dict):
+            red_odds = books[0].get('red')
+            blue_odds = books[0].get('blue')
+
+    if red_odds is not None and blue_odds is not None:
+        p_r = (100.0 / (red_odds + 100.0)) if red_odds > 0 else (-red_odds / (-red_odds + 100.0))
+        p_b = (100.0 / (blue_odds + 100.0)) if blue_odds > 0 else (-blue_odds / (-blue_odds + 100.0))
+        p_mkt = p_r / (p_r + p_b)
+        mkt_edge = p_mkt - 0.5
+        mkt_logit = np.log(np.clip(p_mkt, 0.01, 0.99) / (1.0 - np.clip(p_mkt, 0.01, 0.99)))
+    else:
+        mkt_edge = 0.0
+        mkt_logit = 0.0
+
+    return np.array([
+        r['elo'] - b['elo'],
+        r['str_elo'] - b['str_elo'],
+        r['grap_elo'] - b['grap_elo'],
+        r['wins'] - b['wins'],
+        r['losses'] - b['losses'],
+        r['streak'] - b['streak'],
+        r['recent_form'] - b['recent_form'],
+        r['ko_rate'] - b['ko_rate'],
+        r['sub_rate'] - b['sub_rate'],
+        r['n'] - b['n'],
+        r['rest'] - b['rest'],
+        r['residual'] - b['residual'],
+        r['smoothed_win_rate'] - b['smoothed_win_rate'],
+        r['finish_loss_rate'] - b['finish_loss_rate'],
+        r['recent3_form'] - b['recent3_form'],
+        r['log_inactivity'] - b['log_inactivity'],
+        r['age'] - b['age'],
+        r['height'] - b['height'],
+        reach_diff,
+        r['stance_val'] - b['stance_val'],
+        r['sig_str'] - b['sig_str'],
+        r['sig_acc'] - b['sig_acc'],
+        r['td_land'] - b['td_land'],
+        r['td_pct'] - b['td_pct'],
+        r['sub_att'] - b['sub_att'],
+        r['rounds'] - b['rounds'],
+        r['age_cliff'] - b['age_cliff'],
+        r['longest_streak'] - b['longest_streak'],
+        r['title_bouts'] - b['title_bouts'],
+        r['ko_wins'] - b['ko_wins'],
+        r['sub_wins'] - b['sub_wins'],
+        r['dec_wins'] - b['dec_wins'],
+        reach_open_stance,
+        td_threat,
+        rank_diff,
+        five_rounds_exp,
+        r['ape_idx'] - b['ape_idx'],
+        mkt_edge,
+        mkt_logit
+    ], dtype=float)
 
 
 def replay(fights):
     """Reconstruct fighter state chronologically prior to each calendar day."""
-    states = defaultdict(fresh)
-    examples = []
-    ordered = sorted(fights, key=lambda f: (f['date'], f['id']))
-    for day, group in groupby(ordered, key=lambda f: f['date']):
-        group = list(group)
-        # All bouts on the same day strictly use states from before the day began
-        for f in group:
-            if f.get('winner') in ('red', 'blue'):
-                feat = features(states, f['red'], f['blue'], day, f)
-                y = int(f['winner'] == 'red')
-                examples.append((day, feat, y, f.get('method', '')))
-        for f in group:
-            if f.get('winner') not in ('red', 'blue'):
-                continue
-            a, b = states[identity(f['red'])], states[identity(f['blue'])]
-            y = int(f['winner'] == 'red')
-            expected = 1 / (1 + 10 ** ((b['elo'] - a['elo']) / 400))
-            is_finish = any(m in f.get('method', '').upper() for m in ('KO', 'TKO', 'SUB'))
-            k = 28. if is_finish else 20.
-            delta = k * (y - expected)
-            a['elo'] += delta
-            b['elo'] -= delta
-            for state, won, expectation, corner in [(a, y, expected, 'red'), (b, 1 - y, 1 - expected, 'blue')]:
-                state['residuals'] = (state['residuals'] + [won - expectation])[-5:]
-                state['finish_losses'] += int(not won and is_finish)
-                state['wins'] += won
-                state['losses'] += 1 - won
-                state['streak'] = max(0, state['streak']) + 1 if won else min(0, state['streak']) - 1
-                state['recent'] = (state['recent'] + [won])[-5:]
-                state['recent3'] = (state.get('recent3', []) + [won])[-3:]
-                state['ko'] += int(won and any(m in f.get('method', '').upper() for m in ('KO', 'TKO')))
-                state['sub'] += int(won and 'SUB' in f.get('method', '').upper())
-                state['last'] = day
-                state['total_rounds'] += int(f.get('total_rounds') or 3)
-                if f.get(corner + '_age') is not None: state['age'] = f[corner + '_age']
-                if f.get(corner + '_height') is not None: state['height'] = f[corner + '_height']
-                if f.get(corner + '_reach') is not None: state['reach'] = f[corner + '_reach']
-                if f.get(corner + '_stance'): state['stance'] = f[corner + '_stance']
-                if f.get(corner + '_sig_str_landed') is not None: state['sig_str_landed'] = f[corner + '_sig_str_landed']
-                if f.get(corner + '_sig_str_pct') is not None: state['sig_str_acc'] = f[corner + '_sig_str_pct']
-                if f.get(corner + '_td_landed') is not None: state['td_landed'] = f[corner + '_td_landed']
-                if f.get(corner + '_td_pct') is not None: state['td_acc'] = f[corner + '_td_pct']
-                if f.get(corner + '_sub_att') is not None: state['sub_att'] = f[corner + '_sub_att']
-
-    # Preserve tuple format (day, feat, y) for backwards compatibility
-    cleaned_examples = [(e[0], e[1], e[2]) for e in examples]
-    return cleaned_examples, dict(states)
+    cleaned_examples, states = replay_with_methods(fights)
+    # Return (day, feat, y) tuples for compatibility
+    return [(e[0], e[1], e[2]) for e in cleaned_examples], states
 
 
 def replay_with_methods(fights):
-    """Replay helper that also returns method categories for multi-task training."""
+    """Replay helper returning (day, feat, y, m_cat) for multi-task training."""
     states = defaultdict(fresh)
     examples = []
     ordered = sorted(fights, key=lambda f: (f['date'], f['id']))
+
     for day, group in groupby(ordered, key=lambda f: f['date']):
         group = list(group)
+        # All bouts on same date strictly use states before the day began
         for f in group:
             if f.get('winner') in ('red', 'blue'):
                 feat = features(states, f['red'], f['blue'], day, f)
                 y = int(f['winner'] == 'red')
                 m_str = f.get('method', '').upper()
                 if any(k in m_str for k in ('KO', 'TKO')):
-                    m_cat = 1  # KO/TKO
+                    m_cat = 1
                 elif 'SUB' in m_str:
-                    m_cat = 2  # Submission
+                    m_cat = 2
                 else:
-                    m_cat = 0  # Decision / Other
+                    m_cat = 0
                 examples.append((day, feat, y, m_cat))
+
         for f in group:
             if f.get('winner') not in ('red', 'blue'):
                 continue
             a, b = states[identity(f['red'])], states[identity(f['blue'])]
             y = int(f['winner'] == 'red')
-            expected = 1 / (1 + 10 ** ((b['elo'] - a['elo']) / 400))
-            is_finish = any(m in f.get('method', '').upper() for m in ('KO', 'TKO', 'SUB'))
-            k = 28. if is_finish else 20.
-            delta = k * (y - expected)
+            exp = 1 / (1 + 10 ** ((b['elo'] - a['elo']) / 400))
+            fin = f.get('method', '').upper()
+            is_ko = any(m in fin for m in ('KO', 'TKO'))
+            is_sub = 'SUB' in fin
+            is_dec_split = 'S-DEC' in fin or 'SPLIT' in fin
+            k = 30. if (is_ko or is_sub) else (15. if is_dec_split else 22.)
+            delta = k * (y - exp)
             a['elo'] += delta
             b['elo'] -= delta
-            for state, won, expectation, corner in [(a, y, expected, 'red'), (b, 1 - y, 1 - expected, 'blue')]:
-                state['residuals'] = (state['residuals'] + [won - expectation])[-5:]
-                state['finish_losses'] += int(not won and is_finish)
+
+            if is_ko:
+                a['str_elo'] += delta * 1.3
+                b['str_elo'] -= delta * 1.3
+            elif is_sub:
+                a['grap_elo'] += delta * 1.3
+                b['grap_elo'] -= delta * 1.3
+            else:
+                a['str_elo'] += delta * 0.5
+                b['str_elo'] -= delta * 0.5
+                a['grap_elo'] += delta * 0.5
+                b['grap_elo'] -= delta * 0.5
+
+            for state, won, exp_val, corner in [(a, y, exp, 'red'), (b, 1 - y, 1 - exp, 'blue')]:
+                state['residuals'] = (state['residuals'] + [won - exp_val])[-5:]
+                state['finish_losses'] += int(not won and (is_ko or is_sub))
                 state['wins'] += won
                 state['losses'] += 1 - won
                 state['streak'] = max(0, state['streak']) + 1 if won else min(0, state['streak']) - 1
                 state['recent'] = (state['recent'] + [won])[-5:]
                 state['recent3'] = (state.get('recent3', []) + [won])[-3:]
-                state['ko'] += int(won and any(m in f.get('method', '').upper() for m in ('KO', 'TKO')))
-                state['sub'] += int(won and 'SUB' in f.get('method', '').upper())
+                state['ko'] += int(won and is_ko)
+                state['sub'] += int(won and is_sub)
+                state['dec'] += int(won and not (is_ko or is_sub))
                 state['last'] = day
                 state['total_rounds'] += int(f.get('total_rounds') or 3)
+
                 if f.get(corner + '_age') is not None: state['age'] = f[corner + '_age']
                 if f.get(corner + '_height') is not None: state['height'] = f[corner + '_height']
                 if f.get(corner + '_reach') is not None: state['reach'] = f[corner + '_reach']
+                if f.get(corner + '_weight') is not None: state['weight'] = f[corner + '_weight']
                 if f.get(corner + '_stance'): state['stance'] = f[corner + '_stance']
                 if f.get(corner + '_sig_str_landed') is not None: state['sig_str_landed'] = f[corner + '_sig_str_landed']
                 if f.get(corner + '_sig_str_pct') is not None: state['sig_str_acc'] = f[corner + '_sig_str_pct']
                 if f.get(corner + '_td_landed') is not None: state['td_landed'] = f[corner + '_td_landed']
                 if f.get(corner + '_td_pct') is not None: state['td_acc'] = f[corner + '_td_pct']
                 if f.get(corner + '_sub_att') is not None: state['sub_att'] = f[corner + '_sub_att']
+                if f.get(corner + '_longest_streak') is not None: state['longest_streak'] = f[corner + '_longest_streak']
+                if f.get(corner + '_title_bouts') is not None: state['title_bouts'] = f[corner + '_title_bouts']
+                if f.get(corner + '_rank') is not None: state['rank'] = f[corner + '_rank']
+
     return examples, dict(states)
 
 
 def probability(model, x):
-    """Enforce exact corner swap symmetry for any binary estimator."""
+    """Enforce exact corner swap anti-symmetry for any binary estimator."""
     x = np.asarray(x).reshape(-1, len(FEATURES))
-    return (model.predict_proba(x)[:, 1] + 1 - model.predict_proba(-x)[:, 1]) / 2
+    return (model.predict_proba(x)[:, 1] + 1.0 - model.predict_proba(-x)[:, 1]) / 2.0
 
 
 def fit_symmetric(model, x, y):
@@ -256,16 +388,19 @@ def make_ensemble_factories():
     return {
         'MMA Cipher Logistic Regression': lambda: make_pipeline(
             StandardScaler(),
-            LogisticRegression(C=0.01, max_iter=1000, random_state=42)
+            LogisticRegression(C=0.03, max_iter=1000, random_state=42)
         ),
         'MMA Cipher HistGradientBoosting': lambda: HistGradientBoostingClassifier(
-            max_iter=100, max_leaf_nodes=8, learning_rate=0.03, l2_regularization=20.0, random_state=42
+            max_iter=120, max_leaf_nodes=12, learning_rate=0.03, l2_regularization=20.0, random_state=42
         ),
         'MMA Cipher LightGBM': lambda: lgb.LGBMClassifier(
-            n_estimators=90, num_leaves=8, learning_rate=0.03, reg_lambda=20.0, verbose=-1, random_state=42
+            n_estimators=110, num_leaves=12, learning_rate=0.03, reg_lambda=20.0, verbose=-1, random_state=42
+        ),
+        'MMA Cipher XGBoost': lambda: xgb.XGBClassifier(
+            n_estimators=100, max_depth=3, learning_rate=0.03, reg_lambda=20.0, eval_metric='logloss', random_state=42
         ),
         'MMA Cipher Random Forest': lambda: RandomForestClassifier(
-            n_estimators=180, max_depth=5, min_samples_leaf=20, random_state=42
+            n_estimators=200, max_depth=6, min_samples_leaf=15, random_state=42
         )
     }
 
@@ -280,12 +415,20 @@ def train(fights):
                      red_age=f.get('blue_age'), blue_age=f.get('red_age'),
                      red_height=f.get('blue_height'), blue_height=f.get('red_height'),
                      red_reach=f.get('blue_reach'), blue_reach=f.get('red_reach'),
+                     red_weight=f.get('blue_weight'), blue_weight=f.get('red_weight'),
                      red_stance=f.get('blue_stance'), blue_stance=f.get('red_stance'),
                      red_sig_str_landed=f.get('blue_sig_str_landed'), blue_sig_str_landed=f.get('red_sig_str_landed'),
                      red_sig_str_pct=f.get('blue_sig_str_pct'), blue_sig_str_pct=f.get('red_sig_str_pct'),
                      red_td_landed=f.get('blue_td_landed'), blue_td_landed=f.get('red_td_landed'),
                      red_td_pct=f.get('blue_td_pct'), blue_td_pct=f.get('red_td_pct'),
-                     red_sub_att=f.get('blue_sub_att'), blue_sub_att=f.get('red_sub_att'))
+                     red_sub_att=f.get('blue_sub_att'), blue_sub_att=f.get('red_sub_att'),
+                     red_longest_streak=f.get('blue_longest_streak'), blue_longest_streak=f.get('red_longest_streak'),
+                     red_title_bouts=f.get('blue_title_bouts'), blue_title_bouts=f.get('red_title_bouts'),
+                     red_ko_wins=f.get('blue_ko_wins'), blue_ko_wins=f.get('red_ko_wins'),
+                     red_sub_wins=f.get('blue_sub_wins'), blue_sub_wins=f.get('red_sub_wins'),
+                     red_dec_wins=f.get('blue_dec_wins'), blue_dec_wins=f.get('red_dec_wins'),
+                     red_rank=f.get('blue_rank'), blue_rank=f.get('red_rank'),
+                     red_odds=f.get('blue_odds'), blue_odds=f.get('red_odds'))
         canonical.append(f)
 
     examples_with_method, states = replay_with_methods(canonical)
@@ -318,7 +461,7 @@ def train(fights):
         validation_fold_log_loss[name] = losses
         validation_log_loss[name] = float(np.mean(losses))
 
-    # Evaluate on the validation window to optimize ensemble blend weights
+    # Fit validation models on tr to optimize ensemble weights on va
     x_tr_sym = np.concatenate([x[tr], -x[tr]])
     y_tr_sym = np.concatenate([y[tr], 1 - y[tr]])
     fitted_val = {name: factory().fit(x_tr_sym, y_tr_sym) for name, factory in factories.items()}
@@ -327,9 +470,10 @@ def train(fights):
     def objective(w):
         w = np.maximum(w, 0)
         s = w.sum()
-        if s <= 1e-9: return 10.0
+        if s <= 1e-9:
+            return 10.0
         w = w / s
-        p_blend = np.clip(val_preds @ w, 1e-6, 1 - 1e-6)
+        p_blend = np.clip(val_preds @ w, 1e-6, 1.0 - 1e-6)
         return log_loss(y[va], p_blend, labels=[0, 1])
 
     init_w = np.ones(len(factories)) / len(factories)
@@ -339,9 +483,13 @@ def train(fights):
         opt_w /= opt_w.sum()
     else:
         opt_w = init_w
+
+    # Ensure diverse representation: minimum 10% weight floor to prevent single-model lock-in
+    opt_w = 0.8 * opt_w + 0.2 * init_w
+    opt_w /= opt_w.sum()
     ensemble_weights = {name: float(w) for name, w in zip(factories.keys(), opt_w)}
 
-    # Train serving models on all data before holdout for evaluation
+    # Train serving models on all pre-test data for evaluation
     x_pretest_sym = np.concatenate([x[~te], -x[~te]])
     y_pretest_sym = np.concatenate([y[~te], 1 - y[~te]])
     eval_models = {name: factory().fit(x_pretest_sym, y_pretest_sym) for name, factory in factories.items()}
@@ -485,7 +633,7 @@ def train(fights):
         feature_importances=feature_importances
     )
 
-    # Train production models on the complete dataset
+    # Train production models on all data
     x_full_sym = np.concatenate([x, -x])
     y_full_sym = np.concatenate([y, 1 - y])
     production_models = {name: factory().fit(x_full_sym, y_full_sym) for name, factory in factories.items()}
@@ -502,7 +650,6 @@ def train(fights):
         except Exception:
             method_model = None
 
-    # Primary representative model (best individual validation model or LR)
     best_candidate_name = min(validation_log_loss, key=validation_log_loss.get)
     primary_model = production_models[best_candidate_name]
 
@@ -527,8 +674,14 @@ def _format_advantage(name, diff, is_red_pick):
     d = diff if is_red_pick else -diff
     if name == 'Elo':
         return f"Opponent-adjusted Elo rating edge (+{abs(d):.0f} rating points)"
+    elif name == 'Striking Elo':
+        return f"Striking exchanges & knockout rating edge (+{abs(d):.0f} points)"
+    elif name == 'Grappling Elo':
+        return f"Wrestling control & submission rating edge (+{abs(d):.0f} points)"
     elif name == 'Age differential':
         return f"Youth & prime advantage ({abs(d):.1f} years younger)"
+    elif name == 'Age cliff differential':
+        return "Prime athletic window advantage (Opponent is past age 35 cliff)"
     elif name == 'Sig strike rate differential':
         return f"Striking volume rate advantage (+{abs(d):.1f} SLpM)"
     elif name == 'Sig strike accuracy differential':
@@ -537,20 +690,34 @@ def _format_advantage(name, diff, is_red_pick):
         return f"Offensive takedown volume advantage (+{abs(d):.1f} TD / 15m)"
     elif name == 'Takedown accuracy differential':
         return f"Takedown accuracy completion edge (+{abs(d)*100:.1f}%)"
+    elif name == 'Takedown threat interaction':
+        return "Offensive wrestling vs opponent takedown defense leverage"
     elif name == 'Submission attempt differential':
         return f"Submission grappling threat (+{abs(d):.1f} sub att / 15m)"
     elif name == 'Reach differential':
         return f"Reach wingspan advantage (+{abs(d):.1f} cm)"
+    elif name == 'Reach stance interaction':
+        return "Open stance reach leverage advantage"
     elif name == 'Height differential':
         return f"Height leverage advantage (+{abs(d):.1f} cm)"
+    elif name == 'Ape index differential':
+        return "Ape index anatomical wingspan ratio advantage"
+    elif name == 'Ranking differential':
+        return f"Official UFC division ranking advantage (+{abs(d):.1f} ranking tier)"
     elif name == 'Win streak':
         return f"Momentum & active win streak (+{abs(d):.0f} consecutive wins)"
+    elif name == 'Longest win streak differential':
+        return f"Historical career peak streak (+{abs(d):.0f} wins ceiling)"
+    elif name == 'Title bouts differential':
+        return f"Championship title fight experience (+{abs(d):.0f} title bouts)"
     elif name == 'Total rounds differential':
         return f"Octagon cage time experience (+{abs(d):.0f} rounds logged)"
-    elif name == 'KO win rate':
-        return f"Knockout finishing power (+{abs(d)*100:.1f}%)"
-    elif name == 'Submission win rate':
-        return f"Submission finishing threat (+{abs(d)*100:.1f}%)"
+    elif name == 'KO wins differential' or name == 'KO win rate':
+        return f"Knockout finishing power (+{abs(d):.0f} UFC KO wins)"
+    elif name == 'Submission wins differential' or name == 'Submission win rate':
+        return f"Submission finishing threat (+{abs(d):.0f} submission wins)"
+    elif name == 'Decision dominance differential':
+        return "15-minute fight pace and judging dominance"
     elif name == 'Finish loss rate':
         return "Durability profile and finish resistance"
     elif name == 'Stance advantage':
@@ -559,25 +726,33 @@ def _format_advantage(name, diff, is_red_pick):
         return "Recent three-bout victory momentum"
     elif name == 'Recorded wins':
         return f"Professional experience depth (+{abs(d):.0f} recorded wins)"
+    elif name == 'Market implied edge' or name == 'Market logit':
+        return "Betting market consensus favorite"
     return f"Statistical advantage in {name.lower()}"
 
 
 def _format_risk(name, diff, is_red_pick):
     d = -diff if is_red_pick else diff
     if name == 'Age differential':
-        return f"Opponent holds a youth advantage ({abs(d):.1f} years younger)"
+        return f"Opponent holds youth advantage ({abs(d):.1f} years younger)"
+    elif name == 'Age cliff differential':
+        return "Fighter is in late-career athletic drop-off window (>35 yrs)"
     elif name == 'Reach differential':
-        return f"Opponent has longer reach (+{abs(d):.1f} cm wingspan)"
+        return f"Opponent has longer wingspan (+{abs(d):.1f} cm reach)"
     elif name == 'Height differential':
         return f"Opponent is taller (+{abs(d):.1f} cm)"
     elif name == 'Sig strike rate differential':
         return f"Opponent lands higher striking output (+{abs(d):.1f} SLpM)"
-    elif name == 'Takedown rate differential':
-        return f"Opponent completes more takedowns (+{abs(d):.1f} TD / 15m)"
+    elif name == 'Takedown rate differential' or name == 'Takedown threat interaction':
+        return f"Opponent is an offensive grappling threat (+{abs(d):.1f} TD / 15m)"
     elif name == 'Submission attempt differential':
-        return f"Opponent is dangerous on the ground (+{abs(d):.1f} sub att / 15m)"
+        return f"Opponent possesses dangerous ground submissions (+{abs(d):.1f} sub att)"
     elif name == 'Total rounds differential':
-        return f"Opponent has more cage time experience (+{abs(d):.0f} rounds)"
+        return f"Opponent has more octagon cage time (+{abs(d):.0f} rounds)"
+    elif name == 'Ranking differential':
+        return "Opponent holds higher official UFC division ranking"
+    elif name == 'Market implied edge' or name == 'Market logit':
+        return "Market odds favor opponent"
     return f"Opponent statistical threat in {name.lower()}"
 
 
@@ -621,7 +796,6 @@ def predict(bundle, red, blue, day, bout_meta=None):
             }
         p = float(np.clip(weighted_p, 0.005, 0.995))
     else:
-        # Fallback to single primary model
         p = float(probability(bundle['model'], x)[0])
 
     # Method of victory prediction
@@ -644,9 +818,9 @@ def predict(bundle, red, blue, day, bout_meta=None):
     b = bundle['states'].get(identity(blue), fresh())
 
     tape = {
-        'age': {'red': a.get('age', 30.0), 'blue': b.get('age', 30.0), 'diff': float(x[14]) if len(x) > 14 else 0.0},
-        'height': {'red': a.get('height', 175.0), 'blue': b.get('height', 175.0), 'diff': float(x[15]) if len(x) > 15 else 0.0},
-        'reach': {'red': a.get('reach', 175.0), 'blue': b.get('reach', 175.0), 'diff': float(x[16]) if len(x) > 16 else 0.0},
+        'age': {'red': a.get('age', 30.0), 'blue': b.get('age', 30.0), 'diff': float(x[16]) if len(x) > 16 else 0.0},
+        'height': {'red': a.get('height', 175.0), 'blue': b.get('height', 175.0), 'diff': float(x[17]) if len(x) > 17 else 0.0},
+        'reach': {'red': a.get('reach', 175.0), 'blue': b.get('reach', 175.0), 'diff': float(x[18]) if len(x) > 18 else 0.0},
         'stance': {'red': a.get('stance', 'Orthodox'), 'blue': b.get('stance', 'Orthodox')}
     }
 
@@ -664,7 +838,6 @@ def predict(bundle, red, blue, day, bout_meta=None):
         contributions = (x / scales) * coefs
         items = []
         for f_name, diff_val, c_val in zip(FEATURES, x, contributions):
-            # Signed contribution toward the picked fighter
             pick_contribution = c_val if is_red_pick else -c_val
             items.append({
                 'feature': f_name,
@@ -672,25 +845,23 @@ def predict(bundle, red, blue, day, bout_meta=None):
                 'contribution': float(pick_contribution)
             })
 
-        # Top advantages favoring the pick
         items.sort(key=lambda it: it['contribution'], reverse=True)
         for it in items[:4]:
-            if it['contribution'] > 0.01:
+            if it['contribution'] > 0.005:
                 advantages.append({
                     'title': _format_advantage(it['feature'], it['diff'], is_red_pick),
                     'feature': it['feature'],
                     'diff': round(it['diff'], 2),
-                    'impact': 'high' if it['contribution'] > 0.25 else 'medium'
+                    'impact': 'high' if it['contribution'] > 0.20 else 'medium'
                 })
 
-        # Top risk factors / vulnerabilities favoring opponent
         for it in reversed(items):
-            if it['contribution'] < -0.01 and len(risks) < 2:
+            if it['contribution'] < -0.005 and len(risks) < 2:
                 risks.append({
                     'title': _format_risk(it['feature'], it['diff'], is_red_pick),
                     'feature': it['feature'],
                     'diff': round(it['diff'], 2),
-                    'impact': 'high' if it['contribution'] < -0.2 else 'moderate'
+                    'impact': 'high' if it['contribution'] < -0.18 else 'moderate'
                 })
 
     adv_summary = f"{pick} is favored primarily by " + (", ".join(a['title'].split('(')[0].strip() for a in advantages[:2]) if advantages else "overall algorithmic rating") + "."
@@ -704,13 +875,12 @@ def predict(bundle, red, blue, day, bout_meta=None):
         'risks': risks
     }
 
-    # Model consensus metrics
     model_count = len(ensemble_breakdown)
     agreed_count = sum(1 for m in ensemble_breakdown.values() if (m['red_probability'] >= 0.5) == is_red_pick) if model_count else 1
     agreement_pct = round(agreed_count / max(model_count, 1), 2)
     probs_list = [m['red_probability'] for m in ensemble_breakdown.values()] if model_count else [p]
     spread = round(max(probs_list) - min(probs_list), 3) if probs_list else 0.0
-    uncertainty = 'Low' if spread < 0.12 else ('Moderate' if spread < 0.22 else 'Elevated')
+    uncertainty = 'Low' if spread < 0.10 else ('Moderate' if spread < 0.18 else 'Elevated')
     consensus_tier = f"Unanimous ({agreed_count}/{model_count})" if agreed_count == model_count else f"Majority ({agreed_count}/{model_count})" if agreed_count > model_count / 2 else "Split Consensus"
 
     consensus = {
@@ -722,7 +892,6 @@ def predict(bundle, red, blue, day, bout_meta=None):
         'uncertainty': uncertainty
     }
 
-    # Fighter radar telemetry
     meta_dict = bout_meta or {}
     radar = {
         'red': _build_radar(a, {
@@ -741,17 +910,15 @@ def predict(bundle, red, blue, day, bout_meta=None):
         })
     }
 
-    # Upset potential evaluation
     upset_signals = []
-    # If the underdog pick has high stylistic edge
     if confidence >= 0.52 and confidence <= 0.65:
         if any('takedown' in a['feature'].lower() for a in advantages) and any('strike' in r['feature'].lower() for r in risks):
             upset_signals.append("Stylistic clash: Grappler vs Striker dynamic")
     if uncertainty == 'Elevated':
-        upset_signals.append("Elevated model divergence: Non-linear tree models diverge from linear baseline")
+        upset_signals.append("Elevated model divergence: Tree ensemble diverges from linear baseline")
 
     upset_radar = {
-        'is_candidate': len(upset_signals) > 0 or (confidence >= 0.52 and confidence <= 0.64 and spread >= 0.10),
+        'is_candidate': len(upset_signals) > 0 or (confidence >= 0.52 and confidence <= 0.64 and spread >= 0.08),
         'signals': upset_signals
     }
 
@@ -761,7 +928,7 @@ def predict(bundle, red, blue, day, bout_meta=None):
         pick=pick,
         confidence=confidence,
         model_version=bundle['version'],
-        model_name=bundle.get('name', 'MMA Cipher Ensemble'),
+        model_name=bundle.get('name', 'MMA Cipher Advanced Ensemble'),
         models=ensemble_breakdown,
         consensus=consensus,
         explanation=explanation,

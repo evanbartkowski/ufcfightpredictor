@@ -88,7 +88,7 @@ class Store:
             db.execute('INSERT OR IGNORE INTO prediction_revisions VALUES (?,?,?)', (prediction['id'], revision, payload))
 
     def bootstrap(self, root):
-        if self.meta('seeded') and self.meta('seeded_schema') == 4:
+        if self.meta('seeded') and self.meta('seeded_schema') == 5:
             return
 
         def _num(val):
@@ -116,6 +116,8 @@ class Store:
                     blue_height=_num(row.get('BlueHeightCms')),
                     red_reach=_num(row.get('RedReachCms')),
                     blue_reach=_num(row.get('BlueReachCms')),
+                    red_weight=_num(row.get('RedWeightLbs')),
+                    blue_weight=_num(row.get('BlueWeightLbs')),
                     red_stance=row.get('RedStance') or 'Orthodox',
                     blue_stance=row.get('BlueStance') or 'Orthodox',
                     red_sig_str_landed=_num(row.get('RedAvgSigStrLanded')),
@@ -128,6 +130,20 @@ class Store:
                     blue_td_pct=_num(row.get('BlueAvgTDPct')),
                     red_sub_att=_num(row.get('RedAvgSubAtt')),
                     blue_sub_att=_num(row.get('BlueAvgSubAtt')),
+                    red_longest_streak=_num(row.get('RedLongestWinStreak')),
+                    blue_longest_streak=_num(row.get('BlueLongestWinStreak')),
+                    red_title_bouts=_num(row.get('RedTotalTitleBouts')),
+                    blue_title_bouts=_num(row.get('BlueTotalTitleBouts')),
+                    red_ko_wins=_num(row.get('RedWinsByKO')),
+                    blue_ko_wins=_num(row.get('BlueWinsByKO')),
+                    red_sub_wins=_num(row.get('RedWinsBySubmission')),
+                    blue_sub_wins=_num(row.get('BlueWinsBySubmission')),
+                    red_dec_wins=_num(row.get('RedWinsByDecisionUnanimous')),
+                    blue_dec_wins=_num(row.get('BlueWinsByDecisionUnanimous')),
+                    red_rank=_num(row.get('RMatchWCRank')),
+                    blue_rank=_num(row.get('BMatchWCRank')),
+                    red_odds=_num(row.get('RedOdds')),
+                    blue_odds=_num(row.get('BlueOdds')),
                     title_bout=int(row.get('TitleBout', '0') in ('1', 'True', 'true')),
                     total_rounds=int(_num(row.get('NumberOfRounds')) or 3)
                 )
@@ -137,4 +153,4 @@ class Store:
                 if row['name']:
                     self.save_fighter(dict(row, source='Bundled snapshot (2024; not live)', fetched_at=None))
         self.set_meta('seeded', now())
-        self.set_meta('seeded_schema', 4)
+        self.set_meta('seeded_schema', 5)
