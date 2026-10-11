@@ -6,12 +6,12 @@
   <meta name="theme-color" content="#06070a">
   <meta name="description" content="MMA Cipher — Next-generation UFC fight forecasting, multi-model AI ensemble consensus, pre-bout statistical telemetry, and verified performance tracking.">
   <title>MMA Cipher — AI Fight Intelligence & UFC Predictions</title>
-  <link rel="stylesheet" href="/style.css?v=10">
+  <link rel="stylesheet" href="/style.css?v=11">
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js" defer></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js" defer></script>
   <script src="/firebase.js" defer></script>
-  <script src="/app.js?v=10" defer></script>
+  <script src="/app.js?v=11" defer></script>
 </head>
 <body>
   <header class="topbar">
@@ -61,18 +61,41 @@
     <nav class="tabs" aria-label="Dashboard sections">
       <button class="tab active" data-tab="upcoming" aria-pressed="true">Upcoming fights <span id="card-count">0</span></button>
       <button class="tab" data-tab="matchup" aria-pressed="false">Matchup lab</button>
+      <button class="tab" data-tab="fighters" aria-pressed="false">Fighter database <span id="fighters-count" class="tab-badge">2.4k</span></button>
+      <button class="tab" data-tab="analytics" aria-pressed="false">AI Analytics</button>
       <button class="tab" data-tab="results" aria-pressed="false">Prediction record</button>
       <button class="tab" data-tab="model" aria-pressed="false">Inside the Algorithm</button>
     </nav>
     <section id="upcoming" class="panel">
+      <!-- Beat the AI / Community Scorecard Strip -->
+      <div id="user-scorecard" class="user-scorecard" aria-label="Your prediction tracking">
+        <div class="scorecard-kicker">
+          <span class="scorecard-dot"></span>
+          <span>BEAT THE AI · COMMUNITY PICKS</span>
+        </div>
+        <div class="scorecard-metrics">
+          <div><span class="sc-label">PICKS SAVED</span><strong id="sc-total">0</strong></div>
+          <div><span class="sc-label">SETTLED</span><strong id="sc-settled">0</strong></div>
+          <div><span class="sc-label">CORRECT</span><strong id="sc-correct">0</strong></div>
+          <div><span class="sc-label">ACCURACY</span><strong id="sc-accuracy">—</strong></div>
+          <div><span class="sc-label">CURRENT STREAK</span><strong id="sc-streak" class="streak-glow">0W</strong></div>
+        </div>
+      </div>
       <div class="section-heading">
         <div>
           <div class="eyebrow">NEXT IN THE OCTAGON</div>
           <h2>The fight card</h2>
         </div>
-        <select id="event-filter" aria-label="Choose an event">
-          <option value="">Loading events…</option>
-        </select>
+        <div class="upcoming-controls">
+          <div class="filter-pills" role="toolbar" aria-label="Card filters">
+            <button class="filter-pill active" data-filter="all">All Bouts</button>
+            <button class="filter-pill pill-upset" data-filter="upset">⚡ Upset Radar <span class="pill-badge" id="upset-pill-count">0</span></button>
+            <button class="filter-pill pill-fav" data-filter="favorites">★ Favorites <span class="pill-badge" id="fav-pill-count">0</span></button>
+          </div>
+          <select id="event-filter" aria-label="Choose an event">
+            <option value="">Loading events…</option>
+          </select>
+        </div>
       </div>
       <div id="cards"></div>
     </section>
@@ -95,10 +118,128 @@
         <div id="matchup-output" aria-live="polite"></div>
       </div>
     </section>
+    <section id="fighters" class="panel" hidden>
+      <div class="section-heading">
+        <div>
+          <div class="eyebrow">OFFICIAL UFC ROSTER &amp; CAREER INTELLIGENCE</div>
+          <h2>Fighter Database</h2>
+        </div>
+        <div class="fighter-controls">
+          <input type="search" id="fighter-search" placeholder="Search 2,400+ fighters by name…" autocomplete="off" aria-label="Search fighters">
+          <select id="fighter-division" aria-label="Filter by weight class">
+            <option value="all">All weight classes</option>
+            <option value="Heavyweight">Heavyweight</option>
+            <option value="Light Heavyweight">Light Heavyweight</option>
+            <option value="Middleweight">Middleweight</option>
+            <option value="Welterweight">Welterweight</option>
+            <option value="Lightweight">Lightweight</option>
+            <option value="Featherweight">Featherweight</option>
+            <option value="Bantamweight">Bantamweight</option>
+            <option value="Flyweight">Flyweight</option>
+            <option value="Women's Featherweight">Women's Featherweight</option>
+            <option value="Women's Bantamweight">Women's Bantamweight</option>
+            <option value="Women's Flyweight">Women's Flyweight</option>
+            <option value="Women's Strawweight">Women's Strawweight</option>
+          </select>
+        </div>
+      </div>
+      <div id="fighter-results-summary" class="fighter-results-summary">Showing 2,472 active &amp; historical fighters</div>
+      <div id="fighter-grid" class="fighter-grid"></div>
+    </section>
+    <section id="analytics" class="panel" hidden>
+      <div class="section-heading">
+        <div>
+          <div class="eyebrow">CHRONOLOGICAL BACKTEST &amp; EMPIRICAL VALIDATION</div>
+          <h2>AI Performance Analytics</h2>
+        </div>
+        <div class="analytics-time-pills" role="toolbar" aria-label="Analytics scope">
+          <button class="pill-scope active" data-scope="all">All 113 Events</button>
+          <button class="pill-scope" data-scope="50">Last 50 Events</button>
+          <button class="pill-scope" data-scope="25">Last 25 Events</button>
+          <button class="pill-scope" data-scope="10">Last 10 Events</button>
+        </div>
+      </div>
+
+      <!-- Historical Accuracy Line Chart Card -->
+      <div class="analytics-card">
+        <div class="chart-header">
+          <div>
+            <h3>AI Prediction Accuracy Over Time</h3>
+            <p>Chronological walk-forward test accuracy across confirmed UFC events (Strict zero leakage)</p>
+          </div>
+          <div class="chart-legend">
+            <span class="legend-item"><span class="legend-dot cyan"></span>Cumulative Accuracy</span>
+            <span class="legend-item"><span class="legend-dot rose"></span>Rolling Accuracy</span>
+          </div>
+        </div>
+        <div id="accuracy-chart-container" class="chart-container"></div>
+      </div>
+
+      <!-- Dual Row: Model Leaderboard & Confidence Calibration -->
+      <div class="analytics-row">
+        <!-- Model Comparison Leaderboard -->
+        <div class="analytics-card half">
+          <div class="chart-header">
+            <div>
+              <h3>Ensemble Model Comparison</h3>
+              <p>Independent candidate algorithms evaluated on pristine unseen holdout</p>
+            </div>
+          </div>
+          <div id="models-leaderboard" class="models-leaderboard"></div>
+        </div>
+
+        <!-- AI Confidence Calibration -->
+        <div class="analytics-card half">
+          <div class="chart-header">
+            <div>
+              <h3>AI Confidence Calibration</h3>
+              <p>Nominal predicted probability vs actual observed historical win frequency</p>
+            </div>
+          </div>
+          <div id="calibration-chart-container" class="calibration-container"></div>
+        </div>
+      </div>
+
+      <!-- Second Dual Row: Confidence Distribution & Division Accuracy -->
+      <div class="analytics-row">
+        <!-- Confidence Distribution -->
+        <div class="analytics-card half">
+          <div class="chart-header">
+            <div>
+              <h3>Model Confidence Distribution</h3>
+              <p>Frequency distribution of prediction confidence tiers across all evaluated bouts</p>
+            </div>
+          </div>
+          <div id="confidence-distribution" class="confidence-distribution"></div>
+        </div>
+
+        <!-- Division Accuracy -->
+        <div class="analytics-card half">
+          <div class="chart-header">
+            <div>
+              <h3>Accuracy by Weight Class</h3>
+              <p>Predictive holdout performance broken down by weight class</p>
+            </div>
+          </div>
+          <div id="division-accuracy" class="division-accuracy"></div>
+        </div>
+      </div>
+
+      <!-- Feature Importance Grid -->
+      <div class="analytics-card">
+        <div class="chart-header">
+          <div>
+            <h3>Core Predictive Indicators &amp; Feature Attribution</h3>
+            <p>Primary indicators weighted by mathematical importance in the prediction algorithm</p>
+          </div>
+        </div>
+        <div id="feature-importance-grid" class="feature-importance-grid"></div>
+      </div>
+    </section>
     <section id="results" class="panel" hidden>
       <div class="section-heading">
         <div>
-          <div class="eyebrow">ACCOUNTABILITY & VERIFIED TRACK RECORD</div>
+          <div class="eyebrow">ACCOUNTABILITY &amp; VERIFIED TRACK RECORD</div>
           <h2>The prediction record</h2>
         </div>
       </div>
@@ -113,6 +254,22 @@
       </div>
       <div id="model-info"></div>
     </section>
+    <dialog id="share-modal" class="share-modal" aria-label="Share MMA Cipher prediction card">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Share MMA Cipher Prediction</h3>
+          <button id="modal-close" class="modal-close" aria-label="Close modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <canvas id="share-canvas" width="1200" height="675"></canvas>
+          <div class="modal-actions">
+            <button id="copy-card-btn" class="primary"><span>⎘</span> Copy Image to Clipboard</button>
+            <button id="download-card-btn" class="secondary"><span>↓</span> Download Image (PNG)</button>
+          </div>
+          <div id="share-status" class="share-status" role="status"></div>
+        </div>
+      </div>
+    </dialog>
     <footer class="bottom-gui">
       <div class="bottom-bar">
         <div class="bottom-item bottom-brand">

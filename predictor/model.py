@@ -349,6 +349,118 @@ def train(fights):
     p_te_ensemble = te_preds @ opt_w
 
     elo_te = 1 / (1 + 10 ** (-x[te, 0] / 400))
+
+    # Candidate model holdout metrics
+    candidate_metrics = {}
+    for i, name in enumerate(factories.keys()):
+        cand_p = te_preds[:, i]
+        candidate_metrics[name] = {
+            'accuracy': float(accuracy_score(y[te], cand_p >= .5)),
+            'log_loss': float(log_loss(y[te], cand_p, labels=[0, 1])),
+            'brier': float(brier_score_loss(y[te], cand_p)),
+            'weight': float(ensemble_weights.get(name, 0.0))
+        }
+
+    # Empirical calibration bins on chronological holdout
+    test_indices = np.where(te)[0]
+    p_te_clipped = np.clip(p_te_ensemble, 1e-4, 1.0 - 1e-4)
+    confidences = np.maximum(p_te_clipped, 1.0 - p_te_clipped)
+    corrects = (p_te_clipped >= 0.5) == (y[te] == 1)
+
+    bins = [(0.50, 0.60), (0.60, 0.70), (0.70, 0.80), (0.80, 0.90), (0.90, 1.00)]
+    calibration = []
+    for low, high in bins:
+        mask = (confidences >= low) & (confidences < high if high < 1.0 else confidences <= high)
+        cnt = int(mask.sum())
+        if cnt > 0:
+            exp_val = float(confidences[mask].mean())
+            obs_val = float(corrects[mask].mean())
+            n_corr = int(corrects[mask].sum())
+        else:
+            exp_val = (low + high) / 2
+            obs_val = 0.0
+            n_corr = 0
+        calibration.append({
+            'range': f"{int(low*100)}–{int(high*100)}%",
+            'expected': round(exp_val, 3),
+            'observed': round(obs_val, 3),
+            'count': cnt,
+            'correct': n_corr
+        })
+
+    # Confidence distribution
+    total_test_fights = max(len(test_indices), 1)
+    confidence_distribution = [
+        {
+            'range': b['range'],
+            'count': b['count'],
+            'percentage': round((b['count'] / total_test_fights) * 100, 1)
+        }
+        for b in calibration
+    ]
+
+    # Holdout events history & accuracy over time
+    test_bouts = []
+    for idx_local, idx_global in enumerate(test_indices):
+        d, feat, y_true, m_cat = examples_with_method[idx_global]
+        orig_f = canonical[idx_global]
+        p_val = float(p_te_clipped[idx_local])
+        is_corr = int((p_val >= 0.5) == (y_true == 1))
+        test_bouts.append({
+            'date': d,
+            'event': orig_f.get('event', d),
+            'weight_class': orig_f.get('weight_class', 'Unknown'),
+            'correct': is_corr,
+            'confidence': float(confidences[idx_local])
+        })
+
+    events_history = []
+    running_correct = 0
+    running_total = 0
+    for ev_idx, (ev_date, b_group) in enumerate(groupby(test_bouts, key=lambda b: b['date'])):
+        b_list = list(b_group)
+        n_ev = len(b_list)
+        c_ev = sum(b['correct'] for b in b_list)
+        running_correct += c_ev
+        running_total += n_ev
+        events_history.append({
+            'index': ev_idx + 1,
+            'date': ev_date,
+            'event': b_list[0]['event'],
+            'fights': n_ev,
+            'correct': c_ev,
+            'accuracy': round(c_ev / n_ev, 3) if n_ev else 0.0,
+            'cumulative_accuracy': round(running_correct / running_total, 3),
+            'cumulative_fights': running_total
+        })
+
+    # Weight class accuracy
+    wc_groups = defaultdict(lambda: [0, 0])
+    for b in test_bouts:
+        wc = b['weight_class']
+        wc_groups[wc][0] += b['correct']
+        wc_groups[wc][1] += 1
+    weight_class_stats = {
+        wc: {'accuracy': round(corr / tot, 3), 'fights': tot, 'correct': corr}
+        for wc, (corr, tot) in sorted(wc_groups.items(), key=lambda t: t[1][1], reverse=True)
+        if tot >= 10
+    }
+
+    # Feature importances from regularized logistic pipeline
+    lr_for_importance = eval_models.get('MMA Cipher Logistic Regression')
+    feature_importances = []
+    if lr_for_importance and hasattr(lr_for_importance, 'named_steps'):
+        coefs = lr_for_importance.named_steps['logisticregression'].coef_[0]
+        scales = lr_for_importance.named_steps['standardscaler'].scale_
+        for f_name, c_val, s_val in zip(FEATURES, coefs, scales):
+            feature_importances.append({
+                'feature': f_name,
+                'importance': round(float(abs(c_val)), 4),
+                'direction': 'positive' if c_val > 0 else 'negative',
+                'scale': round(float(s_val), 2)
+            })
+        feature_importances.sort(key=lambda item: item['importance'], reverse=True)
+
     metrics = dict(
         accuracy=float(accuracy_score(y[te], p_te_ensemble >= .5)),
         brier=float(brier_score_loss(y[te], p_te_ensemble)),
@@ -364,7 +476,13 @@ def train(fights):
         validation_scheme='Three expanding chronological windows; final 20% holdout',
         ensemble_weights=ensemble_weights,
         candidate_holdout_accuracies={name: float(accuracy_score(y[te], te_preds[:, i] >= .5))
-                                      for i, name in enumerate(factories.keys())}
+                                      for i, name in enumerate(factories.keys())},
+        candidate_metrics=candidate_metrics,
+        calibration=calibration,
+        confidence_distribution=confidence_distribution,
+        events_history=events_history,
+        weight_class_stats=weight_class_stats,
+        feature_importances=feature_importances
     )
 
     # Train production models on the complete dataset
@@ -403,6 +521,81 @@ def train(fights):
         trained_at=now(),
         through=days[-1]
     )
+
+
+def _format_advantage(name, diff, is_red_pick):
+    d = diff if is_red_pick else -diff
+    if name == 'Elo':
+        return f"Opponent-adjusted Elo rating edge (+{abs(d):.0f} rating points)"
+    elif name == 'Age differential':
+        return f"Youth & prime advantage ({abs(d):.1f} years younger)"
+    elif name == 'Sig strike rate differential':
+        return f"Striking volume rate advantage (+{abs(d):.1f} SLpM)"
+    elif name == 'Sig strike accuracy differential':
+        return f"Striking accuracy precision edge (+{abs(d)*100:.1f}%)"
+    elif name == 'Takedown rate differential':
+        return f"Offensive takedown volume advantage (+{abs(d):.1f} TD / 15m)"
+    elif name == 'Takedown accuracy differential':
+        return f"Takedown accuracy completion edge (+{abs(d)*100:.1f}%)"
+    elif name == 'Submission attempt differential':
+        return f"Submission grappling threat (+{abs(d):.1f} sub att / 15m)"
+    elif name == 'Reach differential':
+        return f"Reach wingspan advantage (+{abs(d):.1f} cm)"
+    elif name == 'Height differential':
+        return f"Height leverage advantage (+{abs(d):.1f} cm)"
+    elif name == 'Win streak':
+        return f"Momentum & active win streak (+{abs(d):.0f} consecutive wins)"
+    elif name == 'Total rounds differential':
+        return f"Octagon cage time experience (+{abs(d):.0f} rounds logged)"
+    elif name == 'KO win rate':
+        return f"Knockout finishing power (+{abs(d)*100:.1f}%)"
+    elif name == 'Submission win rate':
+        return f"Submission finishing threat (+{abs(d)*100:.1f}%)"
+    elif name == 'Finish loss rate':
+        return "Durability profile and finish resistance"
+    elif name == 'Stance advantage':
+        return "Stance matchup angle advantage (Southpaw / Switch)"
+    elif name == 'Recent three form':
+        return "Recent three-bout victory momentum"
+    elif name == 'Recorded wins':
+        return f"Professional experience depth (+{abs(d):.0f} recorded wins)"
+    return f"Statistical advantage in {name.lower()}"
+
+
+def _format_risk(name, diff, is_red_pick):
+    d = -diff if is_red_pick else diff
+    if name == 'Age differential':
+        return f"Opponent holds a youth advantage ({abs(d):.1f} years younger)"
+    elif name == 'Reach differential':
+        return f"Opponent has longer reach (+{abs(d):.1f} cm wingspan)"
+    elif name == 'Height differential':
+        return f"Opponent is taller (+{abs(d):.1f} cm)"
+    elif name == 'Sig strike rate differential':
+        return f"Opponent lands higher striking output (+{abs(d):.1f} SLpM)"
+    elif name == 'Takedown rate differential':
+        return f"Opponent completes more takedowns (+{abs(d):.1f} TD / 15m)"
+    elif name == 'Submission attempt differential':
+        return f"Opponent is dangerous on the ground (+{abs(d):.1f} sub att / 15m)"
+    elif name == 'Total rounds differential':
+        return f"Opponent has more cage time experience (+{abs(d):.0f} rounds)"
+    return f"Opponent statistical threat in {name.lower()}"
+
+
+def _build_radar(fighter_state, attrs):
+    slpm = _safe_float(attrs.get('sig_str_landed'), fighter_state.get('sig_str_landed', 3.5))
+    acc = _safe_float(attrs.get('sig_str_pct'), fighter_state.get('sig_str_acc', 0.45))
+    td = _safe_float(attrs.get('td_landed'), fighter_state.get('td_landed', 1.5))
+    td_def = _safe_float(attrs.get('td_def'), 0.65)
+    sub = _safe_float(attrs.get('sub_att'), fighter_state.get('sub_att', 0.5))
+    exp = min(1.0, (fighter_state.get('wins', 0) + fighter_state.get('losses', 0)) / 22.0)
+    return {
+        'striking_volume': round(min(100.0, max(15.0, (slpm / 7.0) * 100)), 1),
+        'striking_accuracy': round(min(100.0, max(20.0, (acc / 0.65) * 100)), 1),
+        'takedown_volume': round(min(100.0, max(10.0, (td / 4.0) * 100)), 1),
+        'takedown_defense': round(min(100.0, max(20.0, (td_def / 0.85) * 100)), 1),
+        'submission_threat': round(min(100.0, max(10.0, (sub / 2.5) * 100)), 1),
+        'octagon_experience': round(min(100.0, max(15.0, exp * 100)), 1),
+    }
 
 
 def predict(bundle, red, blue, day, bout_meta=None):
@@ -457,14 +650,123 @@ def predict(bundle, red, blue, day, bout_meta=None):
         'stance': {'red': a.get('stance', 'Orthodox'), 'blue': b.get('stance', 'Orthodox')}
     }
 
+    pick = red if p >= .5 else blue
+    is_red_pick = (pick == red)
+    confidence = max(p, 1.0 - p)
+
+    # Feature attribution explanation engine
+    advantages = []
+    risks = []
+    lr_prod = models_dict.get('MMA Cipher Logistic Regression')
+    if lr_prod and hasattr(lr_prod, 'named_steps'):
+        coefs = lr_prod.named_steps['logisticregression'].coef_[0]
+        scales = lr_prod.named_steps['standardscaler'].scale_
+        contributions = (x / scales) * coefs
+        items = []
+        for f_name, diff_val, c_val in zip(FEATURES, x, contributions):
+            # Signed contribution toward the picked fighter
+            pick_contribution = c_val if is_red_pick else -c_val
+            items.append({
+                'feature': f_name,
+                'diff': float(diff_val),
+                'contribution': float(pick_contribution)
+            })
+
+        # Top advantages favoring the pick
+        items.sort(key=lambda it: it['contribution'], reverse=True)
+        for it in items[:4]:
+            if it['contribution'] > 0.01:
+                advantages.append({
+                    'title': _format_advantage(it['feature'], it['diff'], is_red_pick),
+                    'feature': it['feature'],
+                    'diff': round(it['diff'], 2),
+                    'impact': 'high' if it['contribution'] > 0.25 else 'medium'
+                })
+
+        # Top risk factors / vulnerabilities favoring opponent
+        for it in reversed(items):
+            if it['contribution'] < -0.01 and len(risks) < 2:
+                risks.append({
+                    'title': _format_risk(it['feature'], it['diff'], is_red_pick),
+                    'feature': it['feature'],
+                    'diff': round(it['diff'], 2),
+                    'impact': 'high' if it['contribution'] < -0.2 else 'moderate'
+                })
+
+    adv_summary = f"{pick} is favored primarily by " + (", ".join(a['title'].split('(')[0].strip() for a in advantages[:2]) if advantages else "overall algorithmic rating") + "."
+    if risks:
+        adv_summary += f" Key matchup risk: {risks[0]['title'].split('(')[0].strip()}."
+
+    explanation = {
+        'pick': pick,
+        'summary': adv_summary,
+        'advantages': advantages,
+        'risks': risks
+    }
+
+    # Model consensus metrics
+    model_count = len(ensemble_breakdown)
+    agreed_count = sum(1 for m in ensemble_breakdown.values() if (m['red_probability'] >= 0.5) == is_red_pick) if model_count else 1
+    agreement_pct = round(agreed_count / max(model_count, 1), 2)
+    probs_list = [m['red_probability'] for m in ensemble_breakdown.values()] if model_count else [p]
+    spread = round(max(probs_list) - min(probs_list), 3) if probs_list else 0.0
+    uncertainty = 'Low' if spread < 0.12 else ('Moderate' if spread < 0.22 else 'Elevated')
+    consensus_tier = f"Unanimous ({agreed_count}/{model_count})" if agreed_count == model_count else f"Majority ({agreed_count}/{model_count})" if agreed_count > model_count / 2 else "Split Consensus"
+
+    consensus = {
+        'agreement_count': agreed_count,
+        'total_models': model_count,
+        'agreement_pct': agreement_pct,
+        'tier': consensus_tier,
+        'spread': spread,
+        'uncertainty': uncertainty
+    }
+
+    # Fighter radar telemetry
+    meta_dict = bout_meta or {}
+    radar = {
+        'red': _build_radar(a, {
+            'sig_str_landed': meta_dict.get('red_sig_str_landed'),
+            'sig_str_pct': meta_dict.get('red_sig_str_pct'),
+            'td_landed': meta_dict.get('red_td_landed'),
+            'td_def': meta_dict.get('red_td_def'),
+            'sub_att': meta_dict.get('red_sub_att')
+        }),
+        'blue': _build_radar(b, {
+            'sig_str_landed': meta_dict.get('blue_sig_str_landed'),
+            'sig_str_pct': meta_dict.get('blue_sig_str_pct'),
+            'td_landed': meta_dict.get('blue_td_landed'),
+            'td_def': meta_dict.get('blue_td_def'),
+            'sub_att': meta_dict.get('blue_sub_att')
+        })
+    }
+
+    # Upset potential evaluation
+    upset_signals = []
+    # If the underdog pick has high stylistic edge
+    if confidence >= 0.52 and confidence <= 0.65:
+        if any('takedown' in a['feature'].lower() for a in advantages) and any('strike' in r['feature'].lower() for r in risks):
+            upset_signals.append("Stylistic clash: Grappler vs Striker dynamic")
+    if uncertainty == 'Elevated':
+        upset_signals.append("Elevated model divergence: Non-linear tree models diverge from linear baseline")
+
+    upset_radar = {
+        'is_candidate': len(upset_signals) > 0 or (confidence >= 0.52 and confidence <= 0.64 and spread >= 0.10),
+        'signals': upset_signals
+    }
+
     return dict(
         red_probability=p,
         blue_probability=1.0 - p,
-        pick=red if p >= .5 else blue,
-        confidence=max(p, 1.0 - p),
+        pick=pick,
+        confidence=confidence,
         model_version=bundle['version'],
         model_name=bundle.get('name', 'MMA Cipher Ensemble'),
         models=ensemble_breakdown,
+        consensus=consensus,
+        explanation=explanation,
+        radar=radar,
+        upset_radar=upset_radar,
         method_probabilities=method_probs,
         likely_method=likely_method,
         tale_of_the_tape=tape,

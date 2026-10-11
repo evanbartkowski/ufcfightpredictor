@@ -1,6 +1,7 @@
 import logging
 import os
 import threading
+from collections import defaultdict
 from datetime import datetime, timezone, timedelta
 
 import joblib
@@ -295,19 +296,49 @@ class Service:
         bundle = self.bundle
         model_info = None
         if bundle:
+            metrics = bundle.get('metrics', {})
             model_info = {
                 'name': bundle.get('name', 'MMA Cipher Advanced Ensemble'),
                 'version': bundle.get('version'),
                 'schema': bundle.get('schema'),
                 'trained_at': bundle.get('trained_at'),
                 'through': bundle.get('through'),
-                'metrics': bundle.get('metrics'),
+                'metrics': metrics,
                 'weights': bundle.get('weights'),
-                'candidate_models': list(bundle.get('models', {}).keys()) if bundle.get('models') else ['HistGradientBoosting', 'Logistic Regression', 'LightGBM', 'Random Forest']
+                'candidate_models': list(bundle.get('models', {}).keys()) if bundle.get('models') else ['HistGradientBoosting', 'Logistic Regression', 'LightGBM', 'Random Forest'],
+                'candidate_metrics': metrics.get('candidate_metrics'),
+                'calibration': metrics.get('calibration'),
+                'confidence_distribution': metrics.get('confidence_distribution'),
+                'events_history': metrics.get('events_history'),
+                'weight_class_stats': metrics.get('weight_class_stats'),
+                'feature_importances': metrics.get('feature_importances')
             }
+
+        # Index recent verified bouts per fighter for the searchable database & profile views
+        fights_by_fighter = defaultdict(list)
+        for f in sorted(fights.values(), key=lambda x: x['date'], reverse=True):
+            for corner, opp in (('red', 'blue'), ('blue', 'red')):
+                won = f.get('winner') == corner
+                res = 'W' if won else ('L' if f.get('winner') in ('red', 'blue') else 'NC/D')
+                fights_by_fighter[identity(f[corner])].append({
+                    'date': f['date'],
+                    'event': f.get('event', ''),
+                    'opponent': f[opp],
+                    'result': res,
+                    'method': f.get('method', '')
+                })
+
+        fighter_rows = []
+        for f in sorted(self.store.rows('fighters'), key=lambda item: item['name']):
+            f_copy = dict(f)
+            bouts = fights_by_fighter.get(identity(f['name']), [])
+            f_copy['recent_bouts'] = bouts[:6]
+            f_copy['total_recorded_bouts'] = len(bouts)
+            fighter_rows.append(f_copy)
+
         dynamic_interval = self.get_dynamic_sync_interval()
         return dict(upcoming=sorted(upcoming, key=lambda f:f['date']), results=sorted(results, key=lambda f:f['date'], reverse=True),
-                    fighters=sorted(self.store.rows('fighters'), key=lambda f:f['name']),
+                    fighters=fighter_rows,
                     model=model_info,
                     status=dict(self.status, last_sync=self.store.meta('last_sync'), last_error=self.store.meta('sync_error')),
                     refresh=dict(stats_seconds=dynamic_interval, odds_seconds=self.odds_interval, browser_seconds=dynamic_interval,
