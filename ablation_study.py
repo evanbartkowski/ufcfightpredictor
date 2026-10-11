@@ -79,3 +79,4 @@ ll_base = log_loss(y_te, p_te_base, labels=[0, 1])
 brier_base = brier_score_loss(y_te, p_te_base)
 print(f"BASELINE Nelder-Mead Ensemble       Acc: {acc_base*100:.2f}% | LogLoss: {ll_base:.4f} | Brier: {brier_base:.4f}")
 print("Baseline Weights:", {name: round(float(w), 3) for name, w in zip(base_factories.keys(), opt_w)})
+

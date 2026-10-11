@@ -448,34 +448,292 @@ function renderCardPickButtons(fightId) {
   attachCardListeners();
 }
 
-function card(f, withProfiles=false) {
+let fighterImagesMap = {};
+
+async function initFighterImages() {
+  if (data?.images && Object.keys(data.images).length > 0) {
+    fighterImagesMap = data.images;
+    return;
+  }
+  try {
+    const res = await fetch('/static/fighter_images.json');
+    if (res.ok) {
+      fighterImagesMap = await res.json();
+    }
+  } catch (e) {
+    // Graceful fallback
+  }
+}
+
+function getFighterImage(name) {
+  if (!name) return null;
+  const k = name.normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
+  if (data?.images && data.images[k]) return data.images[k];
+  if (fighterImagesMap && fighterImagesMap[k]) return fighterImagesMap[k];
+  if (window.fighterImagesMap && window.fighterImagesMap[k]) return window.fighterImagesMap[k];
+  return null;
+}
+
+function renderFighterAvatar(name, corner='red') {
+  const imgUrl = getFighterImage(name);
+  const initials = (name || '').split(' ').map(n => n[0]).filter(Boolean).slice(0, 2).join('').toUpperCase() || 'MMA';
+  if (imgUrl) {
+    return `<div class="fighter-avatar-frame ${corner}-frame" title="${esc(name)}">
+      <img src="${esc(imgUrl)}" alt="${esc(name)}" class="fighter-img" loading="lazy" onerror="this.onerror=null; this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';" />
+      <div class="fighter-initials" style="display:none">${esc(initials)}</div>
+    </div>`;
+  }
+  return `<div class="fighter-avatar-frame ${corner}-frame" title="${esc(name)}">
+    <div class="fighter-initials">${esc(initials)}</div>
+  </div>`;
+}
+
+function getFighterData(name) {
+  if (!name || !data?.fighters) return null;
+  const key = v => v.normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
+  const k = key(name);
+  return data.fighters.find(f => key(f.name) === k) || null;
+}
+
+function getFighterCoreMetrics(f) {
+  if (!f) {
+    return {
+      volume: 0.4, accuracy: 0.4, avoidance: 0.4, td_acc: 0.4, td_def: 0.4, sub_threat: 0.4,
+      raw: { volume: '—', accuracy: '—', avoidance: '—', td_acc: '—', td_def: '—', sub_threat: '—' }
+    };
+  }
+
+  // 1. Striking Volume (SLpM)
+  const slpm = parseFloat(f.SLpM) || 0;
+  const normVol = Math.max(0.12, Math.min(0.98, slpm / 7.5));
+
+  // 2. Striking Accuracy (sig_str_acc)
+  let strAcc = parseFloat(f.sig_str_acc) || 0;
+  if (strAcc > 1) strAcc = strAcc / 100;
+  const normAcc = Math.max(0.12, Math.min(0.98, strAcc / 0.65));
+
+  // 3. Damage Avoidance (str_def or 1 - SApM / 7.0)
+  let strDef = parseFloat(f.str_def) || 0;
+  if (strDef > 1) strDef = strDef / 100;
+  if (!strDef && f.SApM) {
+    const sapm = parseFloat(f.SApM) || 3.5;
+    strDef = Math.max(0, 1 - (sapm / 7.0));
+  }
+  const normAvoid = Math.max(0.12, Math.min(0.98, strDef / 0.78));
+
+  // 4. Takedown Accuracy (td_acc)
+  let tdAcc = parseFloat(f.td_acc) || 0;
+  if (tdAcc > 1) tdAcc = tdAcc / 100;
+  const normTdAcc = Math.max(0.12, Math.min(0.98, tdAcc / 0.65));
+
+  // 5. Takedown Defense (td_def)
+  let tdDef = parseFloat(f.td_def) || 0;
+  if (tdDef > 1) tdDef = tdDef / 100;
+  const normTdDef = Math.max(0.12, Math.min(0.98, tdDef / 0.90));
+
+  // 6. Submission Threat (sub_avg)
+  const subAvg = parseFloat(f.sub_avg) || 0;
+  const normSub = Math.max(0.12, Math.min(0.98, subAvg / 2.0));
+
+  return {
+    volume: normVol,
+    accuracy: normAcc,
+    avoidance: normAvoid,
+    td_acc: normTdAcc,
+    td_def: normTdDef,
+    sub_threat: normSub,
+    raw: {
+      volume: slpm ? slpm.toFixed(1) : '—',
+      accuracy: strAcc ? `${Math.round(strAcc * 100)}%` : '—',
+      avoidance: strDef ? `${Math.round(strDef * 100)}%` : '—',
+      td_acc: tdAcc ? `${Math.round(tdAcc * 100)}%` : '—',
+      td_def: tdDef ? `${Math.round(tdDef * 100)}%` : '—',
+      sub_threat: subAvg ? subAvg.toFixed(1) : '—'
+    }
+  };
+}
+
+function renderPerformanceSnapshot(redName, blueName) {
+  const redF = getFighterData(redName);
+  const blueF = blueName ? getFighterData(blueName) : null;
+  const redM = getFighterCoreMetrics(redF);
+  const blueM = blueName ? getFighterCoreMetrics(blueF) : null;
+
+  const CX = 175;
+  const CY = 148;
+  const R = 90;
+  const angles = [
+    -Math.PI / 2,        // 0: Striking Volume (Top)
+    -Math.PI / 6,        // 1: Striking Accuracy (Top-Right)
+    Math.PI / 6,         // 2: Damage Avoidance (Bottom-Right)
+    Math.PI / 2,         // 3: Takedown Accuracy (Bottom)
+    (5 * Math.PI) / 6,   // 4: Takedown Defense (Bottom-Left)
+    -(5 * Math.PI) / 6   // 5: Submission Threat (Top-Left)
+  ];
+
+  // Concentric hexagonal grid rings
+  const levels = [0.25, 0.5, 0.75, 1.0];
+  const gridPolygons = levels.map(lvl => {
+    const pts = angles.map(a => `${(CX + R * lvl * Math.cos(a)).toFixed(1)},${(CY + R * lvl * Math.sin(a)).toFixed(1)}`).join(' ');
+    return `<polygon points="${pts}" class="radar-grid-ring" />`;
+  }).join('');
+
+  // 6 spokes
+  const spokes = angles.map(a => {
+    const x2 = (CX + R * Math.cos(a)).toFixed(1);
+    const y2 = (CY + R * Math.sin(a)).toFixed(1);
+    return `<line x1="${CX}" y1="${CY}" x2="${x2}" y2="${y2}" class="radar-spoke" />`;
+  }).join('');
+
+  // Red polygon and vertices
+  const redVals = [redM.volume, redM.accuracy, redM.avoidance, redM.td_acc, redM.td_def, redM.sub_threat];
+  const redPts = angles.map((a, i) => `${(CX + R * redVals[i] * Math.cos(a)).toFixed(1)},${(CY + R * redVals[i] * Math.sin(a)).toFixed(1)}`).join(' ');
+  const redDots = angles.map((a, i) => {
+    const x = (CX + R * redVals[i] * Math.cos(a)).toFixed(1);
+    const y = (CY + R * redVals[i] * Math.sin(a)).toFixed(1);
+    return `<circle cx="${x}" cy="${y}" r="3.5" class="radar-dot red-dot" />`;
+  }).join('');
+
+  // Blue polygon and vertices
+  let blueMarkup = '';
+  if (blueM) {
+    const blueVals = [blueM.volume, blueM.accuracy, blueM.avoidance, blueM.td_acc, blueM.td_def, blueM.sub_threat];
+    const bluePts = angles.map((a, i) => `${(CX + R * blueVals[i] * Math.cos(a)).toFixed(1)},${(CY + R * blueVals[i] * Math.sin(a)).toFixed(1)}`).join(' ');
+    const blueDots = angles.map((a, i) => {
+      const x = (CX + R * blueVals[i] * Math.cos(a)).toFixed(1);
+      const y = (CY + R * blueVals[i] * Math.sin(a)).toFixed(1);
+      return `<circle cx="${x}" cy="${y}" r="3.5" class="radar-dot blue-dot" />`;
+    }).join('');
+    blueMarkup = `<polygon points="${bluePts}" class="radar-poly blue-poly" filter="url(#radarBlueDrop)" />${blueDots}`;
+  }
+
+  const gradId = 'radarGlow_' + Math.random().toString(36).slice(2, 7);
+
+  return `
+    <div class="performance-snapshot-card">
+      <div class="snapshot-header">
+        <span class="snapshot-subtitle">PERFORMANCE SNAPSHOT</span>
+        <h4 class="snapshot-title">${blueName ? "Fighters' Core Metrics" : esc(redName) + " \u00b7 Core Metrics"}</h4>
+      </div>
+      <div class="radar-chart-container">
+        <svg viewBox="0 0 350 295" class="radar-svg" role="img" aria-label="Fighters Core Metrics Radar Chart">
+          <defs>
+            <radialGradient id="${gradId}" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#4a3e72" stop-opacity="0.45" />
+              <stop offset="60%" stop-color="#212338" stop-opacity="0.2" />
+              <stop offset="100%" stop-color="#0e111a" stop-opacity="0" />
+            </radialGradient>
+            <filter id="radarRedDrop" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="0" stdDeviation="2.5" flood-color="#ff4d6d" flood-opacity="0.65"/>
+            </filter>
+            <filter id="radarBlueDrop" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="0" stdDeviation="2.5" flood-color="#00d4ff" flood-opacity="0.65"/>
+            </filter>
+          </defs>
+          <circle cx="${CX}" cy="${CY}" r="${R}" fill="url(#${gradId})" />
+          ${gridPolygons}
+          ${spokes}
+          <polygon points="${redPts}" class="radar-poly red-poly" filter="url(#radarRedDrop)" />
+          ${blueMarkup}
+          ${redDots}
+          <!-- Axes Labels exactly matching user reference -->
+          <text x="175" y="22" text-anchor="middle" class="radar-text"><tspan x="175" dy="0">Striking</tspan><tspan x="175" dy="13">Volume</tspan></text>
+          <text x="265" y="98" text-anchor="start" class="radar-text"><tspan x="265" dy="0">Striking</tspan><tspan x="265" dy="13">Accuracy</tspan></text>
+          <text x="265" y="194" text-anchor="start" class="radar-text"><tspan x="265" dy="0">Damage</tspan><tspan x="265" dy="13">Avoidance</tspan></text>
+          <text x="175" y="262" text-anchor="middle" class="radar-text"><tspan x="175" dy="0">Takedown</tspan><tspan x="175" dy="13">Accuracy</tspan></text>
+          <text x="85" y="194" text-anchor="end" class="radar-text"><tspan x="85" dy="0">Takedown</tspan><tspan x="85" dy="13">Defense</tspan></text>
+          <text x="85" y="98" text-anchor="end" class="radar-text"><tspan x="85" dy="0">Submission</tspan><tspan x="85" dy="13">Threat</tspan></text>
+        </svg>
+      </div>
+      <div class="snapshot-legend">
+        <div class="legend-fighter legend-red">
+          <span class="legend-badge-dot"></span>
+          <strong>${esc(redName)}</strong>
+        </div>
+        ${blueName ? `
+          <div class="legend-fighter legend-blue">
+            <span class="legend-badge-dot"></span>
+            <strong>${esc(blueName)}</strong>
+          </div>
+        ` : ''}
+      </div>
+      <div class="metrics-breakdown-row">
+        <div class="metric-pill" title="Significant Strikes Landed per Minute">
+          <span class="m-val red">${esc(redM.raw.volume)}</span>
+          <span class="m-name">SLpM</span>
+          ${blueM ? `<span class="m-val blue">${esc(blueM.raw.volume)}</span>` : ''}
+        </div>
+        <div class="metric-pill" title="Significant Strike Accuracy">
+          <span class="m-val red">${esc(redM.raw.accuracy)}</span>
+          <span class="m-name">Accuracy</span>
+          ${blueM ? `<span class="m-val blue">${esc(blueM.raw.accuracy)}</span>` : ''}
+        </div>
+        <div class="metric-pill" title="Significant Strike Defense / Avoidance">
+          <span class="m-val red">${esc(redM.raw.avoidance)}</span>
+          <span class="m-name">Avoidance</span>
+          ${blueM ? `<span class="m-val blue">${esc(blueM.raw.avoidance)}</span>` : ''}
+        </div>
+        <div class="metric-pill" title="Takedown Accuracy">
+          <span class="m-val red">${esc(redM.raw.td_acc)}</span>
+          <span class="m-name">TD Acc</span>
+          ${blueM ? `<span class="m-val blue">${esc(blueM.raw.td_acc)}</span>` : ''}
+        </div>
+        <div class="metric-pill" title="Takedown Defense">
+          <span class="m-val red">${esc(redM.raw.td_def)}</span>
+          <span class="m-name">TD Def</span>
+          ${blueM ? `<span class="m-val blue">${esc(blueM.raw.td_def)}</span>` : ''}
+        </div>
+        <div class="metric-pill" title="Submission Attempts per 15 min">
+          <span class="m-val red">${esc(redM.raw.sub_threat)}</span>
+          <span class="m-name">Sub / 15m</span>
+          ${blueM ? `<span class="m-val blue">${esc(blueM.raw.sub_threat)}</span>` : ''}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function card(f, withProfiles=false, isMainEvent=false) {
   const pending = f.prediction_pending;
   const edge = modelEdge(f);
   const isUpset = Boolean(f.upset_radar?.is_candidate || edge);
   const favs = getFavorites();
 
-  return `<article class="fight-card${isWomensFight(f)?' womens-fight':''}${edge?' has-model-edge':''}${isUpset?' is-upset-card':''}" data-fight-id="${esc(f.id || 'custom')}">
+  return `<article class="fight-card${isMainEvent ? ' is-main-event' : ''}${isWomensFight(f)?' womens-fight':''}${edge?' has-model-edge':''}${isUpset?' is-upset-card':''}" data-fight-id="${esc(f.id || 'custom')}">
     <div class="fight-top">
-      <span>${esc(f.weight_class || 'CUSTOM MATCHUP')}</span>
+      <div class="fight-top-tag-wrap">
+        ${isMainEvent ? '<span class="main-event-badge">👑 MAIN EVENT</span>' : ''}
+        <span>${esc(f.weight_class || 'CUSTOM MATCHUP')}</span>
+      </div>
       <span>${f.locked?'FORECAST LOCKED':'MMA CIPHER PROBABILITY'}</span>
     </div>
     ${renderUpsetBanner(f)}
-    ${edge?`<div class="model-edge"><strong>&#9733; MODEL EDGE</strong><span>${esc(f.pick)} &middot; ${pct(edge.probability)} model chance &middot; ${line(edge.price)} at ${esc(edge.name)}</span><small>+${(edge.edge*100).toFixed(1)} points vs. ${pct(edge.implied)} break-even probability. Model estimate, not a guaranteed return.</small></div>`:''}
+    ${edge?`<div class="model-edge"><strong>★ MODEL EDGE</strong><span>${esc(f.pick)} &middot; ${pct(edge.probability)} model chance &middot; ${line(edge.price)} at ${esc(edge.name)}</span><small>+${(edge.edge*100).toFixed(1)} points vs. ${pct(edge.implied)} break-even probability. Model estimate, not a guaranteed return.</small></div>`:''}
     ${countdown(f)}
     <div class="fighters-row">
-      <div>
-        <div class="corner">FIRST FIGHTER</div>
-        <div class="fighter-name">
-          ${esc(f.red)}
-          <button class="fav-btn ${favs.has(f.red)?'is-fav':''}" data-fav-name="${esc(f.red)}" aria-label="Favorite ${esc(f.red)}" title="Favorite ${esc(f.red)}">★</button>
+      <div class="fighter-cell red-cell">
+        <div class="fighter-avatar-wrap red-avatar-wrap">
+          ${renderFighterAvatar(f.red, 'red')}
+        </div>
+        <div class="fighter-details">
+          <div class="corner">FIRST FIGHTER</div>
+          <div class="fighter-name">
+            ${esc(f.red)}
+            <button class="fav-btn ${favs.has(f.red)?'is-fav':''}" data-fav-name="${esc(f.red)}" aria-label="Favorite ${esc(f.red)}" title="Favorite ${esc(f.red)}">★</button>
+          </div>
         </div>
       </div>
       <span class="versus">VS</span>
-      <div>
-        <div class="corner blue">SECOND FIGHTER</div>
-        <div class="fighter-name">
-          ${esc(f.blue)}
-          <button class="fav-btn ${favs.has(f.blue)?'is-fav':''}" data-fav-name="${esc(f.blue)}" aria-label="Favorite ${esc(f.blue)}" title="Favorite ${esc(f.blue)}">★</button>
+      <div class="fighter-cell blue-cell">
+        <div class="fighter-avatar-wrap blue-avatar-wrap">
+          ${renderFighterAvatar(f.blue, 'blue')}
+        </div>
+        <div class="fighter-details">
+          <div class="corner blue">SECOND FIGHTER</div>
+          <div class="fighter-name">
+            ${esc(f.blue)}
+            <button class="fav-btn ${favs.has(f.blue)?'is-fav':''}" data-fav-name="${esc(f.blue)}" aria-label="Favorite ${esc(f.blue)}" title="Favorite ${esc(f.blue)}">★</button>
+          </div>
         </div>
       </div>
     </div>
@@ -500,7 +758,7 @@ function card(f, withProfiles=false) {
     <div class="card-footer-actions">
       <button class="share-card-btn" data-share-id="${esc(f.id)}"><span>⎘</span> Share Prediction</button>
     </div>
-    ${withProfiles?`<details><summary>Compare current fighter stats</summary><div class="comparison">${profile(f.red)}${profile(f.blue)}</div></details>`:''}</article>`;
+    ${withProfiles?`<details class="stats-comparison-details"><summary>Compare current fighter stats</summary>${renderPerformanceSnapshot(f.red, f.blue)}<div class="comparison">${profile(f.red)}${profile(f.blue)}</div></details>`:''}</article>`;
 }
 
 function profile(name) {
@@ -519,7 +777,17 @@ function profile(name) {
     ['Takedown defense', f.td_def],
     ['Submissions / 15 min', f.sub_avg]
   ];
-  return `<div class="profile"><h3>${esc(name)}</h3><span class="tag">${!f.fetched_at?'ARCHIVED PROFILE':Date.now()-Date.parse(f.fetched_at)>(data.refresh?.stats_seconds||3600)*2000?'CACHED \u00b7 REFRESH PENDING':'UFCSTATS PROFILE'}</span>${fields.map(([k,v])=>`<div class="stat-row"><span>${esc(k)}</span><strong>${esc(v || '—')}${!f.fetched_at && ['Height','Reach'].includes(k)?' cm':''}</strong></div>`).join('')}<span class="muted">${esc(f.source)}${f.fetched_at?' · Fetched '+esc(stamp(f.fetched_at)):''}</span></div>`;
+  return `<div class="profile">
+    <div class="profile-header-wrap">
+      ${renderFighterAvatar(name, 'neutral')}
+      <div>
+        <h3>${esc(name)}</h3>
+        <span class="tag">${!f.fetched_at?'ARCHIVED PROFILE':Date.now()-Date.parse(f.fetched_at)>(data.refresh?.stats_seconds||3600)*2000?'CACHED \u00b7 REFRESH PENDING':'UFCSTATS PROFILE'}</span>
+      </div>
+    </div>
+    ${fields.map(([k,v])=>`<div class="stat-row"><span>${esc(k)}</span><strong>${esc(v || '—')}${!f.fetched_at && ['Height','Reach'].includes(k)?' cm':''}</strong></div>`).join('')}
+    <span class="muted">${esc(f.source)}${f.fetched_at?' · Fetched '+esc(stamp(f.fetched_at)):''}</span>
+  </div>`;
 }
 
 function cardSections(fights) {
@@ -539,11 +807,12 @@ function cardSections(fights) {
     }
   }
 
+  const mainBoutId = fights.length ? fights[0].id : null;
   const sections = [['main','Main card'],['prelims','Undercard / Prelims'],['early','Early prelims'],['unassigned','Card placement pending']];
   return sections.map(([key, label]) => {
     const group = filtered.filter(f => (f.odds?.card_section || 'unassigned') === key);
     if (!group.length) return '';
-    return `<section class="card-section" aria-label="${label}"><div class="card-section-heading"><h4>${label}</h4><span>${group.length} ${group.length===1?'bout':'bouts'}</span></div>${key==='unassigned'?'<p class="section-note">The published schedule does not yet confirm these card placements.</p>':'<p class="section-note">Grouped by scheduled broadcast start times. Card placement may change.</p>'}<div class="fight-grid">${group.map(f=>card(f,true)).join('')}</div></section>`;
+    return `<section class="card-section" aria-label="${label}"><div class="card-section-heading"><h4>${label}</h4><span>${group.length} ${group.length===1?'bout':'bouts'}</span></div>${key==='unassigned'?'<p class="section-note">The published schedule does not yet confirm these card placements.</p>':'<p class="section-note">Grouped by scheduled broadcast start times. Card placement may change.</p>'}<div class="fight-grid">${group.map((f, i) => card(f, true, f.id === mainBoutId || Boolean(f.is_main_event) || (key === 'main' && i === 0))).join('')}</div></section>`;
   }).join('');
 }
 
@@ -961,9 +1230,12 @@ function renderFighterDatabase() {
   container.innerHTML = slice.map(f => `
     <div class="fighter-db-card">
       <div class="db-card-header">
-        <div>
-          <div class="db-card-name">${esc(f.name)}</div>
-          <div class="db-card-record">${esc(f.record || 'UFC Veteran')} · ${esc(f.weight_class || 'UFC Division')}</div>
+        <div class="db-header-left">
+          ${renderFighterAvatar(f.name, 'neutral')}
+          <div>
+            <div class="db-card-name">${esc(f.name)}</div>
+            <div class="db-card-record">${esc(f.record || 'UFC Veteran')} · ${esc(f.weight_class || 'UFC Division')}</div>
+          </div>
         </div>
         <button class="fav-btn ${favs.has(f.name)?'is-fav':''}" data-fav-name="${esc(f.name)}" aria-label="Favorite ${esc(f.name)}">★</button>
       </div>
@@ -997,6 +1269,11 @@ function renderFighterDatabase() {
           <span class="db-gauge-val">${esc(f.td_def || '—')}</span>
         </div>
       </div>
+
+      <details class="db-core-details">
+        <summary>View Core Metrics Radar</summary>
+        ${renderPerformanceSnapshot(f.name, null)}
+      </details>
 
       ${f.recent_bouts && f.recent_bouts.length ? `
         <div class="db-bouts-container">
@@ -1321,6 +1598,8 @@ async function load(force = false) {
   if (!force && cached && (now - cached.timestamp < pullInterval)) {
     if (!data) {
       data = cached.data;
+      if (data?.images) fighterImagesMap = data.images;
+      await initFighterImages();
       render();
     }
     if (activeMatchup && !$('matchup').hidden) await refreshMatchup();
@@ -1332,12 +1611,16 @@ async function load(force = false) {
     const r = await fetch('/api/dashboard', { cache: 'no-store', signal: AbortSignal.timeout(20000) });
     if (!r.ok) throw Error('Dashboard is unavailable');
     data = await r.json();
+    if (data?.images) fighterImagesMap = data.images;
+    else await initFighterImages();
     saveCachedPredictions(data);
     render();
     if (activeMatchup && !$('matchup').hidden) await refreshMatchup();
   } catch (e) {
     if (!data && cached) {
       data = cached.data;
+      if (data?.images) fighterImagesMap = data.images;
+      await initFighterImages();
       render();
     }
     $('notice').classList.add('warning');
@@ -1367,7 +1650,7 @@ async function refreshMatchup() {
   $('matchup-output').innerHTML = `
     ${divisionMismatch ? `<div class="division-mismatch-banner">⚠ Cross-division matchup: ${esc(redP.weight_class)} vs. ${esc(blueP.weight_class)}</div>` : ''}
     ${card(f)}
-    ${renderMatchupRadar(f)}
+    ${renderPerformanceSnapshot(f.red, f.blue)}
     <div class="comparison">${profile(f.red)}${profile(f.blue)}</div>
   `;
   attachCardListeners();

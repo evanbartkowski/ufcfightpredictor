@@ -1,5 +1,6 @@
 import logging
 import os
+from pathlib import Path
 import threading
 from collections import defaultdict
 from datetime import datetime, timezone, timedelta
@@ -31,6 +32,15 @@ class Service:
         self.bundle = None
         self.model_path = store.directory / 'model.joblib'
         self.status = dict(running=False, phase='Ready', error=None)
+        self.fighter_images = {}
+        for p in [store.directory.parent / 'static' / 'fighter_images.json', Path('static/fighter_images.json')]:
+            if p.exists():
+                try:
+                    import json
+                    self.fighter_images = json.loads(p.read_text(encoding='utf-8'))
+                    break
+                except Exception:
+                    log.exception('Could not read %s', p)
         if self.model_path.exists():
             try:
                 self.bundle = joblib.load(self.model_path)
@@ -339,6 +349,7 @@ class Service:
         dynamic_interval = self.get_dynamic_sync_interval()
         return dict(upcoming=sorted(upcoming, key=lambda f:f['date']), results=sorted(results, key=lambda f:f['date'], reverse=True),
                     fighters=fighter_rows,
+                    images=self.fighter_images,
                     model=model_info,
                     status=dict(self.status, last_sync=self.store.meta('last_sync'), last_error=self.store.meta('sync_error')),
                     refresh=dict(stats_seconds=dynamic_interval, odds_seconds=self.odds_interval, browser_seconds=dynamic_interval,
