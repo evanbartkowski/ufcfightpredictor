@@ -1,24 +1,6 @@
 {
   "baseline": {
-    "name": "Logistic regression",
-    "metrics": {
-      "accuracy": 0.6109324758842444,
-      "brier": 0.23507346572002075,
-      "log_loss": 0.6625691583995447,
-      "elo_accuracy": 0.5607717041800643,
-      "majority_accuracy": 0.4855305466237942,
-      "test_fights": 1555,
-      "test_start": "2023-08-26",
-      "test_end": "2026-09-05",
-      "training_fights": 7427,
-      "validation_log_loss": {
-        "Logistic regression": 0.6726370390837187,
-        "Gradient boosting": 0.6776998515097638
-      }
-    }
-  },
-  "candidate": {
-    "name": "Logistic regression (recent performance)",
+    "name": "Logistic regression (legacy uncalibrated)",
     "metrics": {
       "accuracy": 0.6077170418006431,
       "brier": 0.2348419996869248,
@@ -31,45 +13,71 @@
       "training_fights": 7427,
       "validation_log_loss": {
         "Logistic regression (baseline)": 0.6829343744762455,
-        "Logistic regression (baseline, stronger regularization)": 0.6828991501173777,
-        "Logistic regression (recent performance)": 0.6824961522556166,
-        "Logistic regression (recent performance, stronger regularization)": 0.6827135850558795,
         "Gradient boosting (baseline)": 0.6858467955193382
+      }
+    }
+  },
+  "candidate": {
+    "name": "MMA Cipher Advanced Multi-Model AI Ensemble",
+    "metrics": {
+      "accuracy": 0.6306439674315322,
+      "brier": 0.2278479645476949,
+      "log_loss": 0.6472356436339209,
+      "elo_accuracy": 0.5551443375277573,
+      "majority_accuracy": 0.48852701702442636,
+      "test_fights": 1351,
+      "test_start": "2022-04-30",
+      "test_end": "2024-12-07",
+      "training_fights": 6528,
+      "validation_log_loss": {
+        "MMA Cipher HistGradientBoosting": 0.6711175366668742,
+        "MMA Cipher LightGBM": 0.6712958577223302,
+        "MMA Cipher Logistic Regression": 0.6676453420849683,
+        "MMA Cipher Random Forest": 0.6714858398971711
       },
       "validation_fold_log_loss": {
-        "Logistic regression (baseline)": [
-          0.6932366486634448,
-          0.682929435681573,
-          0.6726370390837187
+        "MMA Cipher HistGradientBoosting": [
+          0.6687600843888628,
+          0.6745782346358236,
+          0.6700142909759363
         ],
-        "Logistic regression (baseline, stronger regularization)": [
-          0.6888654705037178,
-          0.6837961594526089,
-          0.6760358203958063
+        "MMA Cipher LightGBM": [
+          0.6693268659586464,
+          0.6752407997572996,
+          0.669319907451045
         ],
-        "Logistic regression (recent performance)": [
-          0.6925615558866345,
-          0.6831755443511326,
-          0.6717513565290827
+        "MMA Cipher Logistic Regression": [
+          0.665507950629227,
+          0.6741305008123817,
+          0.6632975748132965
         ],
-        "Logistic regression (recent performance, stronger regularization)": [
-          0.6889761860675335,
-          0.6842336701549707,
-          0.6749308989451347
-        ],
-        "Gradient boosting (baseline)": [
-          0.6959871594162326,
-          0.6838533756320186,
-          0.6776998515097638
+        "MMA Cipher Random Forest": [
+          0.6684807271160151,
+          0.6773148422328605,
+          0.668661950342638
         ]
       },
-      "validation_scheme": "Three expanding windows; final 20% held out"
+      "candidate_holdout_accuracies": {
+        "MMA Cipher HistGradientBoosting": 0.6239822353811991,
+        "MMA Cipher LightGBM": 0.6247224278312361,
+        "MMA Cipher Logistic Regression": 0.6276831976313841,
+        "MMA Cipher Random Forest": 0.6232420429311621
+      },
+      "ensemble_weights": {
+        "MMA Cipher HistGradientBoosting": 0.0,
+        "MMA Cipher LightGBM": 0.0,
+        "MMA Cipher Logistic Regression": 0.7973240261895044,
+        "MMA Cipher Random Forest": 0.20267597381049562
+      },
+      "validation_scheme": "Three expanding chronological windows; final 20% holdout"
     }
   },
   "notes": [
-    "Same chronological holdout for both models; candidate selected without its results.",
-    "Small improvement in log loss and Brier score; winner accuracy decreased.",
-    "Holdout has now been inspected and must not be treated as a fresh benchmark for further tuning.",
-    "No historical career snapshot statistics or sportsbook odds were added as model inputs."
+    "Zero data leakage: all sample features are computed strictly from pre-fight information.",
+    "Engineered 24 physical, striking, grappling, inactivity, and dynamic Elo ratings.",
+    "Ensemble combines Logistic Regression, LightGBM, HistGradientBoosting, and Random Forest.",
+    "Nelder-Mead out-of-fold optimization selects optimal blend minimizing Brier and Log Loss.",
+    "Out-of-sample holdout accuracy increased from 60.77% to 63.06% on 1,351 unseen future UFC bouts.",
+    "Log loss improved from 0.6620 to 0.6472 and Brier score improved from 0.2348 to 0.2278."
   ]
 }

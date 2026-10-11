@@ -208,3 +208,217 @@ footer .footer-contact{justify-content:center;gap:12px;padding:16px 0 22px;margi
 .model-inputs.compact-inputs>span{padding:0;color:#b4bfd5;font-size:10px;line-height:1.5}
 .model-inputs.compact-inputs>span:before{content:"";display:inline-block;width:3px;height:3px;border-radius:50%;background:#cc9cca;margin:0 6px 2px 0}
 @media(max-width:360px){.model-inputs.compact-inputs{grid-template-columns:1fr}}
+
+/* MMA Cipher Advanced Design System */
+.brand-logo {
+  display: block;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.45));
+}
+.brand-wordmark {
+  color: #f2f1f5;
+  font-family: system-ui, -apple-system, sans-serif;
+  letter-spacing: 0.5px;
+}
+.brand-wordmark>span {
+  color: #00f0ff;
+  letter-spacing: 2.8px;
+  text-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
+}
+
+.cipher-pill {
+  font: 700 8px/1 monospace;
+  padding: 3px 6px;
+  border-radius: 4px;
+  background: rgba(0, 240, 255, 0.12);
+  color: #00f0ff;
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.cipher-badge {
+  font: 700 8px/1 monospace;
+  padding: 3px 7px;
+  border-radius: 4px;
+  background: rgba(139, 92, 246, 0.16);
+  color: #c4b5fd;
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  letter-spacing: 0.8px;
+  margin-right: 6px;
+}
+
+/* Projected Method of Victory Strip */
+.method-strip {
+  margin: 16px 0 12px;
+  padding: 12px 14px;
+  background: #111420;
+  border: 1px solid #252a3d;
+  border-radius: 6px;
+}
+.method-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  font: 600 9px monospace;
+  letter-spacing: 1px;
+  color: #a1a7be;
+}
+.method-tag {
+  color: #00f0ff;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+}
+.method-bars {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.method-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.method-name {
+  font: 500 8px monospace;
+  letter-spacing: 0.6px;
+  color: #8b92aa;
+}
+.method-bar-bg {
+  height: 4px;
+  background: #1e2335;
+  border-radius: 2px;
+  overflow: hidden;
+}
+.method-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+.fill-dec {
+  background: linear-gradient(90deg, #38bdf8, #00f0ff);
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
+}
+.fill-ko {
+  background: linear-gradient(90deg, #f43f5e, #ff6470);
+  box-shadow: 0 0 8px rgba(244, 63, 94, 0.4);
+}
+.fill-sub {
+  background: linear-gradient(90deg, #a855f7, #c084fc);
+  box-shadow: 0 0 8px rgba(168, 85, 247, 0.4);
+}
+.method-item strong {
+  font-size: 11px;
+  font-family: monospace;
+  color: #e2e8f0;
+}
+
+/* Tale of the Tape */
+.tape-box {
+  margin: 14px 0 12px;
+  padding: 12px 14px;
+  background: #0f121a;
+  border: 1px solid #202436;
+  border-radius: 6px;
+}
+.tape-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font: 600 8px monospace;
+  letter-spacing: 1px;
+  color: #8f96af;
+  margin-bottom: 8px;
+}
+.tape-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.tape-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  font-size: 11px;
+}
+.tape-val {
+  font-family: monospace;
+  font-weight: 600;
+  color: #f1f5f9;
+}
+.tape-val.right {
+  text-align: right;
+}
+.tape-label {
+  font: 500 8px monospace;
+  letter-spacing: 0.5px;
+  color: #79829c;
+  text-align: center;
+  padding: 0 8px;
+}
+
+/* Ensemble Model Breakdown Drawer */
+.ensemble-details {
+  margin-top: 10px;
+}
+.ensemble-details summary {
+  font-size: 11px;
+  font-weight: 600;
+  color: #a5b4fc;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.ensemble-details summary:hover {
+  color: #c7d2fe;
+}
+.ensemble-breakdown {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: #0d0f17;
+  border: 1px solid #1f2334;
+  border-radius: 6px;
+  padding: 10px;
+}
+.ensemble-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+  border-bottom: 1px solid #161a29;
+}
+.ensemble-row:last-child {
+  border-bottom: none;
+}
+.ensemble-col-name {
+  display: flex;
+  flex-direction: column;
+}
+.ensemble-col-name strong {
+  font-size: 11px;
+  color: #e2e8f0;
+}
+.ensemble-col-name small {
+  font-size: 9px;
+  color: #94a3b8;
+  font-family: monospace;
+}
+.ensemble-col-probs {
+  display: flex;
+  gap: 10px;
+  font: 600 11px monospace;
+}
+.red-bar-prob {
+  color: var(--red);
+}
+.blue-bar-prob {
+  color: var(--blue);
+}
+

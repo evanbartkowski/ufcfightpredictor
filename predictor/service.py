@@ -24,7 +24,7 @@ class Service:
         self.auto_updates = False
         self.background_lock = threading.Lock()
         self.odds_source = odds_source or ESPNOdds()
-        self.sync_interval = max(180, int(os.environ.get('SYNC_INTERVAL_SECONDS', '3600')))
+        self.sync_interval = max(180, int(os.environ.get('SYNC_INTERVAL_SECONDS', '21600')))
         self.odds_interval = max(60, int(os.environ.get('ODDS_INTERVAL_SECONDS', '900')))
         self.odds_status = dict(running=False, error=None)
         self.bundle = None
@@ -134,15 +134,18 @@ class Service:
 
     def refresh_predictions(self, upcoming):
         markets = self.store.meta('markets', [])
-        profiles = {identity(f['name']):f for f in self.store.rows('fighters')}
+        profiles = {identity(f['name']): f for f in self.store.rows('fighters')}
         for fight in upcoming:
             market = match_market(fight, markets)
             if not forecast_open(fight, market):
                 continue
-            prediction = dict(fight, **predict(self.bundle, fight['red'], fight['blue'], fight['date']),
-                              issued_at=now(), fighter_stats={corner:profiles.get(identity(fight[corner]), {})
-                                                             for corner in ('red', 'blue')},
-                              start_at=market.get('start_at') if market else None)
+            prediction = dict(
+                fight,
+                **predict(self.bundle, fight['red'], fight['blue'], fight['date'], bout_meta=fight),
+                issued_at=now(),
+                fighter_stats={corner: profiles.get(identity(fight[corner]), {}) for corner in ('red', 'blue')},
+                start_at=market.get('start_at') if market else None
+            )
             self.store.publish_prediction(prediction)
 
     def sync_odds(self):
@@ -278,11 +281,23 @@ class Service:
                                     method=f.get('method')))
         scored = [r for r in results if r['correct'] is not None]
         bundle = self.bundle
+        model_info = None
+        if bundle:
+            model_info = {
+                'name': bundle.get('name', 'MMA Cipher Advanced Ensemble'),
+                'version': bundle.get('version'),
+                'schema': bundle.get('schema'),
+                'trained_at': bundle.get('trained_at'),
+                'through': bundle.get('through'),
+                'metrics': bundle.get('metrics'),
+                'weights': bundle.get('weights'),
+                'candidate_models': list(bundle.get('models', {}).keys()) if bundle.get('models') else ['HistGradientBoosting', 'Logistic Regression', 'LightGBM', 'Random Forest']
+            }
         return dict(upcoming=sorted(upcoming, key=lambda f:f['date']), results=sorted(results, key=lambda f:f['date'], reverse=True),
                     fighters=sorted(self.store.rows('fighters'), key=lambda f:f['name']),
-                    model={k:v for k,v in bundle.items() if k not in ('model','states')} if bundle else None,
+                    model=model_info,
                     status=dict(self.status, last_sync=self.store.meta('last_sync'), last_error=self.store.meta('sync_error')),
-                    refresh=dict(stats_seconds=self.sync_interval, odds_seconds=self.odds_interval, browser_seconds=60,
+                    refresh=dict(stats_seconds=self.sync_interval, odds_seconds=self.odds_interval, browser_seconds=21600,
                                  automatic=self.auto_updates),
                     odds_status=dict(self.odds_status, checked_at=self.store.meta('odds_checked_at'),
                                      last_sync=self.store.meta('odds_last_sync'), error=self.store.meta('odds_error')),
@@ -291,16 +306,45 @@ class Service:
                     scored_predictions=len(scored), total_fights=len(fights))
 
     def matchup(self, red, blue):
-        names = {identity(f['name']):f['name'] for f in self.store.rows('fighters')}
-        if identity(red) not in names or identity(blue) not in names:
+        fighters = {identity(f['name']): f for f in self.store.rows('fighters')}
+        if identity(red) not in fighters or identity(blue) not in fighters:
             raise ValueError('Choose two fighters from the list.')
         if identity(red) == identity(blue):
             raise ValueError('Choose two different fighters.')
-        red, blue = names[identity(red)], names[identity(blue)]
+        red_p = fighters[identity(red)]
+        blue_p = fighters[identity(blue)]
+        red_name, blue_name = red_p['name'], blue_p['name']
         if self.auto_updates:
             watched = self.store.meta('watched_fighters', {})
-            for name in (red, blue):
+            for name in (red_name, blue_name):
                 watched[name] = now()
-            self.store.set_meta('watched_fighters', dict(sorted(watched.items(),key=lambda item:item[1])[-20:]))
-            self.refresh_selected_profiles((red,blue))
-        return dict(red=red, blue=blue, **predict(self.bundle, red, blue, datetime.now(timezone.utc).date().isoformat()))
+            self.store.set_meta('watched_fighters', dict(sorted(watched.items(), key=lambda item: item[1])[-20:]))
+            self.refresh_selected_profiles((red_name, blue_name))
+
+        bout_meta = {
+            'red_age': red_p.get('age'),
+            'red_height': red_p.get('height'),
+            'red_reach': red_p.get('reach'),
+            'red_stance': red_p.get('stance'),
+            'red_sig_str_landed': red_p.get('SLpM'),
+            'red_sig_str_pct': red_p.get('sig_str_acc'),
+            'red_td_landed': red_p.get('td_avg'),
+            'red_td_pct': red_p.get('td_acc'),
+            'red_sub_att': red_p.get('sub_avg'),
+            'blue_age': blue_p.get('age'),
+            'blue_height': blue_p.get('height'),
+            'blue_reach': blue_p.get('reach'),
+            'blue_stance': blue_p.get('stance'),
+            'blue_sig_str_landed': blue_p.get('SLpM'),
+            'blue_sig_str_pct': blue_p.get('sig_str_acc'),
+            'blue_td_landed': blue_p.get('td_avg'),
+            'blue_td_pct': blue_p.get('td_acc'),
+            'blue_sub_att': blue_p.get('sub_avg'),
+        }
+        pred = predict(self.bundle, red_name, blue_name, datetime.now(timezone.utc).date().isoformat(), bout_meta=bout_meta)
+        return dict(
+            red=red_name,
+            blue=blue_name,
+            fighter_stats={'red': red_p, 'blue': blue_p},
+            **pred
+        )

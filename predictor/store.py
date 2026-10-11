@@ -88,18 +88,53 @@ class Store:
             db.execute('INSERT OR IGNORE INTO prediction_revisions VALUES (?,?,?)', (prediction['id'], revision, payload))
 
     def bootstrap(self, root):
-        if self.meta('seeded'):
+        if self.meta('seeded') and self.meta('seeded_schema') == 4:
             return
+
+        def _num(val):
+            if val is None:
+                return None
+            s = str(val).strip()
+            if not s:
+                return None
+            try:
+                return float(s)
+            except Exception:
+                return None
+
         with (Path(root) / 'ufc-master.csv').open(encoding='utf-8-sig', newline='') as f:
             for row in csv.DictReader(f):
-                fight = dict(id=bout_id(row['Date'], row['RedFighter'], row['BlueFighter']),
-                             date=row['Date'], red=row['RedFighter'], blue=row['BlueFighter'],
-                             winner=row['Winner'].lower() if row['Winner'] in ('Red', 'Blue') else 'other',
-                             method=row['Finish'], weight_class=row['WeightClass'], event='Historical UFC event',
-                             source='bundled ufc-master.csv')
+                fight = dict(
+                    id=bout_id(row['Date'], row['RedFighter'], row['BlueFighter']),
+                    date=row['Date'], red=row['RedFighter'], blue=row['BlueFighter'],
+                    winner=row['Winner'].lower() if row['Winner'] in ('Red', 'Blue') else 'other',
+                    method=row.get('Finish', ''), weight_class=row.get('WeightClass', ''),
+                    event='Historical UFC event', source='bundled ufc-master.csv',
+                    red_age=_num(row.get('RedAge')),
+                    blue_age=_num(row.get('BlueAge')),
+                    red_height=_num(row.get('RedHeightCms')),
+                    blue_height=_num(row.get('BlueHeightCms')),
+                    red_reach=_num(row.get('RedReachCms')),
+                    blue_reach=_num(row.get('BlueReachCms')),
+                    red_stance=row.get('RedStance') or 'Orthodox',
+                    blue_stance=row.get('BlueStance') or 'Orthodox',
+                    red_sig_str_landed=_num(row.get('RedAvgSigStrLanded')),
+                    blue_sig_str_landed=_num(row.get('BlueAvgSigStrLanded')),
+                    red_sig_str_pct=_num(row.get('RedAvgSigStrPct')),
+                    blue_sig_str_pct=_num(row.get('BlueAvgSigStrPct')),
+                    red_td_landed=_num(row.get('RedAvgTDLanded')),
+                    blue_td_landed=_num(row.get('BlueAvgTDLanded')),
+                    red_td_pct=_num(row.get('RedAvgTDPct')),
+                    blue_td_pct=_num(row.get('BlueAvgTDPct')),
+                    red_sub_att=_num(row.get('RedAvgSubAtt')),
+                    blue_sub_att=_num(row.get('BlueAvgSubAtt')),
+                    title_bout=int(row.get('TitleBout', '0') in ('1', 'True', 'true')),
+                    total_rounds=int(_num(row.get('NumberOfRounds')) or 3)
+                )
                 self.save_fight(fight)
         with (Path(root) / 'fighter_stats.csv').open(encoding='utf-8-sig', newline='') as f:
             for row in csv.DictReader(f):
                 if row['name']:
                     self.save_fighter(dict(row, source='Bundled snapshot (2024; not live)', fetched_at=None))
         self.set_meta('seeded', now())
+        self.set_meta('seeded_schema', 4)

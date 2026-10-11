@@ -11,13 +11,14 @@ with sync_playwright() as p:
     page.on('pageerror', lambda error: errors.append(str(error)))
     page.goto('http://127.0.0.1:8000', wait_until='networkidle')
     page.wait_for_function("document.getElementById('fight-count').textContent !== '—'")
-    assert page.title() == 'MMA Oracle Predictions — UFC predictions'
+    assert 'MMA Cipher' in page.title()
     dashboard = page.request.get('http://127.0.0.1:8000/api/dashboard')
     assert dashboard.headers['cache-control'] == 'no-store'
     assert page.locator('#odds-sync').is_visible()
     live = dashboard.json()
     assert live['refresh']['odds_seconds'] == 900
-    assert live['refresh']['stats_seconds'] == 3600
+    assert live['refresh']['stats_seconds'] == 21600
+    assert live['refresh']['browser_seconds'] == 21600
     if live['upcoming'] and live['upcoming'][0]['odds'].get('available'):
         expected = live['upcoming'][0]['odds']['books'][0]
         prices = page.locator('.fight-card').first.locator('.odds-prices strong')
@@ -46,8 +47,8 @@ with sync_playwright() as p:
     page.get_by_text('Choose two different fighters.',exact=True).wait_for()
     page.get_by_role('button', name='Prediction record',exact=True).click()
     assert page.locator('#results').is_visible()
-    page.get_by_role('button', name='Inside the model',exact=True).click()
-    assert page.get_by_text('Brier score · lower is better',exact=True).is_visible()
+    page.locator('button[data-tab="model"]').click()
+    assert page.get_by_text('Brier score', exact=False).is_visible()
     page.set_viewport_size({'width':390,'height':844})
     page.get_by_role('button', name='Upcoming fights').click()
     assert page.evaluate('document.documentElement.scrollWidth <= window.innerWidth')

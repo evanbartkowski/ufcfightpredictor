@@ -54,7 +54,7 @@ def create_app(data_dir=None, bootstrap=True, auto_updates=None):
         if request.path.startswith('/api/'):
             response.headers['Cache-Control'] = 'no-store'
         response.headers['X-Content-Type-Options'] = 'nosniff'
-        response.headers['Content-Security-Policy'] = "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; img-src 'self' data:; frame-ancestors 'none'"
+        response.headers['Content-Security-Policy'] = "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' https://www.gstatic.com; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.google-analytics.com https://*.firebasestorage.app; img-src 'self' data: https://*.google-analytics.com; frame-ancestors 'none'"
         return response
 
     return app
@@ -74,5 +74,5 @@ if __name__ == '__main__':
         service.sync_odds()
         service.sync()
     else:
-        print(f'MMA Oracle Predictions is running at http://{args.host}:{args.port}', flush=True)
+        print(f'MMA Cipher is running at http://{args.host}:{args.port}', flush=True)
         serve(app, host=args.host, port=args.port, threads=6)
