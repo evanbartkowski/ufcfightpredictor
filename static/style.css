@@ -1649,6 +1649,26 @@ input {
   align-items: center;
   gap: 8px;
 }
+.bottom-brand {
+  flex: 0 0 auto;
+  justify-content: flex-start;
+}
+.bottom-creator-center {
+  flex: 1 1 auto;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.bottom-creations {
+  flex: 0 0 auto;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.bottom-socials {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
 
 /* Studio & Glowing Name */
 .studio-badge {
@@ -2011,11 +2031,15 @@ input {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    gap: 10px;
+    gap: 12px;
   }
   .bottom-item {
     justify-content: center;
     flex-wrap: wrap;
+  }
+  .bottom-creator-center {
+    flex-direction: column;
+    gap: 8px;
   }
   .bottom-disclaimer {
     text-align: center;
