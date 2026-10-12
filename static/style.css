@@ -906,22 +906,60 @@ h2 {
 .stats-comparison-details {
   margin-top: 14px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
-  padding-top: 10px;
+  padding-top: 12px;
 }
 .stats-comparison-details summary {
   cursor: pointer;
-  font: 700 11px monospace;
+  font: 700 11px system-ui, -apple-system, monospace;
   letter-spacing: 0.8px;
   color: var(--cyan);
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 0;
-  transition: color 0.2s;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 16px;
+  margin: 6px 0 14px;
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.08) 0%, rgba(18, 24, 40, 0.8) 100%);
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  border-radius: 8px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(0, 240, 255, 0.15);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   user-select: none;
+  list-style: none;
+}
+.stats-comparison-details summary::-webkit-details-marker {
+  display: none;
+}
+.stats-comparison-details summary::before {
+  content: '📊';
+  font-size: 13px;
+  filter: drop-shadow(0 0 6px rgba(0, 240, 255, 0.5));
+}
+.stats-comparison-details summary::after {
+  content: '▾';
+  font-size: 13px;
+  color: var(--cyan);
+  transition: transform 0.25s ease;
+  margin-left: 2px;
 }
 .stats-comparison-details summary:hover {
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.18) 0%, rgba(24, 32, 54, 0.95) 100%);
+  border-color: #00f0ff;
   color: #ffffff;
+  box-shadow: 0 0 18px rgba(0, 240, 255, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+.stats-comparison-details summary:active {
+  transform: translateY(0);
+}
+.stats-comparison-details[open] > summary {
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.12) 0%, rgba(15, 20, 34, 0.95) 100%);
+  border-color: rgba(0, 240, 255, 0.5);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.2);
+  margin-bottom: 16px;
+}
+.stats-comparison-details[open] > summary::after {
+  transform: rotate(180deg);
 }
 .performance-snapshot-card {
   background: linear-gradient(180deg, #121422 0%, #0d0f1a 100%);
