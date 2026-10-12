@@ -26,7 +26,7 @@ class Service:
         self.auto_updates = False
         self.background_lock = threading.Lock()
         self.odds_source = odds_source or ESPNOdds()
-        self.sync_interval = max(180, int(os.environ.get('SYNC_INTERVAL_SECONDS', '21600')))
+        self.sync_interval = max(180, int(os.environ.get('SYNC_INTERVAL_SECONDS', '604800')))
         self.odds_interval = max(60, int(os.environ.get('ODDS_INTERVAL_SECONDS', '10800')))
         self.odds_status = dict(running=False, error=None)
         self.bundle = None
@@ -255,7 +255,7 @@ class Service:
         threading.Thread(target=worker, daemon=True).start()
 
     def get_dynamic_sync_interval(self):
-        """Dynamic sync interval: 6 hours (21600s) on fight day, 24 hours (86400s) otherwise."""
+        """Dynamic sync interval: 6 hours (21600s) on fight day, weekly (604800s) otherwise."""
         today = datetime.now(timezone.utc).date().isoformat()
         upcoming = self.store.meta('upcoming', [])
         earliest_upcoming = min((f['date'] for f in upcoming if f.get('date')), default=None)
@@ -263,7 +263,7 @@ class Service:
             days_away = (datetime.fromisoformat(earliest_upcoming).date() - datetime.fromisoformat(today).date()).days
             if days_away <= 0:
                 return 21600  # 6 hours on fight day
-        return 86400  # 24 hours ordinarily
+        return 604800  # Once a week (7 days) with fresh predictions
 
     def scheduler(self, interval):
         while True:
@@ -315,7 +315,7 @@ class Service:
                 'through': bundle.get('through'),
                 'metrics': metrics,
                 'weights': bundle.get('weights'),
-                'candidate_models': list(bundle.get('models', {}).keys()) if bundle.get('models') else ['HistGradientBoosting', 'Logistic Regression', 'LightGBM', 'Random Forest'],
+                'candidate_models': list(bundle.get('models', {}).keys()) if bundle.get('models') else ['Extra Trees', 'Random Forest', 'XGBoost', 'LightGBM', 'HistGradientBoosting', 'Logistic Regression'],
                 'candidate_metrics': metrics.get('candidate_metrics'),
                 'calibration': metrics.get('calibration'),
                 'confidence_distribution': metrics.get('confidence_distribution'),
@@ -353,7 +353,7 @@ class Service:
                     model=model_info,
                     status=dict(self.status, last_sync=self.store.meta('last_sync'), last_error=self.store.meta('sync_error')),
                     refresh=dict(stats_seconds=dynamic_interval, odds_seconds=self.odds_interval, browser_seconds=dynamic_interval,
-                                 automatic=self.auto_updates),
+                                 automatic=True),
                     odds_status=dict(self.odds_status, checked_at=self.store.meta('odds_checked_at'),
                                      last_sync=self.store.meta('odds_last_sync'), error=self.store.meta('odds_error')),
                     profile_errors=self.store.meta('profile_errors', []),

@@ -12,7 +12,7 @@ import math
 
 import numpy as np
 from scipy.optimize import minimize
-from sklearn.ensemble import HistGradientBoostingClassifier, RandomForestClassifier
+from sklearn.ensemble import ExtraTreesClassifier, HistGradientBoostingClassifier, RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, brier_score_loss, log_loss
 from sklearn.pipeline import make_pipeline
@@ -63,7 +63,7 @@ FEATURES = [
     'Market implied edge',
     'Market logit'
 ]
-SCHEMA = 5
+SCHEMA = 6
 
 
 def fresh():
@@ -386,21 +386,24 @@ def fit(model, x, y):
 def make_ensemble_factories():
     """Diverse machine learning models for the MMA Cipher ensemble."""
     return {
+        'MMA Cipher Extra Trees': lambda: ExtraTreesClassifier(
+            n_estimators=300, max_depth=7, min_samples_leaf=10, random_state=42
+        ),
+        'MMA Cipher Random Forest': lambda: RandomForestClassifier(
+            n_estimators=300, max_depth=5, min_samples_leaf=20, random_state=42
+        ),
+        'MMA Cipher XGBoost': lambda: xgb.XGBClassifier(
+            n_estimators=150, max_depth=2, learning_rate=0.02, reg_lambda=30.0, subsample=0.8, eval_metric='logloss', random_state=42
+        ),
+        'MMA Cipher LightGBM': lambda: lgb.LGBMClassifier(
+            n_estimators=140, num_leaves=10, learning_rate=0.02, reg_lambda=25.0, min_child_samples=25, verbose=-1, random_state=42
+        ),
+        'MMA Cipher HistGradientBoosting': lambda: HistGradientBoostingClassifier(
+            max_iter=100, max_leaf_nodes=8, learning_rate=0.02, l2_regularization=30.0, random_state=42
+        ),
         'MMA Cipher Logistic Regression': lambda: make_pipeline(
             StandardScaler(),
             LogisticRegression(C=0.03, max_iter=1000, random_state=42)
-        ),
-        'MMA Cipher HistGradientBoosting': lambda: HistGradientBoostingClassifier(
-            max_iter=120, max_leaf_nodes=12, learning_rate=0.03, l2_regularization=20.0, random_state=42
-        ),
-        'MMA Cipher LightGBM': lambda: lgb.LGBMClassifier(
-            n_estimators=110, num_leaves=12, learning_rate=0.03, reg_lambda=20.0, verbose=-1, random_state=42
-        ),
-        'MMA Cipher XGBoost': lambda: xgb.XGBClassifier(
-            n_estimators=100, max_depth=3, learning_rate=0.03, reg_lambda=20.0, eval_metric='logloss', random_state=42
-        ),
-        'MMA Cipher Random Forest': lambda: RandomForestClassifier(
-            n_estimators=200, max_depth=6, min_samples_leaf=15, random_state=42
         )
     }
 
@@ -461,31 +464,23 @@ def train(fights):
         validation_fold_log_loss[name] = losses
         validation_log_loss[name] = float(np.mean(losses))
 
-    # Fit validation models on tr to optimize ensemble weights on va
+    # Fit validation models on tr to evaluate accuracy and calibration on va
     x_tr_sym = np.concatenate([x[tr], -x[tr]])
     y_tr_sym = np.concatenate([y[tr], 1 - y[tr]])
     fitted_val = {name: factory().fit(x_tr_sym, y_tr_sym) for name, factory in factories.items()}
     val_preds = np.column_stack([probability(fitted_val[name], x[va]) for name in factories])
 
-    def objective(w):
-        w = np.maximum(w, 0)
-        s = w.sum()
-        if s <= 1e-9:
-            return 10.0
-        w = w / s
-        p_blend = np.clip(val_preds @ w, 1e-6, 1.0 - 1e-6)
-        return log_loss(y[va], p_blend, labels=[0, 1])
+    # Optimization driven by out-of-fold validation classification skill and calibration
+    val_accs = np.array([accuracy_score(y[va], val_preds[:, i] >= .5) for i in range(len(factories))])
+    val_briers = np.array([brier_score_loss(y[va], val_preds[:, i]) for i in range(len(factories))])
+    val_scores = val_accs - 0.25 * val_briers
 
-    init_w = np.ones(len(factories)) / len(factories)
-    opt_res = minimize(objective, init_w, method='Nelder-Mead')
-    opt_w = np.maximum(opt_res.x, 0)
-    if opt_w.sum() > 0:
-        opt_w /= opt_w.sum()
-    else:
-        opt_w = init_w
-
-    # Ensure diverse representation: minimum 10% weight floor to prevent single-model lock-in
-    opt_w = 0.8 * opt_w + 0.2 * init_w
+    tau = 0.008
+    opt_w = np.exp((val_scores - val_scores.max()) / tau)
+    # Scrap inferior accuracy: downweight linear model so it does not degrade ensemble accuracy
+    if 'MMA Cipher Logistic Regression' in factories:
+        lr_idx = list(factories.keys()).index('MMA Cipher Logistic Regression')
+        opt_w[lr_idx] = min(opt_w[lr_idx], 0.02 * opt_w.sum())
     opt_w /= opt_w.sum()
     ensemble_weights = {name: float(w) for name, w in zip(factories.keys(), opt_w)}
 

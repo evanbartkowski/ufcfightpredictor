@@ -378,8 +378,8 @@
             "updated_at": null
           }
         ],
-        "fetched_at": "2026-10-11T21:56:43.476267+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:30.211636+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-10-17T21:00Z",
@@ -768,8 +768,8 @@
             "updated_at": null
           }
         ],
-        "fetched_at": "2026-10-11T21:56:43.304826+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:30.044826+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-10-17T21:00Z",
@@ -1123,8 +1123,8 @@
             "updated_at": null
           }
         ],
-        "fetched_at": "2026-10-11T21:56:43.138769+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:29.877899+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-10-17T21:00Z",
@@ -1513,8 +1513,8 @@
             "updated_at": null
           }
         ],
-        "fetched_at": "2026-10-11T21:56:42.970522+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:29.710449+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-10-17T21:00Z",
@@ -1868,8 +1868,8 @@
             "updated_at": null
           }
         ],
-        "fetched_at": "2026-10-11T21:56:42.804194+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:29.531786+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-10-17T21:00Z",
@@ -2229,8 +2229,8 @@
             "updated_at": null
           }
         ],
-        "fetched_at": "2026-10-11T21:56:42.638241+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:29.358191+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-10-17T21:00Z",
@@ -2596,12 +2596,12 @@
           {
             "name": "DraftKings",
             "red": 190,
-            "blue": -250,
+            "blue": -230,
             "updated_at": null
           }
         ],
-        "fetched_at": "2026-10-11T21:56:42.472101+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:29.191464+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-10-17T21:00Z",
@@ -2926,8 +2926,8 @@
             "updated_at": null
           }
         ],
-        "fetched_at": "2026-10-11T21:56:41.791330+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:28.444931+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-10-17T21:00Z",
@@ -3208,8 +3208,8 @@
             "updated_at": null
           }
         ],
-        "fetched_at": "2026-10-11T21:56:41.624205+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:28.259157+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-10-17T21:00Z",
@@ -3553,8 +3553,8 @@
             "updated_at": null
           }
         ],
-        "fetched_at": "2026-10-11T21:56:41.458179+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:28.090789+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-10-17T21:00Z",
@@ -3933,8 +3933,8 @@
             "updated_at": null
           }
         ],
-        "fetched_at": "2026-10-11T21:56:42.302352+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:29.016321+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-10-17T21:00Z",
@@ -4300,8 +4300,8 @@
             "updated_at": null
           }
         ],
-        "fetched_at": "2026-10-11T21:56:42.131512+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:28.848687+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-10-17T21:00Z",
@@ -4634,8 +4634,8 @@
             "updated_at": null
           }
         ],
-        "fetched_at": "2026-10-11T21:56:41.961242+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:28.613041+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-10-17T21:00Z",
@@ -5024,8 +5024,8 @@
             "updated_at": null
           }
         ],
-        "fetched_at": "2026-10-11T21:56:45.190632+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:31.879359+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-10-24T14:00Z",
@@ -5414,8 +5414,8 @@
             "updated_at": null
           }
         ],
-        "fetched_at": "2026-10-11T21:56:45.020637+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:31.712828+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-10-24T14:00Z",
@@ -5755,8 +5755,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:44.827754+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:31.545484+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-10-24T14:00Z",
@@ -6115,8 +6115,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:44.658631+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:31.379371+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-10-24T14:00Z",
@@ -6498,8 +6498,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:44.317158+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:31.046436+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-10-24T14:00Z",
@@ -6858,8 +6858,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:44.149591+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:30.877564+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-10-24T14:00Z",
@@ -7218,8 +7218,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:43.979695+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:30.710812+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-10-24T14:00Z",
@@ -7599,8 +7599,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:43.812692+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:30.545434+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-10-24T14:00Z",
@@ -7930,8 +7930,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:44.488215+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:31.213264+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-10-24T14:00Z",
@@ -8313,8 +8313,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:47.037396+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:33.722052+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-10-31T21:00Z",
@@ -8635,8 +8635,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:46.870041+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:33.556449+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-10-31T21:00Z",
@@ -8981,8 +8981,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:46.701502+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:33.387488+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-10-31T21:00Z",
@@ -9343,8 +9343,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:46.532619+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:33.221315+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-10-31T21:00Z",
@@ -9726,8 +9726,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:46.361869+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:33.055928+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-10-31T21:00Z",
@@ -10109,8 +10109,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:46.195666+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:32.887078+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-10-31T21:00Z",
@@ -10416,8 +10416,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:46.029727+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:32.721598+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-10-31T21:00Z",
@@ -10744,8 +10744,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:45.861013+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:32.556817+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-10-31T21:00Z",
@@ -11106,8 +11106,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:45.692373+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:32.378667+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-10-31T21:00Z",
@@ -11487,8 +11487,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:45.527117+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:32.212150+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-10-31T21:00Z",
@@ -11872,8 +11872,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:45.357181+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:32.046776+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-10-31T21:00Z",
@@ -12255,8 +12255,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:49.213195+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:35.884121+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-11-07T22:00Z",
@@ -12638,8 +12638,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:49.045010+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:35.720006+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-11-07T22:00Z",
@@ -12969,8 +12969,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:48.878061+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:35.545912+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-11-07T22:00Z",
@@ -13302,8 +13302,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:48.714323+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:35.379793+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-11-07T22:00Z",
@@ -13633,8 +13633,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:48.545056+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:35.213959+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-11-07T22:00Z",
@@ -14016,8 +14016,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:48.374105+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:35.049522+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-11-07T22:00Z",
@@ -14370,8 +14370,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:48.205896+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:34.883354+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-11-07T22:00Z",
@@ -14695,8 +14695,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:48.038927+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:34.719189+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-11-07T22:00Z",
@@ -15055,8 +15055,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:47.873692+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:34.550850+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-11-07T22:00Z",
@@ -15749,8 +15749,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:47.540289+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:34.219607+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-11-07T22:00Z",
@@ -16074,8 +16074,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:47.373794+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:34.053112+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-11-07T22:00Z",
@@ -16396,8 +16396,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:47.206973+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:33.886982+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-11-07T22:00Z",
@@ -16765,8 +16765,8 @@
             "updated_at": null
           }
         ],
-        "fetched_at": "2026-10-11T21:56:51.233175+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:37.901177+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-11-15T00:00Z",
@@ -17132,8 +17132,8 @@
             "updated_at": null
           }
         ],
-        "fetched_at": "2026-10-11T21:56:51.066042+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:37.731928+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-11-15T00:00Z",
@@ -17492,8 +17492,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:50.900731+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:37.561920+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-11-15T00:00Z",
@@ -17875,8 +17875,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:50.731115+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:37.394558+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-11-15T00:00Z",
@@ -18210,8 +18210,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:50.562419+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:37.226597+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-11-15T00:00Z",
@@ -18593,8 +18593,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:50.394272+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:37.058847+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-11-15T00:00Z",
@@ -18976,8 +18976,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:50.224624+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:36.889341+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-11-15T00:00Z",
@@ -19359,8 +19359,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:50.055509+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:36.720744+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-11-15T00:00Z",
@@ -19696,8 +19696,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:49.888823+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:36.554076+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-11-15T00:00Z",
@@ -20056,8 +20056,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:49.721564+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:36.387450+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-11-15T00:00Z",
@@ -20410,8 +20410,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:49.554047+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:36.222027+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-11-15T00:00Z",
@@ -20764,8 +20764,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:49.384229+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:36.053100+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-11-15T00:00Z",
@@ -21128,8 +21128,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:52.748066+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:39.408924+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-11-21T14:00Z",
@@ -21490,8 +21490,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:52.580536+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:39.242749+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-11-21T14:00Z",
@@ -21873,8 +21873,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:52.412420+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:39.075997+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-11-21T14:00Z",
@@ -22256,8 +22256,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:52.245183+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:38.908264+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-11-21T14:00Z",
@@ -22618,8 +22618,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:52.077852+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:38.741359+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-11-21T14:00Z",
@@ -22972,8 +22972,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:51.907422+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:38.573176+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-11-21T14:00Z",
@@ -23306,8 +23306,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:51.739808+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:38.405789+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-11-21T14:00Z",
@@ -23689,8 +23689,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:51.571343+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:38.235313+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-11-21T14:00Z",
@@ -24072,8 +24072,8 @@
       "odds": {
         "available": false,
         "books": [],
-        "fetched_at": "2026-10-11T21:56:51.401334+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:38.070007+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-11-21T14:00Z",
@@ -24462,8 +24462,8 @@
             "updated_at": null
           }
         ],
-        "fetched_at": "2026-10-11T21:56:53.277182+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:39.913847+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-12-12T22:00Z",
@@ -24852,8 +24852,8 @@
             "updated_at": null
           }
         ],
-        "fetched_at": "2026-10-11T21:56:53.098326+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:39.744691+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-12-12T22:00Z",
@@ -25242,8 +25242,8 @@
             "updated_at": null
           }
         ],
-        "fetched_at": "2026-10-11T21:56:52.924677+00:00",
-        "stale": false,
+        "fetched_at": "2026-10-11T22:05:39.575950+00:00",
+        "stale": true,
         "error": null,
         "state": "pre",
         "start_at": "2026-12-12T22:00Z",
@@ -145764,14 +145764,14 @@
   },
   "model": {
     "name": "MMA Cipher Advanced Ensemble",
-    "version": "47750791c21b",
-    "schema": 5,
-    "trained_at": "2026-10-11T21:57:48.985272+00:00",
+    "version": "8d5c006fb9ee",
+    "schema": 6,
+    "trained_at": "2026-10-12T21:02:40.345027+00:00",
     "through": "2026-10-10",
     "metrics": {
-      "accuracy": 0.5871501272264631,
-      "brier": 0.23430435359637214,
-      "log_loss": 0.6598834368932748,
+      "accuracy": 0.6221374045801527,
+      "brier": 0.2331826428437536,
+      "log_loss": 0.6582283526926502,
       "elo_accuracy": 0.5578880407124682,
       "majority_accuracy": 0.48536895674300257,
       "test_fights": 1572,
@@ -145779,148 +145779,162 @@
       "test_end": "2026-10-10",
       "training_fights": 7489,
       "validation_log_loss": {
-        "MMA Cipher Logistic Regression": 0.6205804902427611,
-        "MMA Cipher HistGradientBoosting": 0.62081775761798,
-        "MMA Cipher LightGBM": 0.6208867466421465,
-        "MMA Cipher XGBoost": 0.6206235289573669,
-        "MMA Cipher Random Forest": 0.626611324158112
+        "MMA Cipher Extra Trees": 0.6365663038964717,
+        "MMA Cipher Random Forest": 0.6282039333592461,
+        "MMA Cipher XGBoost": 0.6210133830706278,
+        "MMA Cipher LightGBM": 0.6210631487346793,
+        "MMA Cipher HistGradientBoosting": 0.6235649701969946,
+        "MMA Cipher Logistic Regression": 0.6205804902427611
       },
       "validation_fold_log_loss": {
+        "MMA Cipher Extra Trees": [
+          0.6369519991527623,
+          0.647539972483996,
+          0.625206940052657
+        ],
+        "MMA Cipher Random Forest": [
+          0.6298688091977734,
+          0.6425329954041996,
+          0.6122099954757655
+        ],
+        "MMA Cipher XGBoost": [
+          0.6192152500152588,
+          0.6375229358673096,
+          0.6063019633293152
+        ],
+        "MMA Cipher LightGBM": [
+          0.6221361108921464,
+          0.6349192970125415,
+          0.6061340382993501
+        ],
+        "MMA Cipher HistGradientBoosting": [
+          0.6224762780628088,
+          0.637212104481728,
+          0.6110065280464471
+        ],
         "MMA Cipher Logistic Regression": [
           0.624576755883006,
           0.6388846249936304,
           0.5982800898516467
-        ],
-        "MMA Cipher HistGradientBoosting": [
-          0.6232610524467744,
-          0.6351557187940192,
-          0.6040365016131461
-        ],
-        "MMA Cipher LightGBM": [
-          0.6238128590565633,
-          0.6344602247199423,
-          0.6043871561499339
-        ],
-        "MMA Cipher XGBoost": [
-          0.6210696697235107,
-          0.6353660225868225,
-          0.6054348945617676
-        ],
-        "MMA Cipher Random Forest": [
-          0.628913267268439,
-          0.6416815123917469,
-          0.6092391928141504
         ]
       },
       "validation_scheme": "Three expanding chronological windows; final 20% holdout",
       "ensemble_weights": {
-        "MMA Cipher Logistic Regression": 0.8068607671858057,
-        "MMA Cipher HistGradientBoosting": 0.07313923281419418,
-        "MMA Cipher LightGBM": 0.04,
-        "MMA Cipher XGBoost": 0.04,
-        "MMA Cipher Random Forest": 0.04
+        "MMA Cipher Extra Trees": 0.15109350310185574,
+        "MMA Cipher Random Forest": 0.31207974475141764,
+        "MMA Cipher XGBoost": 0.17267908342476823,
+        "MMA Cipher LightGBM": 0.1381996573662042,
+        "MMA Cipher HistGradientBoosting": 0.20217271637159046,
+        "MMA Cipher Logistic Regression": 0.02377529498416375
       },
       "candidate_holdout_accuracies": {
-        "MMA Cipher Logistic Regression": 0.5820610687022901,
-        "MMA Cipher HistGradientBoosting": 0.6278625954198473,
-        "MMA Cipher LightGBM": 0.6075063613231552,
-        "MMA Cipher XGBoost": 0.6081424936386769,
-        "MMA Cipher Random Forest": 0.6367684478371501
+        "MMA Cipher Extra Trees": 0.6418575063613231,
+        "MMA Cipher Random Forest": 0.6393129770992366,
+        "MMA Cipher XGBoost": 0.6094147582697201,
+        "MMA Cipher LightGBM": 0.6119592875318066,
+        "MMA Cipher HistGradientBoosting": 0.6202290076335878,
+        "MMA Cipher Logistic Regression": 0.5820610687022901
       },
       "candidate_metrics": {
+        "MMA Cipher Extra Trees": {
+          "accuracy": 0.6418575063613231,
+          "log_loss": 0.6615572385386159,
+          "brier": 0.23461202451777174,
+          "weight": 0.15109350310185574
+        },
+        "MMA Cipher Random Forest": {
+          "accuracy": 0.6393129770992366,
+          "log_loss": 0.6569161499386675,
+          "brier": 0.23247194661512166,
+          "weight": 0.31207974475141764
+        },
+        "MMA Cipher XGBoost": {
+          "accuracy": 0.6094147582697201,
+          "log_loss": 0.662974875887754,
+          "brier": 0.23563021918779561,
+          "weight": 0.17267908342476823
+        },
+        "MMA Cipher LightGBM": {
+          "accuracy": 0.6119592875318066,
+          "log_loss": 0.6552061791079065,
+          "brier": 0.2318140753936652,
+          "weight": 0.1381996573662042
+        },
+        "MMA Cipher HistGradientBoosting": {
+          "accuracy": 0.6202290076335878,
+          "log_loss": 0.6595908384264569,
+          "brier": 0.23386419828463118,
+          "weight": 0.20217271637159046
+        },
         "MMA Cipher Logistic Regression": {
           "accuracy": 0.5820610687022901,
           "log_loss": 0.6625450186701252,
           "brier": 0.23563236095481876,
-          "weight": 0.8068607671858057
-        },
-        "MMA Cipher HistGradientBoosting": {
-          "accuracy": 0.6278625954198473,
-          "log_loss": 0.6533825283269937,
-          "brier": 0.2309487442023874,
-          "weight": 0.07313923281419418
-        },
-        "MMA Cipher LightGBM": {
-          "accuracy": 0.6075063613231552,
-          "log_loss": 0.6536999744074142,
-          "brier": 0.23111668403579444,
-          "weight": 0.04
-        },
-        "MMA Cipher XGBoost": {
-          "accuracy": 0.6081424936386769,
-          "log_loss": 0.6565191598849555,
-          "brier": 0.23246135764381942,
-          "weight": 0.04
-        },
-        "MMA Cipher Random Forest": {
-          "accuracy": 0.6367684478371501,
-          "log_loss": 0.6545327338823644,
-          "brier": 0.2313821421577412,
-          "weight": 0.04
+          "weight": 0.02377529498416375
         }
       },
       "calibration": [
         {
           "range": "50\u201360%",
-          "expected": 0.539,
-          "observed": 0.544,
-          "count": 1167,
-          "correct": 635
+          "expected": 0.526,
+          "observed": 0.595,
+          "count": 1306,
+          "correct": 777
         },
         {
           "range": "60\u201370%",
-          "expected": 0.64,
-          "observed": 0.638,
-          "count": 229,
-          "correct": 146
+          "expected": 0.651,
+          "observed": 0.713,
+          "count": 160,
+          "correct": 114
         },
         {
           "range": "70\u201380%",
-          "expected": 0.752,
-          "observed": 0.795,
-          "count": 117,
-          "correct": 93
+          "expected": 0.757,
+          "observed": 0.816,
+          "count": 103,
+          "correct": 84
         },
         {
           "range": "80\u201390%",
-          "expected": 0.839,
-          "observed": 0.811,
-          "count": 53,
-          "correct": 43
+          "expected": 0.806,
+          "observed": 1.0,
+          "count": 3,
+          "correct": 3
         },
         {
           "range": "90\u2013100%",
-          "expected": 0.911,
-          "observed": 1.0,
-          "count": 6,
-          "correct": 6
+          "expected": 0.95,
+          "observed": 0.0,
+          "count": 0,
+          "correct": 0
         }
       ],
       "confidence_distribution": [
         {
           "range": "50\u201360%",
-          "count": 1167,
-          "percentage": 74.2
+          "count": 1306,
+          "percentage": 83.1
         },
         {
           "range": "60\u201370%",
-          "count": 229,
-          "percentage": 14.6
+          "count": 160,
+          "percentage": 10.2
         },
         {
           "range": "70\u201380%",
-          "count": 117,
-          "percentage": 7.4
+          "count": 103,
+          "percentage": 6.6
         },
         {
           "range": "80\u201390%",
-          "count": 53,
-          "percentage": 3.4
+          "count": 3,
+          "percentage": 0.2
         },
         {
           "range": "90\u2013100%",
-          "count": 6,
-          "percentage": 0.4
+          "count": 0,
+          "percentage": 0.0
         }
       ],
       "events_history": [
@@ -145929,9 +145943,9 @@
           "date": "2023-09-23",
           "event": "Historical UFC event",
           "fights": 10,
-          "correct": 6,
-          "accuracy": 0.6,
-          "cumulative_accuracy": 0.6,
+          "correct": 5,
+          "accuracy": 0.5,
+          "cumulative_accuracy": 0.5,
           "cumulative_fights": 10
         },
         {
@@ -145941,7 +145955,7 @@
           "fights": 10,
           "correct": 4,
           "accuracy": 0.4,
-          "cumulative_accuracy": 0.5,
+          "cumulative_accuracy": 0.45,
           "cumulative_fights": 20
         },
         {
@@ -145951,7 +145965,7 @@
           "fights": 11,
           "correct": 6,
           "accuracy": 0.545,
-          "cumulative_accuracy": 0.516,
+          "cumulative_accuracy": 0.484,
           "cumulative_fights": 31
         },
         {
@@ -145961,7 +145975,7 @@
           "fights": 11,
           "correct": 9,
           "accuracy": 0.818,
-          "cumulative_accuracy": 0.595,
+          "cumulative_accuracy": 0.571,
           "cumulative_fights": 42
         },
         {
@@ -145969,9 +145983,9 @@
           "date": "2023-11-04",
           "event": "Historical UFC event",
           "fights": 9,
-          "correct": 7,
-          "accuracy": 0.778,
-          "cumulative_accuracy": 0.627,
+          "correct": 6,
+          "accuracy": 0.667,
+          "cumulative_accuracy": 0.588,
           "cumulative_fights": 51
         },
         {
@@ -145979,9 +145993,9 @@
           "date": "2023-11-11",
           "event": "Historical UFC event",
           "fights": 12,
-          "correct": 8,
-          "accuracy": 0.667,
-          "cumulative_accuracy": 0.635,
+          "correct": 9,
+          "accuracy": 0.75,
+          "cumulative_accuracy": 0.619,
           "cumulative_fights": 63
         },
         {
@@ -145989,9 +146003,9 @@
           "date": "2023-11-18",
           "event": "Historical UFC event",
           "fights": 13,
-          "correct": 11,
-          "accuracy": 0.846,
-          "cumulative_accuracy": 0.671,
+          "correct": 10,
+          "accuracy": 0.769,
+          "cumulative_accuracy": 0.645,
           "cumulative_fights": 76
         },
         {
@@ -145999,9 +146013,9 @@
           "date": "2023-12-02",
           "event": "Historical UFC event",
           "fights": 12,
-          "correct": 8,
-          "accuracy": 0.667,
-          "cumulative_accuracy": 0.67,
+          "correct": 7,
+          "accuracy": 0.583,
+          "cumulative_accuracy": 0.636,
           "cumulative_fights": 88
         },
         {
@@ -146011,7 +146025,7 @@
           "fights": 11,
           "correct": 8,
           "accuracy": 0.727,
-          "cumulative_accuracy": 0.677,
+          "cumulative_accuracy": 0.646,
           "cumulative_fights": 99
         },
         {
@@ -146021,7 +146035,7 @@
           "fights": 12,
           "correct": 7,
           "accuracy": 0.583,
-          "cumulative_accuracy": 0.667,
+          "cumulative_accuracy": 0.64,
           "cumulative_fights": 111
         },
         {
@@ -146031,7 +146045,7 @@
           "fights": 11,
           "correct": 9,
           "accuracy": 0.818,
-          "cumulative_accuracy": 0.68,
+          "cumulative_accuracy": 0.656,
           "cumulative_fights": 122
         },
         {
@@ -146039,9 +146053,9 @@
           "date": "2024-01-20",
           "event": "Historical UFC event",
           "fights": 12,
-          "correct": 7,
-          "accuracy": 0.583,
-          "cumulative_accuracy": 0.672,
+          "correct": 6,
+          "accuracy": 0.5,
+          "cumulative_accuracy": 0.642,
           "cumulative_fights": 134
         },
         {
@@ -146051,7 +146065,7 @@
           "fights": 12,
           "correct": 8,
           "accuracy": 0.667,
-          "cumulative_accuracy": 0.671,
+          "cumulative_accuracy": 0.644,
           "cumulative_fights": 146
         },
         {
@@ -146059,9 +146073,9 @@
           "date": "2024-02-10",
           "event": "Historical UFC event",
           "fights": 13,
-          "correct": 9,
-          "accuracy": 0.692,
-          "cumulative_accuracy": 0.673,
+          "correct": 8,
+          "accuracy": 0.615,
+          "cumulative_accuracy": 0.642,
           "cumulative_fights": 159
         },
         {
@@ -146069,9 +146083,9 @@
           "date": "2024-02-17",
           "event": "Historical UFC event",
           "fights": 12,
-          "correct": 10,
-          "accuracy": 0.833,
-          "cumulative_accuracy": 0.684,
+          "correct": 11,
+          "accuracy": 0.917,
+          "cumulative_accuracy": 0.661,
           "cumulative_fights": 171
         },
         {
@@ -146079,9 +146093,9 @@
           "date": "2024-02-24",
           "event": "Historical UFC event",
           "fights": 12,
-          "correct": 8,
-          "accuracy": 0.667,
-          "cumulative_accuracy": 0.683,
+          "correct": 9,
+          "accuracy": 0.75,
+          "cumulative_accuracy": 0.667,
           "cumulative_fights": 183
         },
         {
@@ -146091,7 +146105,7 @@
           "fights": 11,
           "correct": 8,
           "accuracy": 0.727,
-          "cumulative_accuracy": 0.686,
+          "cumulative_accuracy": 0.67,
           "cumulative_fights": 194
         },
         {
@@ -146099,9 +146113,9 @@
           "date": "2024-03-09",
           "event": "Historical UFC event",
           "fights": 14,
-          "correct": 10,
-          "accuracy": 0.714,
-          "cumulative_accuracy": 0.688,
+          "correct": 9,
+          "accuracy": 0.643,
+          "cumulative_accuracy": 0.668,
           "cumulative_fights": 208
         },
         {
@@ -146109,9 +146123,9 @@
           "date": "2024-03-16",
           "event": "Historical UFC event",
           "fights": 12,
-          "correct": 6,
-          "accuracy": 0.5,
-          "cumulative_accuracy": 0.677,
+          "correct": 4,
+          "accuracy": 0.333,
+          "cumulative_accuracy": 0.65,
           "cumulative_fights": 220
         },
         {
@@ -146121,7 +146135,7 @@
           "fights": 13,
           "correct": 10,
           "accuracy": 0.769,
-          "cumulative_accuracy": 0.682,
+          "cumulative_accuracy": 0.657,
           "cumulative_fights": 233
         },
         {
@@ -146131,7 +146145,7 @@
           "fights": 13,
           "correct": 6,
           "accuracy": 0.462,
-          "cumulative_accuracy": 0.671,
+          "cumulative_accuracy": 0.646,
           "cumulative_fights": 246
         },
         {
@@ -146141,7 +146155,7 @@
           "fights": 12,
           "correct": 7,
           "accuracy": 0.583,
-          "cumulative_accuracy": 0.667,
+          "cumulative_accuracy": 0.643,
           "cumulative_fights": 258
         },
         {
@@ -146149,9 +146163,9 @@
           "date": "2024-04-13",
           "event": "Historical UFC event",
           "fights": 13,
-          "correct": 9,
-          "accuracy": 0.692,
-          "cumulative_accuracy": 0.668,
+          "correct": 10,
+          "accuracy": 0.769,
+          "cumulative_accuracy": 0.649,
           "cumulative_fights": 271
         },
         {
@@ -146161,7 +146175,7 @@
           "fights": 13,
           "correct": 7,
           "accuracy": 0.538,
-          "cumulative_accuracy": 0.662,
+          "cumulative_accuracy": 0.644,
           "cumulative_fights": 284
         },
         {
@@ -146171,7 +146185,7 @@
           "fights": 13,
           "correct": 9,
           "accuracy": 0.692,
-          "cumulative_accuracy": 0.663,
+          "cumulative_accuracy": 0.646,
           "cumulative_fights": 297
         },
         {
@@ -146179,9 +146193,9 @@
           "date": "2024-05-11",
           "event": "Historical UFC event",
           "fights": 12,
-          "correct": 7,
-          "accuracy": 0.583,
-          "cumulative_accuracy": 0.66,
+          "correct": 8,
+          "accuracy": 0.667,
+          "cumulative_accuracy": 0.647,
           "cumulative_fights": 309
         },
         {
@@ -146189,9 +146203,9 @@
           "date": "2024-05-18",
           "event": "Historical UFC event",
           "fights": 12,
-          "correct": 6,
-          "accuracy": 0.5,
-          "cumulative_accuracy": 0.654,
+          "correct": 5,
+          "accuracy": 0.417,
+          "cumulative_accuracy": 0.639,
           "cumulative_fights": 321
         },
         {
@@ -146199,9 +146213,9 @@
           "date": "2024-06-01",
           "event": "Historical UFC event",
           "fights": 12,
-          "correct": 11,
-          "accuracy": 0.917,
-          "cumulative_accuracy": 0.664,
+          "correct": 8,
+          "accuracy": 0.667,
+          "cumulative_accuracy": 0.64,
           "cumulative_fights": 333
         },
         {
@@ -146211,7 +146225,7 @@
           "fights": 14,
           "correct": 9,
           "accuracy": 0.643,
-          "cumulative_accuracy": 0.663,
+          "cumulative_accuracy": 0.64,
           "cumulative_fights": 347
         },
         {
@@ -146221,7 +146235,7 @@
           "fights": 11,
           "correct": 7,
           "accuracy": 0.636,
-          "cumulative_accuracy": 0.662,
+          "cumulative_accuracy": 0.64,
           "cumulative_fights": 358
         },
         {
@@ -146229,9 +146243,9 @@
           "date": "2024-06-22",
           "event": "Historical UFC event",
           "fights": 11,
-          "correct": 9,
-          "accuracy": 0.818,
-          "cumulative_accuracy": 0.667,
+          "correct": 7,
+          "accuracy": 0.636,
+          "cumulative_accuracy": 0.64,
           "cumulative_fights": 369
         },
         {
@@ -146241,7 +146255,7 @@
           "fights": 13,
           "correct": 11,
           "accuracy": 0.846,
-          "cumulative_accuracy": 0.673,
+          "cumulative_accuracy": 0.647,
           "cumulative_fights": 382
         },
         {
@@ -146249,9 +146263,9 @@
           "date": "2024-07-13",
           "event": "Historical UFC event",
           "fights": 11,
-          "correct": 7,
-          "accuracy": 0.636,
-          "cumulative_accuracy": 0.672,
+          "correct": 8,
+          "accuracy": 0.727,
+          "cumulative_accuracy": 0.649,
           "cumulative_fights": 393
         },
         {
@@ -146259,9 +146273,9 @@
           "date": "2024-07-20",
           "event": "Historical UFC event",
           "fights": 11,
-          "correct": 8,
-          "accuracy": 0.727,
-          "cumulative_accuracy": 0.673,
+          "correct": 6,
+          "accuracy": 0.545,
+          "cumulative_accuracy": 0.646,
           "cumulative_fights": 404
         },
         {
@@ -146269,9 +146283,9 @@
           "date": "2024-07-27",
           "event": "Historical UFC event",
           "fights": 14,
-          "correct": 8,
-          "accuracy": 0.571,
-          "cumulative_accuracy": 0.67,
+          "correct": 10,
+          "accuracy": 0.714,
+          "cumulative_accuracy": 0.648,
           "cumulative_fights": 418
         },
         {
@@ -146281,7 +146295,7 @@
           "fights": 13,
           "correct": 11,
           "accuracy": 0.846,
-          "cumulative_accuracy": 0.675,
+          "cumulative_accuracy": 0.654,
           "cumulative_fights": 431
         },
         {
@@ -146291,7 +146305,7 @@
           "fights": 10,
           "correct": 9,
           "accuracy": 0.9,
-          "cumulative_accuracy": 0.68,
+          "cumulative_accuracy": 0.66,
           "cumulative_fights": 441
         },
         {
@@ -146299,9 +146313,9 @@
           "date": "2024-08-17",
           "event": "Historical UFC event",
           "fights": 12,
-          "correct": 6,
-          "accuracy": 0.5,
-          "cumulative_accuracy": 0.675,
+          "correct": 8,
+          "accuracy": 0.667,
+          "cumulative_accuracy": 0.66,
           "cumulative_fights": 453
         },
         {
@@ -146311,7 +146325,7 @@
           "fights": 11,
           "correct": 9,
           "accuracy": 0.818,
-          "cumulative_accuracy": 0.679,
+          "cumulative_accuracy": 0.664,
           "cumulative_fights": 464
         },
         {
@@ -146319,9 +146333,9 @@
           "date": "2024-09-07",
           "event": "Historical UFC event",
           "fights": 12,
-          "correct": 10,
-          "accuracy": 0.833,
-          "cumulative_accuracy": 0.683,
+          "correct": 11,
+          "accuracy": 0.917,
+          "cumulative_accuracy": 0.67,
           "cumulative_fights": 476
         },
         {
@@ -146329,9 +146343,9 @@
           "date": "2024-09-14",
           "event": "Historical UFC event",
           "fights": 10,
-          "correct": 6,
-          "accuracy": 0.6,
-          "cumulative_accuracy": 0.681,
+          "correct": 5,
+          "accuracy": 0.5,
+          "cumulative_accuracy": 0.667,
           "cumulative_fights": 486
         },
         {
@@ -146341,7 +146355,7 @@
           "fights": 14,
           "correct": 10,
           "accuracy": 0.714,
-          "cumulative_accuracy": 0.682,
+          "cumulative_accuracy": 0.668,
           "cumulative_fights": 500
         },
         {
@@ -146349,9 +146363,9 @@
           "date": "2024-10-05",
           "event": "Historical UFC event",
           "fights": 12,
-          "correct": 9,
-          "accuracy": 0.75,
-          "cumulative_accuracy": 0.684,
+          "correct": 8,
+          "accuracy": 0.667,
+          "cumulative_accuracy": 0.668,
           "cumulative_fights": 512
         },
         {
@@ -146361,7 +146375,7 @@
           "fights": 12,
           "correct": 9,
           "accuracy": 0.75,
-          "cumulative_accuracy": 0.685,
+          "cumulative_accuracy": 0.67,
           "cumulative_fights": 524
         },
         {
@@ -146371,7 +146385,7 @@
           "fights": 11,
           "correct": 8,
           "accuracy": 0.727,
-          "cumulative_accuracy": 0.686,
+          "cumulative_accuracy": 0.671,
           "cumulative_fights": 535
         },
         {
@@ -146381,7 +146395,7 @@
           "fights": 13,
           "correct": 12,
           "accuracy": 0.923,
-          "cumulative_accuracy": 0.692,
+          "cumulative_accuracy": 0.677,
           "cumulative_fights": 548
         },
         {
@@ -146389,9 +146403,9 @@
           "date": "2024-11-02",
           "event": "Historical UFC event",
           "fights": 13,
-          "correct": 9,
-          "accuracy": 0.692,
-          "cumulative_accuracy": 0.692,
+          "correct": 8,
+          "accuracy": 0.615,
+          "cumulative_accuracy": 0.676,
           "cumulative_fights": 561
         },
         {
@@ -146399,9 +146413,9 @@
           "date": "2024-11-09",
           "event": "Historical UFC event",
           "fights": 11,
-          "correct": 4,
-          "accuracy": 0.364,
-          "cumulative_accuracy": 0.685,
+          "correct": 5,
+          "accuracy": 0.455,
+          "cumulative_accuracy": 0.671,
           "cumulative_fights": 572
         },
         {
@@ -146411,7 +146425,7 @@
           "fights": 12,
           "correct": 7,
           "accuracy": 0.583,
-          "cumulative_accuracy": 0.683,
+          "cumulative_accuracy": 0.67,
           "cumulative_fights": 584
         },
         {
@@ -146419,9 +146433,9 @@
           "date": "2024-11-23",
           "event": "UFC 309: Jones vs. Miocic",
           "fights": 13,
-          "correct": 7,
-          "accuracy": 0.538,
-          "cumulative_accuracy": 0.68,
+          "correct": 8,
+          "accuracy": 0.615,
+          "cumulative_accuracy": 0.668,
           "cumulative_fights": 597
         },
         {
@@ -146429,9 +146443,9 @@
           "date": "2024-12-07",
           "event": "UFC Fight Night: Yan vs. Figueiredo",
           "fights": 14,
-          "correct": 11,
-          "accuracy": 0.786,
-          "cumulative_accuracy": 0.682,
+          "correct": 13,
+          "accuracy": 0.929,
+          "cumulative_accuracy": 0.674,
           "cumulative_fights": 611
         },
         {
@@ -146439,9 +146453,9 @@
           "date": "2024-12-14",
           "event": "UFC Fight Night: Covington vs. Buckley",
           "fights": 13,
-          "correct": 8,
-          "accuracy": 0.615,
-          "cumulative_accuracy": 0.681,
+          "correct": 7,
+          "accuracy": 0.538,
+          "cumulative_accuracy": 0.671,
           "cumulative_fights": 624
         },
         {
@@ -146449,9 +146463,9 @@
           "date": "2025-01-11",
           "event": "UFC Fight Night: Dern vs. Ribas 2",
           "fights": 14,
-          "correct": 8,
-          "accuracy": 0.571,
-          "cumulative_accuracy": 0.679,
+          "correct": 6,
+          "accuracy": 0.429,
+          "cumulative_accuracy": 0.666,
           "cumulative_fights": 638
         },
         {
@@ -146459,9 +146473,9 @@
           "date": "2025-01-18",
           "event": "UFC 311: Makhachev vs. Moicano",
           "fights": 13,
-          "correct": 10,
-          "accuracy": 0.769,
-          "cumulative_accuracy": 0.68,
+          "correct": 7,
+          "accuracy": 0.538,
+          "cumulative_accuracy": 0.664,
           "cumulative_fights": 651
         },
         {
@@ -146469,9 +146483,9 @@
           "date": "2025-02-01",
           "event": "UFC Fight Night: Adesanya vs. Imavov",
           "fights": 11,
-          "correct": 5,
-          "accuracy": 0.455,
-          "cumulative_accuracy": 0.677,
+          "correct": 6,
+          "accuracy": 0.545,
+          "cumulative_accuracy": 0.662,
           "cumulative_fights": 662
         },
         {
@@ -146479,9 +146493,9 @@
           "date": "2025-02-08",
           "event": "UFC 312: Du Plessis vs. Strickland 2",
           "fights": 11,
-          "correct": 8,
-          "accuracy": 0.727,
-          "cumulative_accuracy": 0.678,
+          "correct": 6,
+          "accuracy": 0.545,
+          "cumulative_accuracy": 0.66,
           "cumulative_fights": 673
         },
         {
@@ -146489,9 +146503,9 @@
           "date": "2025-02-15",
           "event": "UFC 312: Du Plessis vs. Strickland 2",
           "fights": 12,
-          "correct": 6,
-          "accuracy": 0.5,
-          "cumulative_accuracy": 0.674,
+          "correct": 8,
+          "accuracy": 0.667,
+          "cumulative_accuracy": 0.66,
           "cumulative_fights": 685
         },
         {
@@ -146499,9 +146513,9 @@
           "date": "2025-02-22",
           "event": "UFC Fight Night: Cannonier vs. Rodrigues",
           "fights": 12,
-          "correct": 8,
-          "accuracy": 0.667,
-          "cumulative_accuracy": 0.674,
+          "correct": 7,
+          "accuracy": 0.583,
+          "cumulative_accuracy": 0.659,
           "cumulative_fights": 697
         },
         {
@@ -146509,9 +146523,9 @@
           "date": "2025-03-01",
           "event": "UFC Fight Night: Cejudo vs. Song",
           "fights": 10,
-          "correct": 5,
-          "accuracy": 0.5,
-          "cumulative_accuracy": 0.672,
+          "correct": 7,
+          "accuracy": 0.7,
+          "cumulative_accuracy": 0.659,
           "cumulative_fights": 707
         },
         {
@@ -146519,9 +146533,9 @@
           "date": "2025-03-08",
           "event": "UFC Fight Night: Kape vs. Almabayev",
           "fights": 10,
-          "correct": 3,
-          "accuracy": 0.3,
-          "cumulative_accuracy": 0.667,
+          "correct": 6,
+          "accuracy": 0.6,
+          "cumulative_accuracy": 0.658,
           "cumulative_fights": 717
         },
         {
@@ -146529,9 +146543,9 @@
           "date": "2025-03-15",
           "event": "UFC 313: Pereira vs. Ankalaev",
           "fights": 13,
-          "correct": 8,
-          "accuracy": 0.615,
-          "cumulative_accuracy": 0.666,
+          "correct": 9,
+          "accuracy": 0.692,
+          "cumulative_accuracy": 0.659,
           "cumulative_fights": 730
         },
         {
@@ -146539,9 +146553,9 @@
           "date": "2025-03-22",
           "event": "UFC Fight Night: Vettori vs. Dolidze 2",
           "fights": 13,
-          "correct": 7,
-          "accuracy": 0.538,
-          "cumulative_accuracy": 0.664,
+          "correct": 8,
+          "accuracy": 0.615,
+          "cumulative_accuracy": 0.658,
           "cumulative_fights": 743
         },
         {
@@ -146551,7 +146565,7 @@
           "fights": 12,
           "correct": 9,
           "accuracy": 0.75,
-          "cumulative_accuracy": 0.665,
+          "cumulative_accuracy": 0.66,
           "cumulative_fights": 755
         },
         {
@@ -146559,9 +146573,9 @@
           "date": "2025-04-05",
           "event": "UFC Fight Night: Moreno vs. Erceg",
           "fights": 12,
-          "correct": 6,
-          "accuracy": 0.5,
-          "cumulative_accuracy": 0.662,
+          "correct": 5,
+          "accuracy": 0.417,
+          "cumulative_accuracy": 0.656,
           "cumulative_fights": 767
         },
         {
@@ -146569,9 +146583,9 @@
           "date": "2025-04-12",
           "event": "UFC Fight Night: Emmett vs. Murphy",
           "fights": 13,
-          "correct": 6,
-          "accuracy": 0.462,
-          "cumulative_accuracy": 0.659,
+          "correct": 5,
+          "accuracy": 0.385,
+          "cumulative_accuracy": 0.651,
           "cumulative_fights": 780
         },
         {
@@ -146579,9 +146593,9 @@
           "date": "2025-04-26",
           "event": "UFC 314: Volkanovski vs. Lopes",
           "fights": 14,
-          "correct": 9,
-          "accuracy": 0.643,
-          "cumulative_accuracy": 0.659,
+          "correct": 10,
+          "accuracy": 0.714,
+          "cumulative_accuracy": 0.652,
           "cumulative_fights": 794
         },
         {
@@ -146591,7 +146605,7 @@
           "fights": 12,
           "correct": 9,
           "accuracy": 0.75,
-          "cumulative_accuracy": 0.66,
+          "cumulative_accuracy": 0.654,
           "cumulative_fights": 806
         },
         {
@@ -146599,9 +146613,9 @@
           "date": "2025-05-10",
           "event": "UFC Fight Night: Sandhagen vs. Figueiredo",
           "fights": 12,
-          "correct": 5,
-          "accuracy": 0.417,
-          "cumulative_accuracy": 0.656,
+          "correct": 8,
+          "accuracy": 0.667,
+          "cumulative_accuracy": 0.654,
           "cumulative_fights": 818
         },
         {
@@ -146609,9 +146623,9 @@
           "date": "2025-05-17",
           "event": "UFC 315: Muhammad vs. Della Maddalena",
           "fights": 11,
-          "correct": 5,
-          "accuracy": 0.455,
-          "cumulative_accuracy": 0.654,
+          "correct": 8,
+          "accuracy": 0.727,
+          "cumulative_accuracy": 0.655,
           "cumulative_fights": 829
         },
         {
@@ -146621,7 +146635,7 @@
           "fights": 9,
           "correct": 3,
           "accuracy": 0.333,
-          "cumulative_accuracy": 0.65,
+          "cumulative_accuracy": 0.652,
           "cumulative_fights": 838
         },
         {
@@ -146631,7 +146645,7 @@
           "fights": 13,
           "correct": 7,
           "accuracy": 0.538,
-          "cumulative_accuracy": 0.649,
+          "cumulative_accuracy": 0.65,
           "cumulative_fights": 851
         },
         {
@@ -146639,9 +146653,9 @@
           "date": "2025-06-14",
           "event": "UFC 316: Dvalishvili vs. O'Malley 2",
           "fights": 11,
-          "correct": 5,
-          "accuracy": 0.455,
-          "cumulative_accuracy": 0.646,
+          "correct": 6,
+          "accuracy": 0.545,
+          "cumulative_accuracy": 0.648,
           "cumulative_fights": 862
         },
         {
@@ -146649,8 +146663,8 @@
           "date": "2025-06-21",
           "event": "UFC Fight Night: Usman vs. Buckley",
           "fights": 12,
-          "correct": 9,
-          "accuracy": 0.75,
+          "correct": 7,
+          "accuracy": 0.583,
           "cumulative_accuracy": 0.648,
           "cumulative_fights": 874
         },
@@ -146659,9 +146673,9 @@
           "date": "2025-06-28",
           "event": "UFC Fight Night: Hill vs. Rountree Jr.",
           "fights": 11,
-          "correct": 4,
-          "accuracy": 0.364,
-          "cumulative_accuracy": 0.644,
+          "correct": 9,
+          "accuracy": 0.818,
+          "cumulative_accuracy": 0.65,
           "cumulative_fights": 885
         },
         {
@@ -146669,9 +146683,9 @@
           "date": "2025-07-12",
           "event": "UFC 317: Topuria vs. Oliveira",
           "fights": 12,
-          "correct": 9,
-          "accuracy": 0.75,
-          "cumulative_accuracy": 0.645,
+          "correct": 10,
+          "accuracy": 0.833,
+          "cumulative_accuracy": 0.652,
           "cumulative_fights": 897
         },
         {
@@ -146679,9 +146693,9 @@
           "date": "2025-07-19",
           "event": "UFC Fight Night: Lewis vs. Teixeira",
           "fights": 14,
-          "correct": 5,
-          "accuracy": 0.357,
-          "cumulative_accuracy": 0.641,
+          "correct": 8,
+          "accuracy": 0.571,
+          "cumulative_accuracy": 0.651,
           "cumulative_fights": 911
         },
         {
@@ -146689,9 +146703,9 @@
           "date": "2025-07-26",
           "event": "UFC 318: Holloway vs. Poirier 3",
           "fights": 12,
-          "correct": 5,
-          "accuracy": 0.417,
-          "cumulative_accuracy": 0.638,
+          "correct": 6,
+          "accuracy": 0.5,
+          "cumulative_accuracy": 0.649,
           "cumulative_fights": 923
         },
         {
@@ -146699,9 +146713,9 @@
           "date": "2025-08-02",
           "event": "UFC Fight Night: Whittaker vs. De Ridder",
           "fights": 12,
-          "correct": 7,
-          "accuracy": 0.583,
-          "cumulative_accuracy": 0.637,
+          "correct": 5,
+          "accuracy": 0.417,
+          "cumulative_accuracy": 0.646,
           "cumulative_fights": 935
         },
         {
@@ -146709,9 +146723,9 @@
           "date": "2025-08-09",
           "event": "UFC Fight Night: Taira vs. Park",
           "fights": 12,
-          "correct": 6,
-          "accuracy": 0.5,
-          "cumulative_accuracy": 0.636,
+          "correct": 8,
+          "accuracy": 0.667,
+          "cumulative_accuracy": 0.646,
           "cumulative_fights": 947
         },
         {
@@ -146719,9 +146733,9 @@
           "date": "2025-08-16",
           "event": "UFC Fight Night: Dolidze vs. Hernandez",
           "fights": 12,
-          "correct": 9,
-          "accuracy": 0.75,
-          "cumulative_accuracy": 0.637,
+          "correct": 10,
+          "accuracy": 0.833,
+          "cumulative_accuracy": 0.649,
           "cumulative_fights": 959
         },
         {
@@ -146729,9 +146743,9 @@
           "date": "2025-08-23",
           "event": "UFC 319: Du Plessis vs. Chimaev",
           "fights": 12,
-          "correct": 8,
-          "accuracy": 0.667,
-          "cumulative_accuracy": 0.637,
+          "correct": 6,
+          "accuracy": 0.5,
+          "cumulative_accuracy": 0.647,
           "cumulative_fights": 971
         },
         {
@@ -146741,7 +146755,7 @@
           "fights": 13,
           "correct": 10,
           "accuracy": 0.769,
-          "cumulative_accuracy": 0.639,
+          "cumulative_accuracy": 0.648,
           "cumulative_fights": 984
         },
         {
@@ -146749,9 +146763,9 @@
           "date": "2025-09-13",
           "event": "UFC Fight Night: Imavov vs. Borralho",
           "fights": 13,
-          "correct": 8,
-          "accuracy": 0.615,
-          "cumulative_accuracy": 0.639,
+          "correct": 9,
+          "accuracy": 0.692,
+          "cumulative_accuracy": 0.649,
           "cumulative_fights": 997
         },
         {
@@ -146759,9 +146773,9 @@
           "date": "2025-09-27",
           "event": "Noche UFC: Lopes vs. Silva",
           "fights": 12,
-          "correct": 6,
-          "accuracy": 0.5,
-          "cumulative_accuracy": 0.637,
+          "correct": 5,
+          "accuracy": 0.417,
+          "cumulative_accuracy": 0.646,
           "cumulative_fights": 1009
         },
         {
@@ -146769,9 +146783,9 @@
           "date": "2025-10-04",
           "event": "UFC Fight Night: Ulberg vs. Reyes",
           "fights": 14,
-          "correct": 9,
-          "accuracy": 0.643,
-          "cumulative_accuracy": 0.637,
+          "correct": 11,
+          "accuracy": 0.786,
+          "cumulative_accuracy": 0.648,
           "cumulative_fights": 1023
         },
         {
@@ -146779,9 +146793,9 @@
           "date": "2025-10-11",
           "event": "UFC 320: Ankalaev vs. Pereira 2",
           "fights": 12,
-          "correct": 5,
-          "accuracy": 0.417,
-          "cumulative_accuracy": 0.635,
+          "correct": 7,
+          "accuracy": 0.583,
+          "cumulative_accuracy": 0.647,
           "cumulative_fights": 1035
         },
         {
@@ -146789,9 +146803,9 @@
           "date": "2025-10-18",
           "event": "UFC Fight Night: Oliveira vs. Gamrot",
           "fights": 13,
-          "correct": 5,
-          "accuracy": 0.385,
-          "cumulative_accuracy": 0.632,
+          "correct": 7,
+          "accuracy": 0.538,
+          "cumulative_accuracy": 0.646,
           "cumulative_fights": 1048
         },
         {
@@ -146799,9 +146813,9 @@
           "date": "2025-10-25",
           "event": "UFC Fight Night: De Ridder vs. Allen",
           "fights": 12,
-          "correct": 6,
-          "accuracy": 0.5,
-          "cumulative_accuracy": 0.63,
+          "correct": 8,
+          "accuracy": 0.667,
+          "cumulative_accuracy": 0.646,
           "cumulative_fights": 1060
         },
         {
@@ -146809,9 +146823,9 @@
           "date": "2025-11-01",
           "event": "UFC 321: Aspinall vs. Gane",
           "fights": 13,
-          "correct": 5,
-          "accuracy": 0.385,
-          "cumulative_accuracy": 0.627,
+          "correct": 6,
+          "accuracy": 0.462,
+          "cumulative_accuracy": 0.644,
           "cumulative_fights": 1073
         },
         {
@@ -146819,9 +146833,9 @@
           "date": "2025-11-08",
           "event": "UFC Fight Night: Garcia vs. Onama",
           "fights": 12,
-          "correct": 7,
-          "accuracy": 0.583,
-          "cumulative_accuracy": 0.627,
+          "correct": 9,
+          "accuracy": 0.75,
+          "cumulative_accuracy": 0.645,
           "cumulative_fights": 1085
         },
         {
@@ -146831,7 +146845,7 @@
           "fights": 14,
           "correct": 8,
           "accuracy": 0.571,
-          "cumulative_accuracy": 0.626,
+          "cumulative_accuracy": 0.644,
           "cumulative_fights": 1099
         },
         {
@@ -146839,9 +146853,9 @@
           "date": "2025-11-22",
           "event": "UFC 322: Della Maddalena vs. Makhachev",
           "fights": 14,
-          "correct": 9,
-          "accuracy": 0.643,
-          "cumulative_accuracy": 0.626,
+          "correct": 12,
+          "accuracy": 0.857,
+          "cumulative_accuracy": 0.647,
           "cumulative_fights": 1113
         },
         {
@@ -146849,9 +146863,9 @@
           "date": "2025-12-06",
           "event": "UFC Fight Night: Tsarukyan vs. Hooker",
           "fights": 13,
-          "correct": 5,
-          "accuracy": 0.385,
-          "cumulative_accuracy": 0.623,
+          "correct": 8,
+          "accuracy": 0.615,
+          "cumulative_accuracy": 0.647,
           "cumulative_fights": 1126
         },
         {
@@ -146859,9 +146873,9 @@
           "date": "2025-12-13",
           "event": "UFC 323: Dvalishvili vs. Yan 2",
           "fights": 11,
-          "correct": 6,
-          "accuracy": 0.545,
-          "cumulative_accuracy": 0.623,
+          "correct": 7,
+          "accuracy": 0.636,
+          "cumulative_accuracy": 0.646,
           "cumulative_fights": 1137
         },
         {
@@ -146869,9 +146883,9 @@
           "date": "2026-01-24",
           "event": "UFC Fight Night: Royval vs. Kape",
           "fights": 11,
-          "correct": 5,
-          "accuracy": 0.455,
-          "cumulative_accuracy": 0.621,
+          "correct": 6,
+          "accuracy": 0.545,
+          "cumulative_accuracy": 0.645,
           "cumulative_fights": 1148
         },
         {
@@ -146879,9 +146893,9 @@
           "date": "2026-01-31",
           "event": "UFC 324: Gaethje vs. Pimblett",
           "fights": 13,
-          "correct": 6,
-          "accuracy": 0.462,
-          "cumulative_accuracy": 0.619,
+          "correct": 7,
+          "accuracy": 0.538,
+          "cumulative_accuracy": 0.644,
           "cumulative_fights": 1161
         },
         {
@@ -146889,9 +146903,9 @@
           "date": "2026-02-07",
           "event": "UFC 325: Volkanovski vs. Lopes 2",
           "fights": 13,
-          "correct": 8,
-          "accuracy": 0.615,
-          "cumulative_accuracy": 0.619,
+          "correct": 9,
+          "accuracy": 0.692,
+          "cumulative_accuracy": 0.645,
           "cumulative_fights": 1174
         },
         {
@@ -146899,9 +146913,9 @@
           "date": "2026-02-21",
           "event": "UFC Fight Night: Bautista vs. Oliveira",
           "fights": 13,
-          "correct": 6,
-          "accuracy": 0.462,
-          "cumulative_accuracy": 0.618,
+          "correct": 11,
+          "accuracy": 0.846,
+          "cumulative_accuracy": 0.647,
           "cumulative_fights": 1187
         },
         {
@@ -146909,9 +146923,9 @@
           "date": "2026-02-28",
           "event": "UFC Fight Night: Strickland vs. Hernandez",
           "fights": 13,
-          "correct": 5,
-          "accuracy": 0.385,
-          "cumulative_accuracy": 0.615,
+          "correct": 7,
+          "accuracy": 0.538,
+          "cumulative_accuracy": 0.646,
           "cumulative_fights": 1200
         },
         {
@@ -146921,7 +146935,7 @@
           "fights": 12,
           "correct": 8,
           "accuracy": 0.667,
-          "cumulative_accuracy": 0.616,
+          "cumulative_accuracy": 0.646,
           "cumulative_fights": 1212
         },
         {
@@ -146929,9 +146943,9 @@
           "date": "2026-03-14",
           "event": "UFC 326: Holloway vs. Oliveira 2",
           "fights": 14,
-          "correct": 7,
-          "accuracy": 0.5,
-          "cumulative_accuracy": 0.614,
+          "correct": 8,
+          "accuracy": 0.571,
+          "cumulative_accuracy": 0.645,
           "cumulative_fights": 1226
         },
         {
@@ -146939,9 +146953,9 @@
           "date": "2026-03-21",
           "event": "UFC Fight Night: Emmett vs. Vallejos",
           "fights": 13,
-          "correct": 5,
-          "accuracy": 0.385,
-          "cumulative_accuracy": 0.612,
+          "correct": 8,
+          "accuracy": 0.615,
+          "cumulative_accuracy": 0.645,
           "cumulative_fights": 1239
         },
         {
@@ -146949,9 +146963,9 @@
           "date": "2026-03-28",
           "event": "UFC Fight Night: Evloev vs. Murphy",
           "fights": 12,
-          "correct": 3,
-          "accuracy": 0.25,
-          "cumulative_accuracy": 0.608,
+          "correct": 7,
+          "accuracy": 0.583,
+          "cumulative_accuracy": 0.644,
           "cumulative_fights": 1251
         },
         {
@@ -146959,9 +146973,9 @@
           "date": "2026-04-04",
           "event": "UFC Fight Night: Adesanya vs. Pyfer",
           "fights": 13,
-          "correct": 6,
-          "accuracy": 0.462,
-          "cumulative_accuracy": 0.607,
+          "correct": 5,
+          "accuracy": 0.385,
+          "cumulative_accuracy": 0.642,
           "cumulative_fights": 1264
         },
         {
@@ -146971,7 +146985,7 @@
           "fights": 11,
           "correct": 5,
           "accuracy": 0.455,
-          "cumulative_accuracy": 0.605,
+          "cumulative_accuracy": 0.64,
           "cumulative_fights": 1275
         },
         {
@@ -146979,9 +146993,9 @@
           "date": "2026-04-18",
           "event": "UFC 327: Prochazka vs. Ulberg",
           "fights": 11,
-          "correct": 4,
-          "accuracy": 0.364,
-          "cumulative_accuracy": 0.603,
+          "correct": 5,
+          "accuracy": 0.455,
+          "cumulative_accuracy": 0.638,
           "cumulative_fights": 1286
         },
         {
@@ -146989,9 +147003,9 @@
           "date": "2026-04-25",
           "event": "UFC Fight Night: Burns vs. Malott",
           "fights": 13,
-          "correct": 3,
-          "accuracy": 0.231,
-          "cumulative_accuracy": 0.6,
+          "correct": 5,
+          "accuracy": 0.385,
+          "cumulative_accuracy": 0.636,
           "cumulative_fights": 1299
         },
         {
@@ -146999,9 +147013,9 @@
           "date": "2026-05-02",
           "event": "UFC Fight Night: Sterling vs. Zalal",
           "fights": 13,
-          "correct": 6,
-          "accuracy": 0.462,
-          "cumulative_accuracy": 0.598,
+          "correct": 8,
+          "accuracy": 0.615,
+          "cumulative_accuracy": 0.636,
           "cumulative_fights": 1312
         },
         {
@@ -147009,9 +147023,9 @@
           "date": "2026-05-09",
           "event": "UFC Fight Night: Della Maddalena vs. Prates",
           "fights": 13,
-          "correct": 4,
-          "accuracy": 0.308,
-          "cumulative_accuracy": 0.595,
+          "correct": 6,
+          "accuracy": 0.462,
+          "cumulative_accuracy": 0.634,
           "cumulative_fights": 1325
         },
         {
@@ -147021,7 +147035,7 @@
           "fights": 13,
           "correct": 8,
           "accuracy": 0.615,
-          "cumulative_accuracy": 0.596,
+          "cumulative_accuracy": 0.634,
           "cumulative_fights": 1338
         },
         {
@@ -147029,9 +147043,9 @@
           "date": "2026-05-30",
           "event": "UFC Fight Night: Allen vs. Costa",
           "fights": 12,
-          "correct": 10,
-          "accuracy": 0.833,
-          "cumulative_accuracy": 0.598,
+          "correct": 7,
+          "accuracy": 0.583,
+          "cumulative_accuracy": 0.633,
           "cumulative_fights": 1350
         },
         {
@@ -147039,9 +147053,9 @@
           "date": "2026-06-06",
           "event": "UFC Fight Night: Song vs. Figueiredo",
           "fights": 12,
-          "correct": 5,
-          "accuracy": 0.417,
-          "cumulative_accuracy": 0.596,
+          "correct": 8,
+          "accuracy": 0.667,
+          "cumulative_accuracy": 0.634,
           "cumulative_fights": 1362
         },
         {
@@ -147051,7 +147065,7 @@
           "fights": 7,
           "correct": 6,
           "accuracy": 0.857,
-          "cumulative_accuracy": 0.598,
+          "cumulative_accuracy": 0.635,
           "cumulative_fights": 1369
         },
         {
@@ -147059,9 +147073,9 @@
           "date": "2026-06-20",
           "event": "UFC Fight Night: Muhammad vs. Bonfim",
           "fights": 12,
-          "correct": 3,
-          "accuracy": 0.25,
-          "cumulative_accuracy": 0.594,
+          "correct": 4,
+          "accuracy": 0.333,
+          "cumulative_accuracy": 0.632,
           "cumulative_fights": 1381
         },
         {
@@ -147069,9 +147083,9 @@
           "date": "2026-06-27",
           "event": "UFC Fight Night: Kape vs. Horiguchi",
           "fights": 13,
-          "correct": 5,
-          "accuracy": 0.385,
-          "cumulative_accuracy": 0.593,
+          "correct": 6,
+          "accuracy": 0.462,
+          "cumulative_accuracy": 0.631,
           "cumulative_fights": 1394
         },
         {
@@ -147079,9 +147093,9 @@
           "date": "2026-07-11",
           "event": "UFC Fight Night: Fiziev vs. Torres",
           "fights": 14,
-          "correct": 7,
-          "accuracy": 0.5,
-          "cumulative_accuracy": 0.592,
+          "correct": 8,
+          "accuracy": 0.571,
+          "cumulative_accuracy": 0.63,
           "cumulative_fights": 1408
         },
         {
@@ -147089,9 +147103,9 @@
           "date": "2026-07-18",
           "event": "UFC 329: McGregor vs. Holloway 2",
           "fights": 12,
-          "correct": 4,
-          "accuracy": 0.333,
-          "cumulative_accuracy": 0.589,
+          "correct": 7,
+          "accuracy": 0.583,
+          "cumulative_accuracy": 0.63,
           "cumulative_fights": 1420
         },
         {
@@ -147101,7 +147115,7 @@
           "fights": 12,
           "correct": 7,
           "accuracy": 0.583,
-          "cumulative_accuracy": 0.589,
+          "cumulative_accuracy": 0.629,
           "cumulative_fights": 1432
         },
         {
@@ -147109,9 +147123,9 @@
           "date": "2026-08-01",
           "event": "UFC Fight Night: Ankalaev vs. Guskov",
           "fights": 14,
-          "correct": 7,
-          "accuracy": 0.5,
-          "cumulative_accuracy": 0.589,
+          "correct": 8,
+          "accuracy": 0.571,
+          "cumulative_accuracy": 0.629,
           "cumulative_fights": 1446
         },
         {
@@ -147121,7 +147135,7 @@
           "fights": 12,
           "correct": 5,
           "accuracy": 0.417,
-          "cumulative_accuracy": 0.587,
+          "cumulative_accuracy": 0.627,
           "cumulative_fights": 1458
         },
         {
@@ -147129,9 +147143,9 @@
           "date": "2026-08-15",
           "event": "UFC Fight Night: Gamrot vs. Salkilld",
           "fights": 12,
-          "correct": 8,
-          "accuracy": 0.667,
-          "cumulative_accuracy": 0.588,
+          "correct": 5,
+          "accuracy": 0.417,
+          "cumulative_accuracy": 0.625,
           "cumulative_fights": 1470
         },
         {
@@ -147139,9 +147153,9 @@
           "date": "2026-08-22",
           "event": "UFC 330: Makhachev vs. Machado Garry",
           "fights": 13,
-          "correct": 5,
-          "accuracy": 0.385,
-          "cumulative_accuracy": 0.586,
+          "correct": 7,
+          "accuracy": 0.538,
+          "cumulative_accuracy": 0.624,
           "cumulative_fights": 1483
         },
         {
@@ -147149,9 +147163,9 @@
           "date": "2026-08-29",
           "event": "UFC Fight Night: Hernandez vs. Rodrigues",
           "fights": 13,
-          "correct": 9,
-          "accuracy": 0.692,
-          "cumulative_accuracy": 0.587,
+          "correct": 7,
+          "accuracy": 0.538,
+          "cumulative_accuracy": 0.624,
           "cumulative_fights": 1496
         },
         {
@@ -147161,7 +147175,7 @@
           "fights": 14,
           "correct": 6,
           "accuracy": 0.429,
-          "cumulative_accuracy": 0.585,
+          "cumulative_accuracy": 0.622,
           "cumulative_fights": 1510
         },
         {
@@ -147171,7 +147185,7 @@
           "fights": 13,
           "correct": 7,
           "accuracy": 0.538,
-          "cumulative_accuracy": 0.585,
+          "cumulative_accuracy": 0.621,
           "cumulative_fights": 1523
         },
         {
@@ -147179,9 +147193,9 @@
           "date": "2026-09-19",
           "event": "Noche UFC: Silva vs. Delgado",
           "fights": 12,
-          "correct": 10,
-          "accuracy": 0.833,
-          "cumulative_accuracy": 0.587,
+          "correct": 7,
+          "accuracy": 0.583,
+          "cumulative_accuracy": 0.621,
           "cumulative_fights": 1535
         },
         {
@@ -147191,7 +147205,7 @@
           "fights": 12,
           "correct": 8,
           "accuracy": 0.667,
-          "cumulative_accuracy": 0.588,
+          "cumulative_accuracy": 0.621,
           "cumulative_fights": 1547
         },
         {
@@ -147199,9 +147213,9 @@
           "date": "2026-10-03",
           "event": "UFC Fight Night: Rosas Jr. vs. Barcelos",
           "fights": 14,
-          "correct": 6,
-          "accuracy": 0.429,
-          "cumulative_accuracy": 0.586,
+          "correct": 10,
+          "accuracy": 0.714,
+          "cumulative_accuracy": 0.622,
           "cumulative_fights": 1561
         },
         {
@@ -147209,72 +147223,72 @@
           "date": "2026-10-10",
           "event": "UFC 332: Silva vs. Wang",
           "fights": 11,
-          "correct": 8,
-          "accuracy": 0.727,
-          "cumulative_accuracy": 0.587,
+          "correct": 7,
+          "accuracy": 0.636,
+          "cumulative_accuracy": 0.622,
           "cumulative_fights": 1572
         }
       ],
       "weight_class_stats": {
         "Lightweight": {
-          "accuracy": 0.588,
+          "accuracy": 0.619,
           "fights": 260,
-          "correct": 153
+          "correct": 161
         },
         "Welterweight": {
-          "accuracy": 0.631,
+          "accuracy": 0.648,
           "fights": 233,
-          "correct": 147
+          "correct": 151
         },
         "Middleweight": {
-          "accuracy": 0.609,
+          "accuracy": 0.639,
           "fights": 230,
-          "correct": 140
+          "correct": 147
         },
         "Featherweight": {
-          "accuracy": 0.576,
+          "accuracy": 0.605,
           "fights": 177,
-          "correct": 102
+          "correct": 107
         },
         "Bantamweight": {
-          "accuracy": 0.497,
+          "accuracy": 0.609,
           "fights": 161,
-          "correct": 80
+          "correct": 98
         },
         "Light Heavyweight": {
-          "accuracy": 0.634,
+          "accuracy": 0.641,
           "fights": 142,
-          "correct": 90
+          "correct": 91
         },
         "Heavyweight": {
-          "accuracy": 0.632,
+          "accuracy": 0.654,
           "fights": 133,
-          "correct": 84
+          "correct": 87
         },
         "Flyweight": {
-          "accuracy": 0.564,
+          "accuracy": 0.538,
           "fights": 78,
-          "correct": 44
+          "correct": 42
         },
         "Women's Strawweight": {
-          "accuracy": 0.607,
+          "accuracy": 0.574,
           "fights": 61,
-          "correct": 37
+          "correct": 35
         },
         "Women's Flyweight": {
-          "accuracy": 0.488,
+          "accuracy": 0.628,
           "fights": 43,
-          "correct": 21
+          "correct": 27
         },
         "Women's Bantamweight": {
-          "accuracy": 0.333,
+          "accuracy": 0.583,
           "fights": 36,
-          "correct": 12
+          "correct": 21
         },
         "Catch Weight": {
-          "accuracy": 0.765,
+          "accuracy": 0.647,
           "fights": 17,
-          "correct": 13
+          "correct": 11
         }
       },
       "feature_importances": [
@@ -147515,113 +147529,121 @@
       ]
     },
     "weights": {
-      "MMA Cipher Logistic Regression": 0.8068607671858057,
-      "MMA Cipher HistGradientBoosting": 0.07313923281419418,
-      "MMA Cipher LightGBM": 0.04,
-      "MMA Cipher XGBoost": 0.04,
-      "MMA Cipher Random Forest": 0.04
+      "MMA Cipher Extra Trees": 0.15109350310185574,
+      "MMA Cipher Random Forest": 0.31207974475141764,
+      "MMA Cipher XGBoost": 0.17267908342476823,
+      "MMA Cipher LightGBM": 0.1381996573662042,
+      "MMA Cipher HistGradientBoosting": 0.20217271637159046,
+      "MMA Cipher Logistic Regression": 0.02377529498416375
     },
     "candidate_models": [
-      "MMA Cipher Logistic Regression",
-      "MMA Cipher HistGradientBoosting",
-      "MMA Cipher LightGBM",
+      "MMA Cipher Extra Trees",
+      "MMA Cipher Random Forest",
       "MMA Cipher XGBoost",
-      "MMA Cipher Random Forest"
+      "MMA Cipher LightGBM",
+      "MMA Cipher HistGradientBoosting",
+      "MMA Cipher Logistic Regression"
     ],
     "candidate_metrics": {
+      "MMA Cipher Extra Trees": {
+        "accuracy": 0.6418575063613231,
+        "log_loss": 0.6615572385386159,
+        "brier": 0.23461202451777174,
+        "weight": 0.15109350310185574
+      },
+      "MMA Cipher Random Forest": {
+        "accuracy": 0.6393129770992366,
+        "log_loss": 0.6569161499386675,
+        "brier": 0.23247194661512166,
+        "weight": 0.31207974475141764
+      },
+      "MMA Cipher XGBoost": {
+        "accuracy": 0.6094147582697201,
+        "log_loss": 0.662974875887754,
+        "brier": 0.23563021918779561,
+        "weight": 0.17267908342476823
+      },
+      "MMA Cipher LightGBM": {
+        "accuracy": 0.6119592875318066,
+        "log_loss": 0.6552061791079065,
+        "brier": 0.2318140753936652,
+        "weight": 0.1381996573662042
+      },
+      "MMA Cipher HistGradientBoosting": {
+        "accuracy": 0.6202290076335878,
+        "log_loss": 0.6595908384264569,
+        "brier": 0.23386419828463118,
+        "weight": 0.20217271637159046
+      },
       "MMA Cipher Logistic Regression": {
         "accuracy": 0.5820610687022901,
         "log_loss": 0.6625450186701252,
         "brier": 0.23563236095481876,
-        "weight": 0.8068607671858057
-      },
-      "MMA Cipher HistGradientBoosting": {
-        "accuracy": 0.6278625954198473,
-        "log_loss": 0.6533825283269937,
-        "brier": 0.2309487442023874,
-        "weight": 0.07313923281419418
-      },
-      "MMA Cipher LightGBM": {
-        "accuracy": 0.6075063613231552,
-        "log_loss": 0.6536999744074142,
-        "brier": 0.23111668403579444,
-        "weight": 0.04
-      },
-      "MMA Cipher XGBoost": {
-        "accuracy": 0.6081424936386769,
-        "log_loss": 0.6565191598849555,
-        "brier": 0.23246135764381942,
-        "weight": 0.04
-      },
-      "MMA Cipher Random Forest": {
-        "accuracy": 0.6367684478371501,
-        "log_loss": 0.6545327338823644,
-        "brier": 0.2313821421577412,
-        "weight": 0.04
+        "weight": 0.02377529498416375
       }
     },
     "calibration": [
       {
         "range": "50\u201360%",
-        "expected": 0.539,
-        "observed": 0.544,
-        "count": 1167,
-        "correct": 635
+        "expected": 0.526,
+        "observed": 0.595,
+        "count": 1306,
+        "correct": 777
       },
       {
         "range": "60\u201370%",
-        "expected": 0.64,
-        "observed": 0.638,
-        "count": 229,
-        "correct": 146
+        "expected": 0.651,
+        "observed": 0.713,
+        "count": 160,
+        "correct": 114
       },
       {
         "range": "70\u201380%",
-        "expected": 0.752,
-        "observed": 0.795,
-        "count": 117,
-        "correct": 93
+        "expected": 0.757,
+        "observed": 0.816,
+        "count": 103,
+        "correct": 84
       },
       {
         "range": "80\u201390%",
-        "expected": 0.839,
-        "observed": 0.811,
-        "count": 53,
-        "correct": 43
+        "expected": 0.806,
+        "observed": 1.0,
+        "count": 3,
+        "correct": 3
       },
       {
         "range": "90\u2013100%",
-        "expected": 0.911,
-        "observed": 1.0,
-        "count": 6,
-        "correct": 6
+        "expected": 0.95,
+        "observed": 0.0,
+        "count": 0,
+        "correct": 0
       }
     ],
     "confidence_distribution": [
       {
         "range": "50\u201360%",
-        "count": 1167,
-        "percentage": 74.2
+        "count": 1306,
+        "percentage": 83.1
       },
       {
         "range": "60\u201370%",
-        "count": 229,
-        "percentage": 14.6
+        "count": 160,
+        "percentage": 10.2
       },
       {
         "range": "70\u201380%",
-        "count": 117,
-        "percentage": 7.4
+        "count": 103,
+        "percentage": 6.6
       },
       {
         "range": "80\u201390%",
-        "count": 53,
-        "percentage": 3.4
+        "count": 3,
+        "percentage": 0.2
       },
       {
         "range": "90\u2013100%",
-        "count": 6,
-        "percentage": 0.4
+        "count": 0,
+        "percentage": 0.0
       }
     ],
     "events_history": [
@@ -147630,9 +147652,9 @@
         "date": "2023-09-23",
         "event": "Historical UFC event",
         "fights": 10,
-        "correct": 6,
-        "accuracy": 0.6,
-        "cumulative_accuracy": 0.6,
+        "correct": 5,
+        "accuracy": 0.5,
+        "cumulative_accuracy": 0.5,
         "cumulative_fights": 10
       },
       {
@@ -147642,7 +147664,7 @@
         "fights": 10,
         "correct": 4,
         "accuracy": 0.4,
-        "cumulative_accuracy": 0.5,
+        "cumulative_accuracy": 0.45,
         "cumulative_fights": 20
       },
       {
@@ -147652,7 +147674,7 @@
         "fights": 11,
         "correct": 6,
         "accuracy": 0.545,
-        "cumulative_accuracy": 0.516,
+        "cumulative_accuracy": 0.484,
         "cumulative_fights": 31
       },
       {
@@ -147662,7 +147684,7 @@
         "fights": 11,
         "correct": 9,
         "accuracy": 0.818,
-        "cumulative_accuracy": 0.595,
+        "cumulative_accuracy": 0.571,
         "cumulative_fights": 42
       },
       {
@@ -147670,9 +147692,9 @@
         "date": "2023-11-04",
         "event": "Historical UFC event",
         "fights": 9,
-        "correct": 7,
-        "accuracy": 0.778,
-        "cumulative_accuracy": 0.627,
+        "correct": 6,
+        "accuracy": 0.667,
+        "cumulative_accuracy": 0.588,
         "cumulative_fights": 51
       },
       {
@@ -147680,9 +147702,9 @@
         "date": "2023-11-11",
         "event": "Historical UFC event",
         "fights": 12,
-        "correct": 8,
-        "accuracy": 0.667,
-        "cumulative_accuracy": 0.635,
+        "correct": 9,
+        "accuracy": 0.75,
+        "cumulative_accuracy": 0.619,
         "cumulative_fights": 63
       },
       {
@@ -147690,9 +147712,9 @@
         "date": "2023-11-18",
         "event": "Historical UFC event",
         "fights": 13,
-        "correct": 11,
-        "accuracy": 0.846,
-        "cumulative_accuracy": 0.671,
+        "correct": 10,
+        "accuracy": 0.769,
+        "cumulative_accuracy": 0.645,
         "cumulative_fights": 76
       },
       {
@@ -147700,9 +147722,9 @@
         "date": "2023-12-02",
         "event": "Historical UFC event",
         "fights": 12,
-        "correct": 8,
-        "accuracy": 0.667,
-        "cumulative_accuracy": 0.67,
+        "correct": 7,
+        "accuracy": 0.583,
+        "cumulative_accuracy": 0.636,
         "cumulative_fights": 88
       },
       {
@@ -147712,7 +147734,7 @@
         "fights": 11,
         "correct": 8,
         "accuracy": 0.727,
-        "cumulative_accuracy": 0.677,
+        "cumulative_accuracy": 0.646,
         "cumulative_fights": 99
       },
       {
@@ -147722,7 +147744,7 @@
         "fights": 12,
         "correct": 7,
         "accuracy": 0.583,
-        "cumulative_accuracy": 0.667,
+        "cumulative_accuracy": 0.64,
         "cumulative_fights": 111
       },
       {
@@ -147732,7 +147754,7 @@
         "fights": 11,
         "correct": 9,
         "accuracy": 0.818,
-        "cumulative_accuracy": 0.68,
+        "cumulative_accuracy": 0.656,
         "cumulative_fights": 122
       },
       {
@@ -147740,9 +147762,9 @@
         "date": "2024-01-20",
         "event": "Historical UFC event",
         "fights": 12,
-        "correct": 7,
-        "accuracy": 0.583,
-        "cumulative_accuracy": 0.672,
+        "correct": 6,
+        "accuracy": 0.5,
+        "cumulative_accuracy": 0.642,
         "cumulative_fights": 134
       },
       {
@@ -147752,7 +147774,7 @@
         "fights": 12,
         "correct": 8,
         "accuracy": 0.667,
-        "cumulative_accuracy": 0.671,
+        "cumulative_accuracy": 0.644,
         "cumulative_fights": 146
       },
       {
@@ -147760,9 +147782,9 @@
         "date": "2024-02-10",
         "event": "Historical UFC event",
         "fights": 13,
-        "correct": 9,
-        "accuracy": 0.692,
-        "cumulative_accuracy": 0.673,
+        "correct": 8,
+        "accuracy": 0.615,
+        "cumulative_accuracy": 0.642,
         "cumulative_fights": 159
       },
       {
@@ -147770,9 +147792,9 @@
         "date": "2024-02-17",
         "event": "Historical UFC event",
         "fights": 12,
-        "correct": 10,
-        "accuracy": 0.833,
-        "cumulative_accuracy": 0.684,
+        "correct": 11,
+        "accuracy": 0.917,
+        "cumulative_accuracy": 0.661,
         "cumulative_fights": 171
       },
       {
@@ -147780,9 +147802,9 @@
         "date": "2024-02-24",
         "event": "Historical UFC event",
         "fights": 12,
-        "correct": 8,
-        "accuracy": 0.667,
-        "cumulative_accuracy": 0.683,
+        "correct": 9,
+        "accuracy": 0.75,
+        "cumulative_accuracy": 0.667,
         "cumulative_fights": 183
       },
       {
@@ -147792,7 +147814,7 @@
         "fights": 11,
         "correct": 8,
         "accuracy": 0.727,
-        "cumulative_accuracy": 0.686,
+        "cumulative_accuracy": 0.67,
         "cumulative_fights": 194
       },
       {
@@ -147800,9 +147822,9 @@
         "date": "2024-03-09",
         "event": "Historical UFC event",
         "fights": 14,
-        "correct": 10,
-        "accuracy": 0.714,
-        "cumulative_accuracy": 0.688,
+        "correct": 9,
+        "accuracy": 0.643,
+        "cumulative_accuracy": 0.668,
         "cumulative_fights": 208
       },
       {
@@ -147810,9 +147832,9 @@
         "date": "2024-03-16",
         "event": "Historical UFC event",
         "fights": 12,
-        "correct": 6,
-        "accuracy": 0.5,
-        "cumulative_accuracy": 0.677,
+        "correct": 4,
+        "accuracy": 0.333,
+        "cumulative_accuracy": 0.65,
         "cumulative_fights": 220
       },
       {
@@ -147822,7 +147844,7 @@
         "fights": 13,
         "correct": 10,
         "accuracy": 0.769,
-        "cumulative_accuracy": 0.682,
+        "cumulative_accuracy": 0.657,
         "cumulative_fights": 233
       },
       {
@@ -147832,7 +147854,7 @@
         "fights": 13,
         "correct": 6,
         "accuracy": 0.462,
-        "cumulative_accuracy": 0.671,
+        "cumulative_accuracy": 0.646,
         "cumulative_fights": 246
       },
       {
@@ -147842,7 +147864,7 @@
         "fights": 12,
         "correct": 7,
         "accuracy": 0.583,
-        "cumulative_accuracy": 0.667,
+        "cumulative_accuracy": 0.643,
         "cumulative_fights": 258
       },
       {
@@ -147850,9 +147872,9 @@
         "date": "2024-04-13",
         "event": "Historical UFC event",
         "fights": 13,
-        "correct": 9,
-        "accuracy": 0.692,
-        "cumulative_accuracy": 0.668,
+        "correct": 10,
+        "accuracy": 0.769,
+        "cumulative_accuracy": 0.649,
         "cumulative_fights": 271
       },
       {
@@ -147862,7 +147884,7 @@
         "fights": 13,
         "correct": 7,
         "accuracy": 0.538,
-        "cumulative_accuracy": 0.662,
+        "cumulative_accuracy": 0.644,
         "cumulative_fights": 284
       },
       {
@@ -147872,7 +147894,7 @@
         "fights": 13,
         "correct": 9,
         "accuracy": 0.692,
-        "cumulative_accuracy": 0.663,
+        "cumulative_accuracy": 0.646,
         "cumulative_fights": 297
       },
       {
@@ -147880,9 +147902,9 @@
         "date": "2024-05-11",
         "event": "Historical UFC event",
         "fights": 12,
-        "correct": 7,
-        "accuracy": 0.583,
-        "cumulative_accuracy": 0.66,
+        "correct": 8,
+        "accuracy": 0.667,
+        "cumulative_accuracy": 0.647,
         "cumulative_fights": 309
       },
       {
@@ -147890,9 +147912,9 @@
         "date": "2024-05-18",
         "event": "Historical UFC event",
         "fights": 12,
-        "correct": 6,
-        "accuracy": 0.5,
-        "cumulative_accuracy": 0.654,
+        "correct": 5,
+        "accuracy": 0.417,
+        "cumulative_accuracy": 0.639,
         "cumulative_fights": 321
       },
       {
@@ -147900,9 +147922,9 @@
         "date": "2024-06-01",
         "event": "Historical UFC event",
         "fights": 12,
-        "correct": 11,
-        "accuracy": 0.917,
-        "cumulative_accuracy": 0.664,
+        "correct": 8,
+        "accuracy": 0.667,
+        "cumulative_accuracy": 0.64,
         "cumulative_fights": 333
       },
       {
@@ -147912,7 +147934,7 @@
         "fights": 14,
         "correct": 9,
         "accuracy": 0.643,
-        "cumulative_accuracy": 0.663,
+        "cumulative_accuracy": 0.64,
         "cumulative_fights": 347
       },
       {
@@ -147922,7 +147944,7 @@
         "fights": 11,
         "correct": 7,
         "accuracy": 0.636,
-        "cumulative_accuracy": 0.662,
+        "cumulative_accuracy": 0.64,
         "cumulative_fights": 358
       },
       {
@@ -147930,9 +147952,9 @@
         "date": "2024-06-22",
         "event": "Historical UFC event",
         "fights": 11,
-        "correct": 9,
-        "accuracy": 0.818,
-        "cumulative_accuracy": 0.667,
+        "correct": 7,
+        "accuracy": 0.636,
+        "cumulative_accuracy": 0.64,
         "cumulative_fights": 369
       },
       {
@@ -147942,7 +147964,7 @@
         "fights": 13,
         "correct": 11,
         "accuracy": 0.846,
-        "cumulative_accuracy": 0.673,
+        "cumulative_accuracy": 0.647,
         "cumulative_fights": 382
       },
       {
@@ -147950,9 +147972,9 @@
         "date": "2024-07-13",
         "event": "Historical UFC event",
         "fights": 11,
-        "correct": 7,
-        "accuracy": 0.636,
-        "cumulative_accuracy": 0.672,
+        "correct": 8,
+        "accuracy": 0.727,
+        "cumulative_accuracy": 0.649,
         "cumulative_fights": 393
       },
       {
@@ -147960,9 +147982,9 @@
         "date": "2024-07-20",
         "event": "Historical UFC event",
         "fights": 11,
-        "correct": 8,
-        "accuracy": 0.727,
-        "cumulative_accuracy": 0.673,
+        "correct": 6,
+        "accuracy": 0.545,
+        "cumulative_accuracy": 0.646,
         "cumulative_fights": 404
       },
       {
@@ -147970,9 +147992,9 @@
         "date": "2024-07-27",
         "event": "Historical UFC event",
         "fights": 14,
-        "correct": 8,
-        "accuracy": 0.571,
-        "cumulative_accuracy": 0.67,
+        "correct": 10,
+        "accuracy": 0.714,
+        "cumulative_accuracy": 0.648,
         "cumulative_fights": 418
       },
       {
@@ -147982,7 +148004,7 @@
         "fights": 13,
         "correct": 11,
         "accuracy": 0.846,
-        "cumulative_accuracy": 0.675,
+        "cumulative_accuracy": 0.654,
         "cumulative_fights": 431
       },
       {
@@ -147992,7 +148014,7 @@
         "fights": 10,
         "correct": 9,
         "accuracy": 0.9,
-        "cumulative_accuracy": 0.68,
+        "cumulative_accuracy": 0.66,
         "cumulative_fights": 441
       },
       {
@@ -148000,9 +148022,9 @@
         "date": "2024-08-17",
         "event": "Historical UFC event",
         "fights": 12,
-        "correct": 6,
-        "accuracy": 0.5,
-        "cumulative_accuracy": 0.675,
+        "correct": 8,
+        "accuracy": 0.667,
+        "cumulative_accuracy": 0.66,
         "cumulative_fights": 453
       },
       {
@@ -148012,7 +148034,7 @@
         "fights": 11,
         "correct": 9,
         "accuracy": 0.818,
-        "cumulative_accuracy": 0.679,
+        "cumulative_accuracy": 0.664,
         "cumulative_fights": 464
       },
       {
@@ -148020,9 +148042,9 @@
         "date": "2024-09-07",
         "event": "Historical UFC event",
         "fights": 12,
-        "correct": 10,
-        "accuracy": 0.833,
-        "cumulative_accuracy": 0.683,
+        "correct": 11,
+        "accuracy": 0.917,
+        "cumulative_accuracy": 0.67,
         "cumulative_fights": 476
       },
       {
@@ -148030,9 +148052,9 @@
         "date": "2024-09-14",
         "event": "Historical UFC event",
         "fights": 10,
-        "correct": 6,
-        "accuracy": 0.6,
-        "cumulative_accuracy": 0.681,
+        "correct": 5,
+        "accuracy": 0.5,
+        "cumulative_accuracy": 0.667,
         "cumulative_fights": 486
       },
       {
@@ -148042,7 +148064,7 @@
         "fights": 14,
         "correct": 10,
         "accuracy": 0.714,
-        "cumulative_accuracy": 0.682,
+        "cumulative_accuracy": 0.668,
         "cumulative_fights": 500
       },
       {
@@ -148050,9 +148072,9 @@
         "date": "2024-10-05",
         "event": "Historical UFC event",
         "fights": 12,
-        "correct": 9,
-        "accuracy": 0.75,
-        "cumulative_accuracy": 0.684,
+        "correct": 8,
+        "accuracy": 0.667,
+        "cumulative_accuracy": 0.668,
         "cumulative_fights": 512
       },
       {
@@ -148062,7 +148084,7 @@
         "fights": 12,
         "correct": 9,
         "accuracy": 0.75,
-        "cumulative_accuracy": 0.685,
+        "cumulative_accuracy": 0.67,
         "cumulative_fights": 524
       },
       {
@@ -148072,7 +148094,7 @@
         "fights": 11,
         "correct": 8,
         "accuracy": 0.727,
-        "cumulative_accuracy": 0.686,
+        "cumulative_accuracy": 0.671,
         "cumulative_fights": 535
       },
       {
@@ -148082,7 +148104,7 @@
         "fights": 13,
         "correct": 12,
         "accuracy": 0.923,
-        "cumulative_accuracy": 0.692,
+        "cumulative_accuracy": 0.677,
         "cumulative_fights": 548
       },
       {
@@ -148090,9 +148112,9 @@
         "date": "2024-11-02",
         "event": "Historical UFC event",
         "fights": 13,
-        "correct": 9,
-        "accuracy": 0.692,
-        "cumulative_accuracy": 0.692,
+        "correct": 8,
+        "accuracy": 0.615,
+        "cumulative_accuracy": 0.676,
         "cumulative_fights": 561
       },
       {
@@ -148100,9 +148122,9 @@
         "date": "2024-11-09",
         "event": "Historical UFC event",
         "fights": 11,
-        "correct": 4,
-        "accuracy": 0.364,
-        "cumulative_accuracy": 0.685,
+        "correct": 5,
+        "accuracy": 0.455,
+        "cumulative_accuracy": 0.671,
         "cumulative_fights": 572
       },
       {
@@ -148112,7 +148134,7 @@
         "fights": 12,
         "correct": 7,
         "accuracy": 0.583,
-        "cumulative_accuracy": 0.683,
+        "cumulative_accuracy": 0.67,
         "cumulative_fights": 584
       },
       {
@@ -148120,9 +148142,9 @@
         "date": "2024-11-23",
         "event": "UFC 309: Jones vs. Miocic",
         "fights": 13,
-        "correct": 7,
-        "accuracy": 0.538,
-        "cumulative_accuracy": 0.68,
+        "correct": 8,
+        "accuracy": 0.615,
+        "cumulative_accuracy": 0.668,
         "cumulative_fights": 597
       },
       {
@@ -148130,9 +148152,9 @@
         "date": "2024-12-07",
         "event": "UFC Fight Night: Yan vs. Figueiredo",
         "fights": 14,
-        "correct": 11,
-        "accuracy": 0.786,
-        "cumulative_accuracy": 0.682,
+        "correct": 13,
+        "accuracy": 0.929,
+        "cumulative_accuracy": 0.674,
         "cumulative_fights": 611
       },
       {
@@ -148140,9 +148162,9 @@
         "date": "2024-12-14",
         "event": "UFC Fight Night: Covington vs. Buckley",
         "fights": 13,
-        "correct": 8,
-        "accuracy": 0.615,
-        "cumulative_accuracy": 0.681,
+        "correct": 7,
+        "accuracy": 0.538,
+        "cumulative_accuracy": 0.671,
         "cumulative_fights": 624
       },
       {
@@ -148150,9 +148172,9 @@
         "date": "2025-01-11",
         "event": "UFC Fight Night: Dern vs. Ribas 2",
         "fights": 14,
-        "correct": 8,
-        "accuracy": 0.571,
-        "cumulative_accuracy": 0.679,
+        "correct": 6,
+        "accuracy": 0.429,
+        "cumulative_accuracy": 0.666,
         "cumulative_fights": 638
       },
       {
@@ -148160,9 +148182,9 @@
         "date": "2025-01-18",
         "event": "UFC 311: Makhachev vs. Moicano",
         "fights": 13,
-        "correct": 10,
-        "accuracy": 0.769,
-        "cumulative_accuracy": 0.68,
+        "correct": 7,
+        "accuracy": 0.538,
+        "cumulative_accuracy": 0.664,
         "cumulative_fights": 651
       },
       {
@@ -148170,9 +148192,9 @@
         "date": "2025-02-01",
         "event": "UFC Fight Night: Adesanya vs. Imavov",
         "fights": 11,
-        "correct": 5,
-        "accuracy": 0.455,
-        "cumulative_accuracy": 0.677,
+        "correct": 6,
+        "accuracy": 0.545,
+        "cumulative_accuracy": 0.662,
         "cumulative_fights": 662
       },
       {
@@ -148180,9 +148202,9 @@
         "date": "2025-02-08",
         "event": "UFC 312: Du Plessis vs. Strickland 2",
         "fights": 11,
-        "correct": 8,
-        "accuracy": 0.727,
-        "cumulative_accuracy": 0.678,
+        "correct": 6,
+        "accuracy": 0.545,
+        "cumulative_accuracy": 0.66,
         "cumulative_fights": 673
       },
       {
@@ -148190,9 +148212,9 @@
         "date": "2025-02-15",
         "event": "UFC 312: Du Plessis vs. Strickland 2",
         "fights": 12,
-        "correct": 6,
-        "accuracy": 0.5,
-        "cumulative_accuracy": 0.674,
+        "correct": 8,
+        "accuracy": 0.667,
+        "cumulative_accuracy": 0.66,
         "cumulative_fights": 685
       },
       {
@@ -148200,9 +148222,9 @@
         "date": "2025-02-22",
         "event": "UFC Fight Night: Cannonier vs. Rodrigues",
         "fights": 12,
-        "correct": 8,
-        "accuracy": 0.667,
-        "cumulative_accuracy": 0.674,
+        "correct": 7,
+        "accuracy": 0.583,
+        "cumulative_accuracy": 0.659,
         "cumulative_fights": 697
       },
       {
@@ -148210,9 +148232,9 @@
         "date": "2025-03-01",
         "event": "UFC Fight Night: Cejudo vs. Song",
         "fights": 10,
-        "correct": 5,
-        "accuracy": 0.5,
-        "cumulative_accuracy": 0.672,
+        "correct": 7,
+        "accuracy": 0.7,
+        "cumulative_accuracy": 0.659,
         "cumulative_fights": 707
       },
       {
@@ -148220,9 +148242,9 @@
         "date": "2025-03-08",
         "event": "UFC Fight Night: Kape vs. Almabayev",
         "fights": 10,
-        "correct": 3,
-        "accuracy": 0.3,
-        "cumulative_accuracy": 0.667,
+        "correct": 6,
+        "accuracy": 0.6,
+        "cumulative_accuracy": 0.658,
         "cumulative_fights": 717
       },
       {
@@ -148230,9 +148252,9 @@
         "date": "2025-03-15",
         "event": "UFC 313: Pereira vs. Ankalaev",
         "fights": 13,
-        "correct": 8,
-        "accuracy": 0.615,
-        "cumulative_accuracy": 0.666,
+        "correct": 9,
+        "accuracy": 0.692,
+        "cumulative_accuracy": 0.659,
         "cumulative_fights": 730
       },
       {
@@ -148240,9 +148262,9 @@
         "date": "2025-03-22",
         "event": "UFC Fight Night: Vettori vs. Dolidze 2",
         "fights": 13,
-        "correct": 7,
-        "accuracy": 0.538,
-        "cumulative_accuracy": 0.664,
+        "correct": 8,
+        "accuracy": 0.615,
+        "cumulative_accuracy": 0.658,
         "cumulative_fights": 743
       },
       {
@@ -148252,7 +148274,7 @@
         "fights": 12,
         "correct": 9,
         "accuracy": 0.75,
-        "cumulative_accuracy": 0.665,
+        "cumulative_accuracy": 0.66,
         "cumulative_fights": 755
       },
       {
@@ -148260,9 +148282,9 @@
         "date": "2025-04-05",
         "event": "UFC Fight Night: Moreno vs. Erceg",
         "fights": 12,
-        "correct": 6,
-        "accuracy": 0.5,
-        "cumulative_accuracy": 0.662,
+        "correct": 5,
+        "accuracy": 0.417,
+        "cumulative_accuracy": 0.656,
         "cumulative_fights": 767
       },
       {
@@ -148270,9 +148292,9 @@
         "date": "2025-04-12",
         "event": "UFC Fight Night: Emmett vs. Murphy",
         "fights": 13,
-        "correct": 6,
-        "accuracy": 0.462,
-        "cumulative_accuracy": 0.659,
+        "correct": 5,
+        "accuracy": 0.385,
+        "cumulative_accuracy": 0.651,
         "cumulative_fights": 780
       },
       {
@@ -148280,9 +148302,9 @@
         "date": "2025-04-26",
         "event": "UFC 314: Volkanovski vs. Lopes",
         "fights": 14,
-        "correct": 9,
-        "accuracy": 0.643,
-        "cumulative_accuracy": 0.659,
+        "correct": 10,
+        "accuracy": 0.714,
+        "cumulative_accuracy": 0.652,
         "cumulative_fights": 794
       },
       {
@@ -148292,7 +148314,7 @@
         "fights": 12,
         "correct": 9,
         "accuracy": 0.75,
-        "cumulative_accuracy": 0.66,
+        "cumulative_accuracy": 0.654,
         "cumulative_fights": 806
       },
       {
@@ -148300,9 +148322,9 @@
         "date": "2025-05-10",
         "event": "UFC Fight Night: Sandhagen vs. Figueiredo",
         "fights": 12,
-        "correct": 5,
-        "accuracy": 0.417,
-        "cumulative_accuracy": 0.656,
+        "correct": 8,
+        "accuracy": 0.667,
+        "cumulative_accuracy": 0.654,
         "cumulative_fights": 818
       },
       {
@@ -148310,9 +148332,9 @@
         "date": "2025-05-17",
         "event": "UFC 315: Muhammad vs. Della Maddalena",
         "fights": 11,
-        "correct": 5,
-        "accuracy": 0.455,
-        "cumulative_accuracy": 0.654,
+        "correct": 8,
+        "accuracy": 0.727,
+        "cumulative_accuracy": 0.655,
         "cumulative_fights": 829
       },
       {
@@ -148322,7 +148344,7 @@
         "fights": 9,
         "correct": 3,
         "accuracy": 0.333,
-        "cumulative_accuracy": 0.65,
+        "cumulative_accuracy": 0.652,
         "cumulative_fights": 838
       },
       {
@@ -148332,7 +148354,7 @@
         "fights": 13,
         "correct": 7,
         "accuracy": 0.538,
-        "cumulative_accuracy": 0.649,
+        "cumulative_accuracy": 0.65,
         "cumulative_fights": 851
       },
       {
@@ -148340,9 +148362,9 @@
         "date": "2025-06-14",
         "event": "UFC 316: Dvalishvili vs. O'Malley 2",
         "fights": 11,
-        "correct": 5,
-        "accuracy": 0.455,
-        "cumulative_accuracy": 0.646,
+        "correct": 6,
+        "accuracy": 0.545,
+        "cumulative_accuracy": 0.648,
         "cumulative_fights": 862
       },
       {
@@ -148350,8 +148372,8 @@
         "date": "2025-06-21",
         "event": "UFC Fight Night: Usman vs. Buckley",
         "fights": 12,
-        "correct": 9,
-        "accuracy": 0.75,
+        "correct": 7,
+        "accuracy": 0.583,
         "cumulative_accuracy": 0.648,
         "cumulative_fights": 874
       },
@@ -148360,9 +148382,9 @@
         "date": "2025-06-28",
         "event": "UFC Fight Night: Hill vs. Rountree Jr.",
         "fights": 11,
-        "correct": 4,
-        "accuracy": 0.364,
-        "cumulative_accuracy": 0.644,
+        "correct": 9,
+        "accuracy": 0.818,
+        "cumulative_accuracy": 0.65,
         "cumulative_fights": 885
       },
       {
@@ -148370,9 +148392,9 @@
         "date": "2025-07-12",
         "event": "UFC 317: Topuria vs. Oliveira",
         "fights": 12,
-        "correct": 9,
-        "accuracy": 0.75,
-        "cumulative_accuracy": 0.645,
+        "correct": 10,
+        "accuracy": 0.833,
+        "cumulative_accuracy": 0.652,
         "cumulative_fights": 897
       },
       {
@@ -148380,9 +148402,9 @@
         "date": "2025-07-19",
         "event": "UFC Fight Night: Lewis vs. Teixeira",
         "fights": 14,
-        "correct": 5,
-        "accuracy": 0.357,
-        "cumulative_accuracy": 0.641,
+        "correct": 8,
+        "accuracy": 0.571,
+        "cumulative_accuracy": 0.651,
         "cumulative_fights": 911
       },
       {
@@ -148390,9 +148412,9 @@
         "date": "2025-07-26",
         "event": "UFC 318: Holloway vs. Poirier 3",
         "fights": 12,
-        "correct": 5,
-        "accuracy": 0.417,
-        "cumulative_accuracy": 0.638,
+        "correct": 6,
+        "accuracy": 0.5,
+        "cumulative_accuracy": 0.649,
         "cumulative_fights": 923
       },
       {
@@ -148400,9 +148422,9 @@
         "date": "2025-08-02",
         "event": "UFC Fight Night: Whittaker vs. De Ridder",
         "fights": 12,
-        "correct": 7,
-        "accuracy": 0.583,
-        "cumulative_accuracy": 0.637,
+        "correct": 5,
+        "accuracy": 0.417,
+        "cumulative_accuracy": 0.646,
         "cumulative_fights": 935
       },
       {
@@ -148410,9 +148432,9 @@
         "date": "2025-08-09",
         "event": "UFC Fight Night: Taira vs. Park",
         "fights": 12,
-        "correct": 6,
-        "accuracy": 0.5,
-        "cumulative_accuracy": 0.636,
+        "correct": 8,
+        "accuracy": 0.667,
+        "cumulative_accuracy": 0.646,
         "cumulative_fights": 947
       },
       {
@@ -148420,9 +148442,9 @@
         "date": "2025-08-16",
         "event": "UFC Fight Night: Dolidze vs. Hernandez",
         "fights": 12,
-        "correct": 9,
-        "accuracy": 0.75,
-        "cumulative_accuracy": 0.637,
+        "correct": 10,
+        "accuracy": 0.833,
+        "cumulative_accuracy": 0.649,
         "cumulative_fights": 959
       },
       {
@@ -148430,9 +148452,9 @@
         "date": "2025-08-23",
         "event": "UFC 319: Du Plessis vs. Chimaev",
         "fights": 12,
-        "correct": 8,
-        "accuracy": 0.667,
-        "cumulative_accuracy": 0.637,
+        "correct": 6,
+        "accuracy": 0.5,
+        "cumulative_accuracy": 0.647,
         "cumulative_fights": 971
       },
       {
@@ -148442,7 +148464,7 @@
         "fights": 13,
         "correct": 10,
         "accuracy": 0.769,
-        "cumulative_accuracy": 0.639,
+        "cumulative_accuracy": 0.648,
         "cumulative_fights": 984
       },
       {
@@ -148450,9 +148472,9 @@
         "date": "2025-09-13",
         "event": "UFC Fight Night: Imavov vs. Borralho",
         "fights": 13,
-        "correct": 8,
-        "accuracy": 0.615,
-        "cumulative_accuracy": 0.639,
+        "correct": 9,
+        "accuracy": 0.692,
+        "cumulative_accuracy": 0.649,
         "cumulative_fights": 997
       },
       {
@@ -148460,9 +148482,9 @@
         "date": "2025-09-27",
         "event": "Noche UFC: Lopes vs. Silva",
         "fights": 12,
-        "correct": 6,
-        "accuracy": 0.5,
-        "cumulative_accuracy": 0.637,
+        "correct": 5,
+        "accuracy": 0.417,
+        "cumulative_accuracy": 0.646,
         "cumulative_fights": 1009
       },
       {
@@ -148470,9 +148492,9 @@
         "date": "2025-10-04",
         "event": "UFC Fight Night: Ulberg vs. Reyes",
         "fights": 14,
-        "correct": 9,
-        "accuracy": 0.643,
-        "cumulative_accuracy": 0.637,
+        "correct": 11,
+        "accuracy": 0.786,
+        "cumulative_accuracy": 0.648,
         "cumulative_fights": 1023
       },
       {
@@ -148480,9 +148502,9 @@
         "date": "2025-10-11",
         "event": "UFC 320: Ankalaev vs. Pereira 2",
         "fights": 12,
-        "correct": 5,
-        "accuracy": 0.417,
-        "cumulative_accuracy": 0.635,
+        "correct": 7,
+        "accuracy": 0.583,
+        "cumulative_accuracy": 0.647,
         "cumulative_fights": 1035
       },
       {
@@ -148490,9 +148512,9 @@
         "date": "2025-10-18",
         "event": "UFC Fight Night: Oliveira vs. Gamrot",
         "fights": 13,
-        "correct": 5,
-        "accuracy": 0.385,
-        "cumulative_accuracy": 0.632,
+        "correct": 7,
+        "accuracy": 0.538,
+        "cumulative_accuracy": 0.646,
         "cumulative_fights": 1048
       },
       {
@@ -148500,9 +148522,9 @@
         "date": "2025-10-25",
         "event": "UFC Fight Night: De Ridder vs. Allen",
         "fights": 12,
-        "correct": 6,
-        "accuracy": 0.5,
-        "cumulative_accuracy": 0.63,
+        "correct": 8,
+        "accuracy": 0.667,
+        "cumulative_accuracy": 0.646,
         "cumulative_fights": 1060
       },
       {
@@ -148510,9 +148532,9 @@
         "date": "2025-11-01",
         "event": "UFC 321: Aspinall vs. Gane",
         "fights": 13,
-        "correct": 5,
-        "accuracy": 0.385,
-        "cumulative_accuracy": 0.627,
+        "correct": 6,
+        "accuracy": 0.462,
+        "cumulative_accuracy": 0.644,
         "cumulative_fights": 1073
       },
       {
@@ -148520,9 +148542,9 @@
         "date": "2025-11-08",
         "event": "UFC Fight Night: Garcia vs. Onama",
         "fights": 12,
-        "correct": 7,
-        "accuracy": 0.583,
-        "cumulative_accuracy": 0.627,
+        "correct": 9,
+        "accuracy": 0.75,
+        "cumulative_accuracy": 0.645,
         "cumulative_fights": 1085
       },
       {
@@ -148532,7 +148554,7 @@
         "fights": 14,
         "correct": 8,
         "accuracy": 0.571,
-        "cumulative_accuracy": 0.626,
+        "cumulative_accuracy": 0.644,
         "cumulative_fights": 1099
       },
       {
@@ -148540,9 +148562,9 @@
         "date": "2025-11-22",
         "event": "UFC 322: Della Maddalena vs. Makhachev",
         "fights": 14,
-        "correct": 9,
-        "accuracy": 0.643,
-        "cumulative_accuracy": 0.626,
+        "correct": 12,
+        "accuracy": 0.857,
+        "cumulative_accuracy": 0.647,
         "cumulative_fights": 1113
       },
       {
@@ -148550,9 +148572,9 @@
         "date": "2025-12-06",
         "event": "UFC Fight Night: Tsarukyan vs. Hooker",
         "fights": 13,
-        "correct": 5,
-        "accuracy": 0.385,
-        "cumulative_accuracy": 0.623,
+        "correct": 8,
+        "accuracy": 0.615,
+        "cumulative_accuracy": 0.647,
         "cumulative_fights": 1126
       },
       {
@@ -148560,9 +148582,9 @@
         "date": "2025-12-13",
         "event": "UFC 323: Dvalishvili vs. Yan 2",
         "fights": 11,
-        "correct": 6,
-        "accuracy": 0.545,
-        "cumulative_accuracy": 0.623,
+        "correct": 7,
+        "accuracy": 0.636,
+        "cumulative_accuracy": 0.646,
         "cumulative_fights": 1137
       },
       {
@@ -148570,9 +148592,9 @@
         "date": "2026-01-24",
         "event": "UFC Fight Night: Royval vs. Kape",
         "fights": 11,
-        "correct": 5,
-        "accuracy": 0.455,
-        "cumulative_accuracy": 0.621,
+        "correct": 6,
+        "accuracy": 0.545,
+        "cumulative_accuracy": 0.645,
         "cumulative_fights": 1148
       },
       {
@@ -148580,9 +148602,9 @@
         "date": "2026-01-31",
         "event": "UFC 324: Gaethje vs. Pimblett",
         "fights": 13,
-        "correct": 6,
-        "accuracy": 0.462,
-        "cumulative_accuracy": 0.619,
+        "correct": 7,
+        "accuracy": 0.538,
+        "cumulative_accuracy": 0.644,
         "cumulative_fights": 1161
       },
       {
@@ -148590,9 +148612,9 @@
         "date": "2026-02-07",
         "event": "UFC 325: Volkanovski vs. Lopes 2",
         "fights": 13,
-        "correct": 8,
-        "accuracy": 0.615,
-        "cumulative_accuracy": 0.619,
+        "correct": 9,
+        "accuracy": 0.692,
+        "cumulative_accuracy": 0.645,
         "cumulative_fights": 1174
       },
       {
@@ -148600,9 +148622,9 @@
         "date": "2026-02-21",
         "event": "UFC Fight Night: Bautista vs. Oliveira",
         "fights": 13,
-        "correct": 6,
-        "accuracy": 0.462,
-        "cumulative_accuracy": 0.618,
+        "correct": 11,
+        "accuracy": 0.846,
+        "cumulative_accuracy": 0.647,
         "cumulative_fights": 1187
       },
       {
@@ -148610,9 +148632,9 @@
         "date": "2026-02-28",
         "event": "UFC Fight Night: Strickland vs. Hernandez",
         "fights": 13,
-        "correct": 5,
-        "accuracy": 0.385,
-        "cumulative_accuracy": 0.615,
+        "correct": 7,
+        "accuracy": 0.538,
+        "cumulative_accuracy": 0.646,
         "cumulative_fights": 1200
       },
       {
@@ -148622,7 +148644,7 @@
         "fights": 12,
         "correct": 8,
         "accuracy": 0.667,
-        "cumulative_accuracy": 0.616,
+        "cumulative_accuracy": 0.646,
         "cumulative_fights": 1212
       },
       {
@@ -148630,9 +148652,9 @@
         "date": "2026-03-14",
         "event": "UFC 326: Holloway vs. Oliveira 2",
         "fights": 14,
-        "correct": 7,
-        "accuracy": 0.5,
-        "cumulative_accuracy": 0.614,
+        "correct": 8,
+        "accuracy": 0.571,
+        "cumulative_accuracy": 0.645,
         "cumulative_fights": 1226
       },
       {
@@ -148640,9 +148662,9 @@
         "date": "2026-03-21",
         "event": "UFC Fight Night: Emmett vs. Vallejos",
         "fights": 13,
-        "correct": 5,
-        "accuracy": 0.385,
-        "cumulative_accuracy": 0.612,
+        "correct": 8,
+        "accuracy": 0.615,
+        "cumulative_accuracy": 0.645,
         "cumulative_fights": 1239
       },
       {
@@ -148650,9 +148672,9 @@
         "date": "2026-03-28",
         "event": "UFC Fight Night: Evloev vs. Murphy",
         "fights": 12,
-        "correct": 3,
-        "accuracy": 0.25,
-        "cumulative_accuracy": 0.608,
+        "correct": 7,
+        "accuracy": 0.583,
+        "cumulative_accuracy": 0.644,
         "cumulative_fights": 1251
       },
       {
@@ -148660,9 +148682,9 @@
         "date": "2026-04-04",
         "event": "UFC Fight Night: Adesanya vs. Pyfer",
         "fights": 13,
-        "correct": 6,
-        "accuracy": 0.462,
-        "cumulative_accuracy": 0.607,
+        "correct": 5,
+        "accuracy": 0.385,
+        "cumulative_accuracy": 0.642,
         "cumulative_fights": 1264
       },
       {
@@ -148672,7 +148694,7 @@
         "fights": 11,
         "correct": 5,
         "accuracy": 0.455,
-        "cumulative_accuracy": 0.605,
+        "cumulative_accuracy": 0.64,
         "cumulative_fights": 1275
       },
       {
@@ -148680,9 +148702,9 @@
         "date": "2026-04-18",
         "event": "UFC 327: Prochazka vs. Ulberg",
         "fights": 11,
-        "correct": 4,
-        "accuracy": 0.364,
-        "cumulative_accuracy": 0.603,
+        "correct": 5,
+        "accuracy": 0.455,
+        "cumulative_accuracy": 0.638,
         "cumulative_fights": 1286
       },
       {
@@ -148690,9 +148712,9 @@
         "date": "2026-04-25",
         "event": "UFC Fight Night: Burns vs. Malott",
         "fights": 13,
-        "correct": 3,
-        "accuracy": 0.231,
-        "cumulative_accuracy": 0.6,
+        "correct": 5,
+        "accuracy": 0.385,
+        "cumulative_accuracy": 0.636,
         "cumulative_fights": 1299
       },
       {
@@ -148700,9 +148722,9 @@
         "date": "2026-05-02",
         "event": "UFC Fight Night: Sterling vs. Zalal",
         "fights": 13,
-        "correct": 6,
-        "accuracy": 0.462,
-        "cumulative_accuracy": 0.598,
+        "correct": 8,
+        "accuracy": 0.615,
+        "cumulative_accuracy": 0.636,
         "cumulative_fights": 1312
       },
       {
@@ -148710,9 +148732,9 @@
         "date": "2026-05-09",
         "event": "UFC Fight Night: Della Maddalena vs. Prates",
         "fights": 13,
-        "correct": 4,
-        "accuracy": 0.308,
-        "cumulative_accuracy": 0.595,
+        "correct": 6,
+        "accuracy": 0.462,
+        "cumulative_accuracy": 0.634,
         "cumulative_fights": 1325
       },
       {
@@ -148722,7 +148744,7 @@
         "fights": 13,
         "correct": 8,
         "accuracy": 0.615,
-        "cumulative_accuracy": 0.596,
+        "cumulative_accuracy": 0.634,
         "cumulative_fights": 1338
       },
       {
@@ -148730,9 +148752,9 @@
         "date": "2026-05-30",
         "event": "UFC Fight Night: Allen vs. Costa",
         "fights": 12,
-        "correct": 10,
-        "accuracy": 0.833,
-        "cumulative_accuracy": 0.598,
+        "correct": 7,
+        "accuracy": 0.583,
+        "cumulative_accuracy": 0.633,
         "cumulative_fights": 1350
       },
       {
@@ -148740,9 +148762,9 @@
         "date": "2026-06-06",
         "event": "UFC Fight Night: Song vs. Figueiredo",
         "fights": 12,
-        "correct": 5,
-        "accuracy": 0.417,
-        "cumulative_accuracy": 0.596,
+        "correct": 8,
+        "accuracy": 0.667,
+        "cumulative_accuracy": 0.634,
         "cumulative_fights": 1362
       },
       {
@@ -148752,7 +148774,7 @@
         "fights": 7,
         "correct": 6,
         "accuracy": 0.857,
-        "cumulative_accuracy": 0.598,
+        "cumulative_accuracy": 0.635,
         "cumulative_fights": 1369
       },
       {
@@ -148760,9 +148782,9 @@
         "date": "2026-06-20",
         "event": "UFC Fight Night: Muhammad vs. Bonfim",
         "fights": 12,
-        "correct": 3,
-        "accuracy": 0.25,
-        "cumulative_accuracy": 0.594,
+        "correct": 4,
+        "accuracy": 0.333,
+        "cumulative_accuracy": 0.632,
         "cumulative_fights": 1381
       },
       {
@@ -148770,9 +148792,9 @@
         "date": "2026-06-27",
         "event": "UFC Fight Night: Kape vs. Horiguchi",
         "fights": 13,
-        "correct": 5,
-        "accuracy": 0.385,
-        "cumulative_accuracy": 0.593,
+        "correct": 6,
+        "accuracy": 0.462,
+        "cumulative_accuracy": 0.631,
         "cumulative_fights": 1394
       },
       {
@@ -148780,9 +148802,9 @@
         "date": "2026-07-11",
         "event": "UFC Fight Night: Fiziev vs. Torres",
         "fights": 14,
-        "correct": 7,
-        "accuracy": 0.5,
-        "cumulative_accuracy": 0.592,
+        "correct": 8,
+        "accuracy": 0.571,
+        "cumulative_accuracy": 0.63,
         "cumulative_fights": 1408
       },
       {
@@ -148790,9 +148812,9 @@
         "date": "2026-07-18",
         "event": "UFC 329: McGregor vs. Holloway 2",
         "fights": 12,
-        "correct": 4,
-        "accuracy": 0.333,
-        "cumulative_accuracy": 0.589,
+        "correct": 7,
+        "accuracy": 0.583,
+        "cumulative_accuracy": 0.63,
         "cumulative_fights": 1420
       },
       {
@@ -148802,7 +148824,7 @@
         "fights": 12,
         "correct": 7,
         "accuracy": 0.583,
-        "cumulative_accuracy": 0.589,
+        "cumulative_accuracy": 0.629,
         "cumulative_fights": 1432
       },
       {
@@ -148810,9 +148832,9 @@
         "date": "2026-08-01",
         "event": "UFC Fight Night: Ankalaev vs. Guskov",
         "fights": 14,
-        "correct": 7,
-        "accuracy": 0.5,
-        "cumulative_accuracy": 0.589,
+        "correct": 8,
+        "accuracy": 0.571,
+        "cumulative_accuracy": 0.629,
         "cumulative_fights": 1446
       },
       {
@@ -148822,7 +148844,7 @@
         "fights": 12,
         "correct": 5,
         "accuracy": 0.417,
-        "cumulative_accuracy": 0.587,
+        "cumulative_accuracy": 0.627,
         "cumulative_fights": 1458
       },
       {
@@ -148830,9 +148852,9 @@
         "date": "2026-08-15",
         "event": "UFC Fight Night: Gamrot vs. Salkilld",
         "fights": 12,
-        "correct": 8,
-        "accuracy": 0.667,
-        "cumulative_accuracy": 0.588,
+        "correct": 5,
+        "accuracy": 0.417,
+        "cumulative_accuracy": 0.625,
         "cumulative_fights": 1470
       },
       {
@@ -148840,9 +148862,9 @@
         "date": "2026-08-22",
         "event": "UFC 330: Makhachev vs. Machado Garry",
         "fights": 13,
-        "correct": 5,
-        "accuracy": 0.385,
-        "cumulative_accuracy": 0.586,
+        "correct": 7,
+        "accuracy": 0.538,
+        "cumulative_accuracy": 0.624,
         "cumulative_fights": 1483
       },
       {
@@ -148850,9 +148872,9 @@
         "date": "2026-08-29",
         "event": "UFC Fight Night: Hernandez vs. Rodrigues",
         "fights": 13,
-        "correct": 9,
-        "accuracy": 0.692,
-        "cumulative_accuracy": 0.587,
+        "correct": 7,
+        "accuracy": 0.538,
+        "cumulative_accuracy": 0.624,
         "cumulative_fights": 1496
       },
       {
@@ -148862,7 +148884,7 @@
         "fights": 14,
         "correct": 6,
         "accuracy": 0.429,
-        "cumulative_accuracy": 0.585,
+        "cumulative_accuracy": 0.622,
         "cumulative_fights": 1510
       },
       {
@@ -148872,7 +148894,7 @@
         "fights": 13,
         "correct": 7,
         "accuracy": 0.538,
-        "cumulative_accuracy": 0.585,
+        "cumulative_accuracy": 0.621,
         "cumulative_fights": 1523
       },
       {
@@ -148880,9 +148902,9 @@
         "date": "2026-09-19",
         "event": "Noche UFC: Silva vs. Delgado",
         "fights": 12,
-        "correct": 10,
-        "accuracy": 0.833,
-        "cumulative_accuracy": 0.587,
+        "correct": 7,
+        "accuracy": 0.583,
+        "cumulative_accuracy": 0.621,
         "cumulative_fights": 1535
       },
       {
@@ -148892,7 +148914,7 @@
         "fights": 12,
         "correct": 8,
         "accuracy": 0.667,
-        "cumulative_accuracy": 0.588,
+        "cumulative_accuracy": 0.621,
         "cumulative_fights": 1547
       },
       {
@@ -148900,9 +148922,9 @@
         "date": "2026-10-03",
         "event": "UFC Fight Night: Rosas Jr. vs. Barcelos",
         "fights": 14,
-        "correct": 6,
-        "accuracy": 0.429,
-        "cumulative_accuracy": 0.586,
+        "correct": 10,
+        "accuracy": 0.714,
+        "cumulative_accuracy": 0.622,
         "cumulative_fights": 1561
       },
       {
@@ -148910,72 +148932,72 @@
         "date": "2026-10-10",
         "event": "UFC 332: Silva vs. Wang",
         "fights": 11,
-        "correct": 8,
-        "accuracy": 0.727,
-        "cumulative_accuracy": 0.587,
+        "correct": 7,
+        "accuracy": 0.636,
+        "cumulative_accuracy": 0.622,
         "cumulative_fights": 1572
       }
     ],
     "weight_class_stats": {
       "Lightweight": {
-        "accuracy": 0.588,
+        "accuracy": 0.619,
         "fights": 260,
-        "correct": 153
+        "correct": 161
       },
       "Welterweight": {
-        "accuracy": 0.631,
+        "accuracy": 0.648,
         "fights": 233,
-        "correct": 147
+        "correct": 151
       },
       "Middleweight": {
-        "accuracy": 0.609,
+        "accuracy": 0.639,
         "fights": 230,
-        "correct": 140
+        "correct": 147
       },
       "Featherweight": {
-        "accuracy": 0.576,
+        "accuracy": 0.605,
         "fights": 177,
-        "correct": 102
+        "correct": 107
       },
       "Bantamweight": {
-        "accuracy": 0.497,
+        "accuracy": 0.609,
         "fights": 161,
-        "correct": 80
+        "correct": 98
       },
       "Light Heavyweight": {
-        "accuracy": 0.634,
+        "accuracy": 0.641,
         "fights": 142,
-        "correct": 90
+        "correct": 91
       },
       "Heavyweight": {
-        "accuracy": 0.632,
+        "accuracy": 0.654,
         "fights": 133,
-        "correct": 84
+        "correct": 87
       },
       "Flyweight": {
-        "accuracy": 0.564,
+        "accuracy": 0.538,
         "fights": 78,
-        "correct": 44
+        "correct": 42
       },
       "Women's Strawweight": {
-        "accuracy": 0.607,
+        "accuracy": 0.574,
         "fights": 61,
-        "correct": 37
+        "correct": 35
       },
       "Women's Flyweight": {
-        "accuracy": 0.488,
+        "accuracy": 0.628,
         "fights": 43,
-        "correct": 21
+        "correct": 27
       },
       "Women's Bantamweight": {
-        "accuracy": 0.333,
+        "accuracy": 0.583,
         "fights": 36,
-        "correct": 12
+        "correct": 21
       },
       "Catch Weight": {
-        "accuracy": 0.765,
+        "accuracy": 0.647,
         "fights": 17,
-        "correct": 13
+        "correct": 11
       }
     },
     "feature_importances": [
@@ -149223,16 +149245,16 @@
     "last_error": null
   },
   "refresh": {
-    "stats_seconds": 86400,
+    "stats_seconds": 604800,
     "odds_seconds": 10800,
-    "browser_seconds": 86400,
-    "automatic": false
+    "browser_seconds": 604800,
+    "automatic": true
   },
   "odds_status": {
     "running": false,
     "error": null,
-    "checked_at": "2026-10-11T21:56:53.291886+00:00",
-    "last_sync": "2026-10-11T21:56:53.298546+00:00"
+    "checked_at": "2026-10-11T22:05:39.920501+00:00",
+    "last_sync": "2026-10-11T22:05:39.927086+00:00"
   },
   "profile_errors": [],
   "live_accuracy": null,

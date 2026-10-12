@@ -184,11 +184,173 @@ function setUserPick(fightId, side) {
 // ==========================================
 // Odds & Card Countdown
 // ==========================================
+function calculateProfitability(f) {
+  if (!f || f.prediction_pending) return null;
+  const o = f.odds;
+  const books = o?.books || [];
+  if (!books.length) return null;
+  const book = books[0];
+
+  const isPickRed = (f.pick === f.red);
+  const pickOdds = isPickRed ? book.red : book.blue;
+  const oppOdds = isPickRed ? book.blue : book.red;
+  const pickProb = Math.max(0.01, Math.min(0.99, isPickRed ? (f.red_probability || f.confidence) : (f.blue_probability || f.confidence)));
+
+  if (pickOdds === null || pickOdds === undefined) return null;
+
+  // Decimal payout multiplier D
+  let dec = 0;
+  let profitOn100 = 0;
+  if (pickOdds > 0) {
+    dec = 1.0 + (pickOdds / 100.0);
+    profitOn100 = pickOdds;
+  } else {
+    dec = 1.0 + (100.0 / Math.abs(pickOdds));
+    profitOn100 = (100.0 / Math.abs(pickOdds)) * 100.0;
+  }
+
+  // Sportsbook implied break-even probability
+  const impliedProb = 1.0 / dec;
+
+  // Mathematical Expected Value (EV%)
+  const ev = (pickProb * dec - 1.0) * 100.0;
+
+  // Edge over implied line in percentage points
+  const edgeDiff = (pickProb - impliedProb) * 100.0;
+
+  // Value tier and user-facing rating
+  let tier = 'neutral';
+  let ratingLabel = '⚖️ FAIR MARKET VALUE';
+  let badgeText = 'MODERATE';
+  let summary = '';
+  let meterPct = 50;
+
+  if (ev >= 15.0) {
+    tier = 'exceptional';
+    ratingLabel = '🔥 EXCEPTIONAL PROFIT VALUE';
+    badgeText = 'VERY HIGH';
+    meterPct = Math.min(98, Math.max(75, 70 + ev));
+    summary = `MMA Cipher projects a massive mathematical edge (+${edgeDiff.toFixed(1)}% vs sportsbook break-even). Strong value proposition with outsized profit potential.`;
+  } else if (ev >= 6.0) {
+    tier = 'positive';
+    ratingLabel = '🌟 STRONG PROFIT VALUE';
+    badgeText = 'HIGH';
+    meterPct = Math.min(85, Math.max(62, 55 + ev * 2.2));
+    summary = `The AI win probability (${(pickProb * 100).toFixed(1)}%) substantially exceeds sportsbook break-even (${(impliedProb * 100).toFixed(1)}%), producing a favorable +${ev.toFixed(1)}% expected return.`;
+  } else if (ev >= 0.0) {
+    tier = 'moderate';
+    ratingLabel = '⚡ POSITIVE VALUE';
+    badgeText = 'FAVORABLE';
+    meterPct = Math.min(65, Math.max(52, 50 + ev * 2.5));
+    summary = `Favorable pricing: the payout pays out higher than model-projected outcome probability. Positive expected value (+${ev.toFixed(1)}%).`;
+  } else if (ev >= -6.0) {
+    tier = 'neutral';
+    ratingLabel = '⚖️ FAIR MARKET ODDS';
+    badgeText = 'NEUTRAL';
+    meterPct = Math.max(35, Math.min(49, 50 + ev * 2.0));
+    summary = `Market moneylines closely match AI win confidence. Expected return is neutral once sportsbook house juice is accounted for.`;
+  } else {
+    tier = 'negative';
+    ratingLabel = '⚠️ LOW PROFIT VALUE';
+    badgeText = 'UNFAVORABLE';
+    meterPct = Math.max(12, Math.min(32, 35 + ev));
+    summary = `The current sportsbook line is expensive relative to AI confidence. Unfavorable risk-to-reward ratio (-${Math.abs(ev).toFixed(1)}% EV).`;
+  }
+
+  return {
+    bookName: book.name || 'Sportsbook',
+    pick: f.pick,
+    pickOdds,
+    oppOdds,
+    pickProb,
+    impliedProb,
+    dec,
+    profitOn100,
+    ev,
+    edgeDiff,
+    tier,
+    ratingLabel,
+    badgeText,
+    meterPct,
+    summary
+  };
+}
+
+function renderProfitPredictor(f) {
+  const p = calculateProfitability(f);
+  if (!p) {
+    return `
+      <section class="profit-predictor-panel is-pending" aria-label="Betting Profitability & EV Predictor">
+        <div class="profit-header">
+          <div class="profit-title-group">
+            <span class="profit-tag-pill"><span class="pulse-dot"></span> MONEY-MAKER PREDICTOR</span>
+            <h4>Chances of Making Money</h4>
+          </div>
+          <span class="profit-badge tier-neutral">AWAITING ODDS</span>
+        </div>
+        <p class="muted">Live sportsbook moneylines have not yet settled for this matchup. Real-time profit calculations and expected value meters will activate once sportsbooks publish moneylines.</p>
+      </section>
+    `;
+  }
+
+  const isPos = p.ev >= 0;
+  const evSign = isPos ? '+' : '';
+  const edgeSign = p.edgeDiff >= 0 ? '+' : '';
+
+  return `
+    <section class="profit-predictor-panel tier-${p.tier}" aria-label="Betting Profitability & EV Predictor">
+      <div class="profit-header">
+        <div class="profit-title-group">
+          <span class="profit-tag-pill"><span class="pulse-dot"></span> MONEY-MAKER PREDICTOR</span>
+          <h4>Chances of Making Money &middot; ${esc(p.pick)}</h4>
+        </div>
+        <span class="profit-badge tier-${p.tier}">${p.ratingLabel}</span>
+      </div>
+
+      <div class="profit-metrics-grid">
+        <div class="profit-metric-card highlight-card">
+          <span class="pm-label">EXPECTED VALUE (EV)</span>
+          <strong class="pm-val ${isPos ? 'ev-positive' : 'ev-negative'}">${evSign}${p.ev.toFixed(1)}%</strong>
+          <small>${isPos ? 'Mathematical profit edge' : 'Sportsbook hold disadvantage'}</small>
+        </div>
+
+        <div class="profit-metric-card">
+          <span class="pm-label">RETURN ON $100 BET</span>
+          <strong class="pm-val profit-val">+$${p.profitOn100.toFixed(0)} <span class="profit-small">profit</span></strong>
+          <small>Total payout: $${(100 + p.profitOn100).toFixed(0)} at ${line(p.pickOdds)}</small>
+        </div>
+
+        <div class="profit-metric-card">
+          <span class="pm-label">AI CONFIDENCE VS MARKET</span>
+          <strong class="pm-val comparison-val">${(p.pickProb * 100).toFixed(1)}% <span class="vs-text">vs</span> ${(p.impliedProb * 100).toFixed(1)}%</strong>
+          <small>${edgeSign}${p.edgeDiff.toFixed(1)}% edge over break-even</small>
+        </div>
+      </div>
+
+      <div class="profit-gauge-container">
+        <div class="gauge-labels">
+          <span class="gauge-ai-label">AI Win Chance: <strong>${(p.pickProb * 100).toFixed(1)}%</strong></span>
+          <span class="gauge-meter-label">Value Rating: <strong>${p.badgeText}</strong></span>
+          <span class="gauge-mkt-label">Break-Even Line: <strong>${(p.impliedProb * 100).toFixed(1)}%</strong></span>
+        </div>
+        <div class="profit-gauge-track" role="progressbar" aria-valuenow="${p.meterPct}" aria-valuemin="0" aria-valuemax="100" aria-label="Profitability Score: ${p.meterPct}%">
+          <div class="profit-gauge-fill tier-${p.tier}" style="width: ${p.meterPct}%"></div>
+          <div class="gauge-marker" style="left: ${Math.max(8, Math.min(92, p.impliedProb * 100))}%" title="Break-Even Line: ${(p.impliedProb * 100).toFixed(1)}%">
+            <span class="marker-flag">Break-Even</span>
+          </div>
+        </div>
+        <p class="profit-summary-note">${esc(p.summary)}</p>
+      </div>
+    </section>
+  `;
+}
+
 function oddsPanel(f) {
   const o = f.odds;
   if (!o) return '';
   const books = o.books || [];
-  return `<section class="odds-panel" aria-label="Sportsbook odds"><div class="odds-heading"><span>SPORTSBOOK MONEYLINE</span><span class="odds-state ${o.stale?'is-stale':''}">${o.stale?'STALE / RETRYING':o.available?'LATEST FETCH':'AWAITING ODDS'}</span></div>${books.map(b=>`<div class="odds-book"><span>${esc(b.name)}</span></div><div class="odds-prices"><strong title="${esc(f.red)}">${line(b.red)}</strong><strong title="${esc(f.blue)}">${line(b.blue)}</strong></div><div class="odds-fighters"><span>${esc(f.red)}</span><span>${esc(f.blue)}</span></div>`).join('')}${!books.length?`<p class="muted">${esc(o.message || 'Odds are temporarily unavailable.')}</p>`:''}<div class="odds-meta">${o.fetched_at?'Checked '+esc(stamp(o.fetched_at))+' \u00b7 ':''}${o.source?'Via ESPN \u00b7 ':''}Auto-refresh ${Math.round((data?.refresh?.odds_seconds||900)/60)} min${o.error?' \u00b7 Refresh failed':''}</div>${o.available?'<div class="odds-meta">Source does not supply a line-change timestamp. Prices may move between checks.</div>':''}</section>`;
+  const oddsHtml = `<section class="odds-panel" aria-label="Sportsbook odds"><div class="odds-heading"><span>SPORTSBOOK MONEYLINE</span><span class="odds-state ${o.stale?'is-stale':''}">${o.stale?'STALE / RETRYING':o.available?'LATEST FETCH':'AWAITING ODDS'}</span></div>${books.map(b=>`<div class="odds-book"><span>${esc(b.name)}</span></div><div class="odds-prices"><strong title="${esc(f.red)}">${line(b.red)}</strong><strong title="${esc(f.blue)}">${line(b.blue)}</strong></div><div class="odds-fighters"><span>${esc(f.red)}</span><span>${esc(f.blue)}</span></div>`).join('')}${!books.length?`<p class="muted">${esc(o.message || 'Odds are temporarily unavailable.')}</p>`:''}<div class="odds-meta">${o.fetched_at?'Checked '+esc(stamp(o.fetched_at))+' \u00b7 ':''}${o.source?'Via ESPN \u00b7 ':''}Auto-refresh ${Math.round((data?.refresh?.odds_seconds||900)/60)} min${o.error?' \u00b7 Refresh failed':''}</div>${o.available?'<div class="odds-meta">Source does not supply a line-change timestamp. Prices may move between checks.</div>':''}</section>`;
+  return oddsHtml + renderProfitPredictor(f);
 }
 
 function countdownText(value, state, currentTime=Date.now()) {
@@ -707,6 +869,24 @@ function quickOddsBar(f) {
   const bestBook = o.books[0];
   const redPrice = line(bestBook.red);
   const bluePrice = line(bestBook.blue);
+  const p = calculateProfitability(f);
+
+  let profitSnippet = '';
+  if (p) {
+    const isPos = p.ev >= 0;
+    profitSnippet = `
+      <div class="quick-profit-bar tier-${p.tier}">
+        <div class="qpb-left">
+          <span class="qpb-icon">💰</span>
+          <span>Chances of profiting: <strong class="${isPos ? 'qpb-green' : 'qpb-neg'}">${isPos ? '+' : ''}${p.ev.toFixed(1)}% EV</strong></span>
+        </div>
+        <div class="qpb-right">
+          <span>Bet $100 &rarr; <strong>+$${p.profitOn100.toFixed(0)} profit</strong> on ${esc(p.pick.split(' ').pop())}</span>
+        </div>
+      </div>
+    `;
+  }
+
   return `
     <div class="quick-odds-bar">
       <div class="quick-odds-label">
@@ -718,6 +898,7 @@ function quickOddsBar(f) {
         <strong title="${esc(f.blue)}">${bluePrice}</strong>
       </div>
     </div>
+    ${profitSnippet}
   `;
 }
 
@@ -747,7 +928,7 @@ function toggleCardDrawer(fightId) {
   }
 }
 
-function card(f, withProfiles=false, isMainEvent=false) {
+function card(f, withProfiles=false, isMainEvent=false, mainCardInfo=null) {
   const pending = f.prediction_pending;
   const edge = modelEdge(f);
   const isUpset = Boolean(f.upset_radar?.is_candidate || edge);
@@ -757,8 +938,11 @@ function card(f, withProfiles=false, isMainEvent=false) {
   return `<article class="fight-card${isMainEvent ? ' is-main-event' : ''}${isWomensFight(f)?' womens-fight':''}${edge?' has-model-edge':''}${isUpset?' is-upset-card':''}" data-fight-id="${esc(f.id || 'custom')}">
     <div class="fight-top">
       <div class="fight-top-tag-wrap">
-        ${isMainEvent ? '<span class="main-event-badge">👑 MAIN EVENT</span>' : ''}
-        <span>${esc(f.weight_class || 'CUSTOM MATCHUP')}</span>
+        ${mainCardInfo ? `
+          <span class="fight-order-badge ${mainCardInfo.isMain ? 'is-main-order' : mainCardInfo.isCoMain ? 'is-comain-order' : 'is-card-order'}">${esc(mainCardInfo.orderLabel)}</span>
+          ${mainCardInfo.predictedTime ? `<span class="predicted-time-badge" title="Estimated fighter walkout time">🕒 ${esc(mainCardInfo.predictedTime)}</span>` : ''}
+        ` : (isMainEvent ? '<span class="main-event-badge">👑 MAIN EVENT</span>' : '')}
+        <span class="weight-class-tag">${esc(f.weight_class || 'CUSTOM MATCHUP')}</span>
       </div>
       <span>${f.locked?'FORECAST LOCKED':'MMA CIPHER PROBABILITY'}</span>
     </div>
@@ -859,6 +1043,52 @@ function profile(name) {
 
 const openUndercardSections = new Set();
 
+function getMainCardBoutMeta(f, i, totalMainBouts, mainStartAt) {
+  const boutNumber = totalMainBouts - i;
+  const isMain = (i === 0);
+  const isCoMain = (i === 1 && totalMainBouts > 2);
+
+  let orderLabel = '';
+  if (isMain) {
+    orderLabel = `👑 MAIN EVENT · BOUT ${boutNumber} OF ${totalMainBouts}`;
+  } else if (isCoMain) {
+    orderLabel = `⚔️ CO-MAIN EVENT · BOUT ${boutNumber} OF ${totalMainBouts}`;
+  } else {
+    orderLabel = `🥊 MAIN CARD · BOUT ${boutNumber} OF ${totalMainBouts}`;
+  }
+
+  // Calculate predicted walkout / fight time
+  let timeStr = '';
+  const startTimestamp = Date.parse(f.odds?.start_at || f.start_at || mainStartAt);
+  if (Number.isFinite(startTimestamp)) {
+    // In UFC main card: Bout 1 starts at T0, Bout 2 at T0+30m, ... Main Event at T0 + (total-1)*30m
+    const minutesOffset = (boutNumber - 1) * 30;
+    const estDate = new Date(startTimestamp + minutesOffset * 60 * 1000);
+    const localTime = estDate.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    try {
+      const etTime = estDate.toLocaleTimeString('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit' });
+      timeStr = `Est. Walkout ~${localTime} (${etTime} ET)`;
+    } catch (_) {
+      timeStr = `Est. Walkout ~${localTime}`;
+    }
+  } else {
+    if (isMain) timeStr = 'Est. Walkout ~12:15 AM ET';
+    else if (isCoMain) timeStr = 'Est. Walkout ~11:45 PM ET';
+    else {
+      const minOffset = (boutNumber - 1) * 30;
+      timeStr = `Est. Walkout ~${minOffset}m after start`;
+    }
+  }
+
+  return {
+    boutNumber,
+    isMain,
+    isCoMain,
+    orderLabel,
+    predictedTime: timeStr
+  };
+}
+
 function cardSections(fights) {
   const favs = getFavorites();
   let filtered = fights;
@@ -882,13 +1112,17 @@ function cardSections(fights) {
     const group = filtered.filter(f => (f.odds?.card_section || 'unassigned') === key);
     if (!group.length) return '';
     if (key === 'main') {
+      const mainStartAt = group[0]?.odds?.start_at || group[0]?.start_at;
       return `<section class="card-section" aria-label="${label}">
         <div class="card-section-heading">
           <h4>${label}</h4>
           <span>${group.length} ${group.length===1?'bout':'bouts'}</span>
         </div>
-        <p class="section-note">Grouped by scheduled broadcast start times. Card placement may change.</p>
-        <div class="fight-grid">${group.map((f, i) => card(f, true, f.id === mainBoutId || Boolean(f.is_main_event) || i === 0)).join('')}</div>
+        <p class="section-note">Main card scheduled bout order &amp; estimated walkout times. Broadcast timing may adapt to fight pacing.</p>
+        <div class="fight-grid">${group.map((f, i) => {
+          const meta = getMainCardBoutMeta(f, i, group.length, mainStartAt);
+          return card(f, true, meta.isMain, meta);
+        }).join('')}</div>
       </section>`;
     }
 
@@ -931,9 +1165,9 @@ function updateNextEvent() {
   });
   link.dataset.event = next ? `${next.date}|${next.event}` : '';
   $('next-event-label').textContent = next ? 'NEXT EVENT' : 'EXPLORE';
-  $('next-event-date').textContent = next ? new Date(`${next.date}T12:00:00`).toLocaleDateString(undefined,{month:'short',day:'numeric'}) : 'Fight cards';
-  link.title = next ? `${next.event} - View fight card` : 'Browse upcoming fight cards';
-  link.setAttribute('aria-label', next ? `View ${next.event} on ${day(next.date)}` : 'Browse upcoming fight cards');
+  $('next-event-date').textContent = next ? new Date(`${next.date}T12:00:00`).toLocaleDateString(undefined,{month:'short',day:'numeric'}) : 'Upcoming Bouts';
+  link.title = next ? `${next.event} - View predictions` : 'Browse upcoming bouts';
+  link.setAttribute('aria-label', next ? `View ${next.event} on ${day(next.date)}` : 'Browse upcoming bouts');
 }
 
 $('next-event-link')?.addEventListener('click', () => {
@@ -1029,7 +1263,7 @@ function render() {
   $('last-sync').textContent = data.status.last_sync ? new Date(data.status.last_sync).toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit',second:'2-digit'}) : 'Not yet';
   const pullInterval = getDynamicPullInterval(data?.upcoming);
   const isFightCadence = pullInterval <= 6 * 3600 * 1000;
-  $('sync-state').textContent = data.status.running ? data.status.phase : (isFightCadence ? 'Fight day: updating every 6h' : 'Updating every 24h (6h on fight day)');
+  $('sync-state').textContent = data.status.running ? data.status.phase : (isFightCadence ? 'Fight day: updating every 6h' : 'Updating weekly with fresh predictions');
   const stale = !data.status.last_sync || Date.now() - Date.parse(data.status.last_sync) > (data.refresh.stats_seconds * 2000);
   const lastFailure = data.status.last_error;
   const error = data.status.error || (lastFailure && (!data.status.last_sync || Date.parse(lastFailure.at) > Date.parse(data.status.last_sync)) ? lastFailure.message : null);
@@ -1040,10 +1274,6 @@ function render() {
   $('notice').textContent = data.status.running ? 'Refreshing fight data in the background. Saved data remains available.' : error ? 'Fight data is delayed. Showing saved data; retrying automatically.' : stale ? 'Showing saved data. A fresh update is pending.' : `Fight data up to date / ${stamp(data.status.last_sync)}`;
   $('notice').textContent += profileWarning;
   updateNextEvent();
-  if (data.refresh.automatic === false) {
-    $('notice').classList.add('warning');
-    $('notice').textContent += ' Automatic server updates are disabled.';
-  }
   $('card-count').textContent = data.upcoming.length;
   if ($('fighters-count')) $('fighters-count').textContent = `${(data.fighters.length / 1000).toFixed(1)}k`;
 
