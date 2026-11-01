@@ -6,3 +6,16 @@ __pycache__
 test-results
 *.ipynb
 ufcstats_sample.html
+gha-creds-*.json
+.env
+*.log
+.firebase
+static/fighters
+static/events
+static/fights
+static/model
+static/status
+static/api/fighters
+static/api/predictions
+static/api/analytics
+static/api/sync-state.json.gz

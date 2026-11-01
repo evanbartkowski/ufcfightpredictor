@@ -2,7 +2,7 @@
 import re
 import time
 from datetime import datetime
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urljoin, urlunparse
 
 import requests
 from bs4 import BeautifulSoup
@@ -10,8 +10,19 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 from .store import bout_id, identity, now
+from .profiles import normalize_profile
+from .network import UPSTREAM
 
-BASE = 'http://ufcstats.com'
+BASE = 'https://ufcstats.com'
+_http_only_until = 0.
+
+
+def official_url(url):
+    parsed = urlparse(url)
+    if (parsed.hostname not in ('ufcstats.com','www.ufcstats.com') or parsed.scheme not in ('http','https')
+            or parsed.username or parsed.password or parsed.port not in (None,80,443)):
+        raise ValueError('Only official UFCStats URLs are accepted')
+    return parsed
 
 
 def parse_events(html):
@@ -75,6 +86,7 @@ def parse_fighter(html, url):
         data['record'] = record.get_text(' ', strip=True).replace('Record:', '').strip()
     if 'SLpM' not in data:
         raise ValueError('Fighter profile is missing statistics')
+    data['normalized'] = normalize_profile(data)
     return data
 
 
@@ -82,23 +94,49 @@ class UFCStats:
     def __init__(self):
         self.session = requests.Session()
         self.session.headers['User-Agent'] = 'MMAOraclePredictions/1.0 (personal UFC statistics dashboard)'
-        self.session.mount('http://', HTTPAdapter(max_retries=Retry(total=2, backoff_factor=1,
-            status_forcelist=[429, 500, 502, 503, 504])))
+        for scheme in ('http://','https://'):
+            self.session.mount(scheme, HTTPAdapter(max_retries=Retry(total=1, backoff_factor=1,
+                status_forcelist=[500,502,503,504], respect_retry_after_header=False)))
         self.last_request = 0
 
     def get(self, url):
-        parsed = urlparse(url)
-        if parsed.hostname not in ('ufcstats.com', 'www.ufcstats.com') or parsed.scheme not in ('http', 'https'):
-            raise ValueError('Only official UFCStats URLs are accepted')
+        global _http_only_until
+        parsed = official_url(url)
+        # Prefer TLS even for the site's old HTTP links. Some UFCStats hosts
+        # still refuse port 443; only connection failures permit an HTTP retry.
+        # Invalid certificates, HTTP errors, and off-host redirects do not.
+        scheme = 'http' if time.monotonic() < _http_only_until else 'https'
+        url = urlunparse(parsed._replace(scheme=scheme))
         time.sleep(max(0, .6 - (time.monotonic()-self.last_request)))
         self.last_request = time.monotonic()
-        response = self.session.get(url, timeout=(10, 30))
+        for _ in range(4):
+            official_url(url)
+            try:
+                with UPSTREAM.request():
+                    response = self.session.get(url, timeout=(3,30), allow_redirects=False)
+            except requests.exceptions.SSLError:
+                raise
+            except requests.exceptions.ConnectionError:
+                if urlparse(url).scheme != 'https':
+                    raise
+                _http_only_until = time.monotonic()+3600
+                url = urlunparse(urlparse(url)._replace(scheme='http'))
+                continue
+            if response.status_code in (301,302,303,307,308):
+                target = urljoin(url, response.headers.get('Location',''))
+                official_url(target)
+                url = target
+                continue
+            break
+        else:
+            raise ValueError('Too many UFCStats redirects or failed transport attempts')
         response.raise_for_status()
         if 'Checking your browser' in response.text or 'This site requires JavaScript' in response.text:
             return self.browser_get(url)
         return response.text
 
     def browser_get(self, url):
+        official_url(url)
         # Let the site's normal JavaScript browser check run, then reuse its session.
         # No CAPTCHA solving or credentials are involved.
         from playwright.sync_api import sync_playwright
@@ -108,6 +146,7 @@ class UFCStats:
                 try:
                     context = browser.new_context()
                     page = context.new_page()
+                    page.route('**/*', lambda route: route.continue_() if urlparse(route.request.url).hostname in ('ufcstats.com','www.ufcstats.com') else route.abort())
                     page.goto(url, timeout=45000)
                     page.wait_for_selector('a[href*="event-details/"], a[href*="fighter-details/"], .b-content__title-highlight', timeout=30000)
                     self.session.headers['User-Agent'] = page.evaluate('navigator.userAgent')

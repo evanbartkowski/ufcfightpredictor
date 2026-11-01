@@ -34,5 +34,6 @@
 .published-events { display:flex; flex-wrap:wrap; gap:12px 20px; margin:20px 0; }
 .personal-pick-note { color:#b3bdd0; font-size:12px; line-height:1.7; margin:14px 0 0; }
 .factor-detail { display:block; color:#abb9ce; margin-top:7px; font-size:11px; line-height:1.6; }
+.public-pagination { display:flex; justify-content:center; align-items:center; gap:20px; margin:24px 0; }
 .forecast-detail-link { display:block; margin:8px 0 14px; font-size:12px; }
 @media(max-width:600px) { .directory-page { padding:90px 16px 24px; } .public-section { padding:18px 14px; } .public-facts { grid-template-columns:1fr; } .directory-page td,.directory-page th { padding:10px 8px; } .public-nav { gap:12px 18px; } }

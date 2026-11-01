@@ -28,7 +28,7 @@ with sync_playwright() as p:
             route.abort()
         else:
             route.fulfill(json={'revision': str(len(calls) + 1)})
-    page.route('**/api/dashboard?*', dashboard)
+    page.route('**/api/overview?*', dashboard)
     page.route('**/api/update?*', update)
     page.clock.install()
     page.goto('http://127.0.0.1:8000', wait_until='networkidle')
@@ -89,7 +89,7 @@ with sync_playwright() as p:
     offline.on('pageerror', lambda error: errors.append(str(error)))
     old = dict(payload, upcoming=[dict(payload['upcoming'][0], date='2026-10-17', event='Expired October card')])
     offline.add_init_script('localStorage.setItem("mma_cipher_dashboard", ' + json.dumps(json.dumps(old)) + '); localStorage.setItem("mma_cipher_last_pull", String(Date.now()));')
-    offline.route('**/api/dashboard?*', lambda route: route.abort())
+    offline.route('**/api/overview?*', lambda route: route.abort())
     offline.goto('http://127.0.0.1:8000', wait_until='networkidle')
     offline.get_by_text('Connection interrupted.', exact=False).wait_for()
     # Current pre-rendered HTML remains useful even if an old browser cache and

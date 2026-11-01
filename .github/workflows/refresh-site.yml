@@ -2,9 +2,11 @@ name: Refresh fight data and website
 
 on:
   schedule:
-    - cron: '7,22,37,52 * * * *'
+    - cron: '8,23,38,53 * * * *'
   workflow_dispatch:
   push:
+    branches: [main]
+  pull_request:
     branches: [main]
 
 concurrency:
@@ -15,7 +17,28 @@ permissions:
   contents: read
 
 jobs:
+  clean-container:
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build clean image with pinned dependencies and prebuilt model
+        run: docker build --pull --no-cache -t mma-cipher-clean .
+      - name: Verify ready and unready server processes
+        run: |
+          docker run -d --name cipher-ready -p 127.0.0.1:8088:8000 mma-cipher-clean python app.py --no-sync
+          python3 scripts/container_smoke.py http://127.0.0.1:8088
+          docker run -d --name cipher-unready -p 127.0.0.1:8089:8000 -e PREBUILT_DATA_DIR=/unavailable -e DATA_DIR=/tmp/empty mma-cipher-clean python app.py --no-sync
+          python3 scripts/container_smoke.py http://127.0.0.1:8089 --expect-unready
+      - name: Container logs
+        if: always()
+        run: |
+          docker logs cipher-ready 2>&1 || true
+          docker logs cipher-unready 2>&1 || true
   refresh:
+    needs: clean-container
+    if: ${{ !cancelled() && github.ref == 'refs/heads/main' && (needs.clean-container.result == 'success' || needs.clean-container.result == 'skipped') }}
     runs-on: ubuntu-latest
     timeout-minutes: 40
     permissions:
@@ -35,9 +58,10 @@ jobs:
           node-version: '22'
       - name: Install updater
         run: |
-          python -m pip install -r requirements-dev.txt
+          python -m pip install --require-hashes -r requirements-dev.txt
+          python -m pip check
           python -m playwright install --with-deps chromium
-          npm install --global firebase-tools@14
+          npm install --global firebase-tools@15.33.0
       - name: Test source changes
         if: github.event_name != 'schedule'
         run: python -m pytest -q

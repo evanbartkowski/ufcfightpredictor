@@ -8,6 +8,10 @@
     ],
     "rewrites": [
       {
+        "source": "/api/overview",
+        "destination": "/api/overview.json"
+      },
+      {
         "source": "/api/model",
         "destination": "/api/model.json"
       },

@@ -15,6 +15,10 @@ let analyticsScope = 'all'; // 'all' | '50' | '25' | '10'
 let fighterSearchQuery = '';
 let fighterDivisionFilter = 'all';
 let shareTargetFight = null;
+let fighterPage = 1;
+const fighterPageRequests = new Map();
+const loadedFighterPages = new Set();
+const analyticsRequests = new Map();
 
 // ==========================================
 // Navigation & Tab Switching
@@ -26,7 +30,7 @@ function showTab(name) {
     b.setAttribute('aria-pressed', String(b.dataset.tab === name));
   });
   if (name === 'analytics') {
-    renderAnalytics();
+    ensureAnalytics().then(renderAnalytics).catch(() => { $('accuracy-chart-container').textContent = 'Historical analytics are temporarily unavailable. Please retry.'; });
   } else if (name === 'fighters') {
     renderFighterDatabase();
   }
@@ -581,6 +585,8 @@ function getFighterData(name) {
   if (!name || !data?.fighters) return null;
   const key = v => v.normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
   const k = key(name);
+  const indexed = data.fighters.find(f => key(f.name) === k);
+  for (const fight of data.upcoming || []) for (const corner of ['red','blue']) if (key(fight[corner]) === k && fight.fighter_stats?.[corner]) return {...indexed,...fight.fighter_stats[corner]};
   return data.fighters.find(f => key(f.name) === k) || null;
 }
 
@@ -592,6 +598,7 @@ function getFighterCoreMetrics(f) {
     };
   }
 
+  const measured = value => value != null && value !== '' && Number.isFinite(parseFloat(value));
   // 1. Striking Volume (SLpM)
   const slpm = parseFloat(f.SLpM) || 0;
   const normVol = Math.max(0.12, Math.min(0.98, slpm / 7.5));
@@ -604,8 +611,8 @@ function getFighterCoreMetrics(f) {
   // 3. Damage Avoidance (str_def or 1 - SApM / 7.0)
   let strDef = parseFloat(f.str_def) || 0;
   if (strDef > 1) strDef = strDef / 100;
-  if (!strDef && f.SApM) {
-    const sapm = parseFloat(f.SApM) || 3.5;
+  if (!measured(f.str_def) && measured(f.SApM)) {
+    const sapm = parseFloat(f.SApM);
     strDef = Math.max(0, 1 - (sapm / 7.0));
   }
   const normAvoid = Math.max(0.12, Math.min(0.98, strDef / 0.78));
@@ -632,12 +639,12 @@ function getFighterCoreMetrics(f) {
     td_def: normTdDef,
     sub_threat: normSub,
     raw: {
-      volume: slpm ? slpm.toFixed(1) : '—',
-      accuracy: strAcc ? `${Math.round(strAcc * 100)}%` : '—',
-      avoidance: strDef ? `${Math.round(strDef * 100)}%` : '—',
-      td_acc: tdAcc ? `${Math.round(tdAcc * 100)}%` : '—',
-      td_def: tdDef ? `${Math.round(tdDef * 100)}%` : '—',
-      sub_threat: subAvg ? subAvg.toFixed(1) : '—'
+      volume: measured(f.SLpM) ? slpm.toFixed(1) : '—',
+      accuracy: measured(f.sig_str_acc) ? `${Math.round(strAcc * 100)}%` : '—',
+      avoidance: measured(f.str_def) || measured(f.SApM) ? `${Math.round(strDef * 100)}%` : '—',
+      td_acc: measured(f.td_acc) ? `${Math.round(tdAcc * 100)}%` : '—',
+      td_def: measured(f.td_def) ? `${Math.round(tdDef * 100)}%` : '—',
+      sub_threat: measured(f.sub_avg) ? subAvg.toFixed(1) : '—'
     }
   };
 }
@@ -937,7 +944,7 @@ function card(f, withProfiles=false, isMainEvent=false, mainCardInfo=null) {
 
 function profile(name) {
   const key = v => v.normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
-  const f = data.fighters.find(f => key(f.name) === key(name));
+  const f = getFighterData(name);
   if (!f) return '';
   const fields = [
     ['Record', f.record || `${parseInt(f.wins)||0}–${parseInt(f.losses)||0}`],
@@ -1158,6 +1165,7 @@ function attachCardListeners() {
 // ==========================================
 function render() {
   if (!data) return;
+  data = currentDashboard(data);
   const m = data.model;
   if (m) {
     $('model-summary').innerHTML = `
@@ -1177,11 +1185,13 @@ function render() {
   const stale = !Number.isFinite(Date.parse(data.status.last_sync)) || Date.now() - Date.parse(data.status.last_sync) > ((data.refresh?.stats_seconds || 21600) + 900) * 1000;
   const lastFailure = data.status.last_error;
   const error = data.status.error || (lastFailure && (!data.status.last_sync || Date.parse(lastFailure.at) > Date.parse(data.status.last_sync)) ? lastFailure.message : null);
+  const publicationLate = data.published_at && Date.now()-Date.parse(data.published_at)>45*60000;
   const profileWarning = data.profile_errors?.length ? ` ${data.profile_errors.length} fighter profiles could not be refreshed and are labeled as cached.` : '';
   $('odds-sync').textContent = data.odds_status.error ? 'Odds delayed / retrying automatically' : data.odds_status.running ? 'Refreshing odds...' : data.odds_status.checked_at ? `Odds checked ${stamp(data.odds_status.checked_at)}` : 'Waiting for sportsbook odds';
   $('odds-sync').classList.toggle('warning', Boolean(data.odds_status.error));
-  $('notice').classList.toggle('warning', Boolean(!data.status.running && (error || stale)));
+  $('notice').classList.toggle('warning', Boolean(!data.status.running && (error || stale || publicationLate)));
   $('notice').textContent = data.status.running ? 'Refreshing fight data in the background. Saved data remains available.' : error ? `Fight data refresh failed. Retrying automatically. Last successful pull: ${stamp(data.status.last_sync)}.` : stale ? `Fight data is delayed. Automatic updates will retry. Last successful pull: ${stamp(data.status.last_sync)}.` : `Fight data up to date / ${stamp(data.status.last_sync)}`;
+  if (publicationLate) $('notice').textContent = `Automatic publication is delayed. Last site update: ${stamp(data.published_at)}. Saved fight data remains available.`;
   $('notice').textContent += profileWarning;
   updateNextEvent();
   $('card-count').textContent = data.upcoming.length;
@@ -1245,6 +1255,8 @@ function render() {
       </div>
     `;
   }
+  if (!$('analytics').hidden) ensureAnalytics().then(renderAnalytics).catch(()=>{});
+  if (!$('fighters').hidden) renderFighterDatabase();
   document.querySelectorAll('[data-open-lab]').forEach(b => b.addEventListener('click', () => showTab('matchup')));
 }
 
@@ -1473,6 +1485,43 @@ function renderFeatureImportances() {
 // ==========================================
 // Fighter Database Rendering
 // ==========================================
+async function ensureAnalytics() {
+  if (!data?.model) return;
+  const version = data.model.version;
+  if (!analyticsRequests.has(version)) analyticsRequests.set(version, (async () => {
+    const readPage = async number => {
+      const url = data.api_mode === 'static' ? `/api/analytics/events/page/${number}.json` : `/api/analytics?kind=events&page=${number}&per_page=100`;
+      const r = await fetch(url,{signal:AbortSignal.timeout(20000)});
+      if (!r.ok) throw Error('Analytics unavailable');
+      return r.json();
+    };
+    const first = await readPage(1);
+    const rest = await Promise.all(Array.from({length:Math.max(0,first.pages-1)},(_,i)=>readPage(i+2)));
+    return [...first.items,...rest.flatMap(p=>p.items)];
+  })().catch(error=>{analyticsRequests.delete(version);throw error;}));
+  const events = await analyticsRequests.get(version);
+  if (data?.model?.version === version) data.model.metrics.events_history = events;
+}
+
+function ensureFighterProfiles(visible) {
+  const revision = data.revision;
+  const pages = [...new Set(visible.filter(f=>!Array.isArray(f.recent_bouts)).map(f=>f.profile_page).filter(Boolean))];
+  for (const number of pages) {
+    const requestKey = `${revision}|${number}`;
+    if (loadedFighterPages.has(requestKey) || fighterPageRequests.has(requestKey)) continue;
+    const url = data.api_mode === 'static' ? `/api/fighters/page/${number}.json` : `/api/fighters?page=${number}&per_page=48`;
+    fighterPageRequests.set(requestKey,fetch(url,{signal:AbortSignal.timeout(20000)}).then(async r=>{
+      if (!r.ok) throw Error('Profiles unavailable');
+      const result = await r.json();
+      if (data.revision !== revision) return;
+      const details = new Map(result.items.map(f=>[f.name,f]));
+      data.fighters = data.fighters.map(f=>details.has(f.name)?{...f,...details.get(f.name)}:f);
+      loadedFighterPages.add(requestKey);
+      renderFighterDatabase();
+    }).catch(()=>{ if ($('fighter-results-summary')) $('fighter-results-summary').textContent += ' Profile details delayed; retrying on your next visit.'; }).finally(()=>fighterPageRequests.delete(requestKey)));
+  }
+}
+
 function renderFighterDatabase() {
   const container = $('fighter-grid');
   if (!container || !data?.fighters) return;
@@ -1491,15 +1540,18 @@ function renderFighterDatabase() {
   if (summary) summary.textContent = `Showing ${filtered.length.toLocaleString()} verified UFC fighters`;
 
   // Virtual slice: top 48 fighters matching to keep 60fps responsiveness
-  const slice = filtered.slice(0, 48);
+  const pages = Math.max(1,Math.ceil(filtered.length/48));
+  fighterPage = Math.min(fighterPage,pages);
+  const slice = filtered.slice((fighterPage-1)*48,fighterPage*48);
+  ensureFighterProfiles(slice);
   container.innerHTML = slice.map(f => `
     <div class="fighter-db-card">
       <div class="db-card-header">
         <div class="db-header-left">
           ${renderFighterAvatar(f.name, 'neutral')}
           <div>
-            <div class="db-card-name">${esc(f.name)}</div>
-            <div class="db-card-record">${esc(f.record || 'UFC Veteran')} · ${esc(f.weight_class || 'UFC Division')}</div>
+            <div class="db-card-name"><a class="public-link" href="${esc(f.path || '/fighters/')}">${esc(f.name)}</a></div>
+            <div class="db-card-record">${esc(f.record || 'Record unavailable')} · ${esc(f.weight_class || 'UFC Division')}</div>
           </div>
         </div>
         <button class="fav-btn ${favs.has(f.name)?'is-fav':''}" data-fav-name="${esc(f.name)}" aria-label="Favorite ${esc(f.name)}">${art('star')}</button>
@@ -1508,7 +1560,7 @@ function renderFighterDatabase() {
       <div class="db-physical-row">
         <div class="db-physical-item"><span>HEIGHT</span><strong>${esc(f.height || '—')}</strong></div>
         <div class="db-physical-item"><span>REACH</span><strong>${esc(f.reach || '—')}</strong></div>
-        <div class="db-physical-item"><span>STANCE</span><strong>${esc(f.stance || 'Orthodox')}</strong></div>
+        <div class="db-physical-item"><span>STANCE</span><strong>${esc(f.stance || 'Unavailable')}</strong></div>
         <div class="db-physical-item"><span>DOB</span><strong>${esc(f.dob || '—')}</strong></div>
       </div>
 
@@ -1520,7 +1572,7 @@ function renderFighterDatabase() {
         </div>
         <div class="db-gauge-row">
           <span class="db-gauge-label">Striking accuracy</span>
-          <div class="db-gauge-track"><div class="db-gauge-fill" style="width:${Math.min(100, (parseFloat(f.sig_str_acc)||0.45)*100)}%"></div></div>
+          <div class="db-gauge-track"><div class="db-gauge-fill" style="width:${Math.min(100, (f.normalized?.sig_str_pct ?? ((parseFloat(f.sig_str_acc)||0)/(String(f.sig_str_acc).includes('%') || parseFloat(f.sig_str_acc)>1 ? 100 : 1)))*100)}%"></div></div>
           <span class="db-gauge-val">${esc(f.sig_str_acc || '—')}</span>
         </div>
         <div class="db-gauge-row">
@@ -1530,7 +1582,7 @@ function renderFighterDatabase() {
         </div>
         <div class="db-gauge-row">
           <span class="db-gauge-label">Takedown defense</span>
-          <div class="db-gauge-track"><div class="db-gauge-fill" style="width:${Math.min(100, (parseFloat(f.td_def)||0.65)*100)}%"></div></div>
+          <div class="db-gauge-track"><div class="db-gauge-fill" style="width:${Math.min(100, (f.normalized?.td_def ?? ((parseFloat(f.td_def)||0)/(String(f.td_def).includes('%') || parseFloat(f.td_def)>1 ? 100 : 1)))*100)}%"></div></div>
           <span class="db-gauge-val">${esc(f.td_def || '—')}</span>
         </div>
       </div>
@@ -1558,6 +1610,12 @@ function renderFighterDatabase() {
     </div>
   `).join('');
 
+  const pagination = $('fighter-pagination');
+  if (pagination) {
+    pagination.innerHTML = `<button class="secondary" id="fighter-prev" ${fighterPage===1?'disabled':''}>Previous</button><span>Page ${fighterPage} of ${pages}</span><button class="secondary" id="fighter-next" ${fighterPage===pages?'disabled':''}>Next</button>`;
+    $('fighter-prev').onclick = () => {fighterPage--;renderFighterDatabase();};
+    $('fighter-next').onclick = () => {fighterPage++;renderFighterDatabase();};
+  }
   // Attach favorite & lab listeners
   container.querySelectorAll('.fav-btn').forEach(b => {
     b.onclick = () => toggleFavorite(b.dataset.favName);
@@ -1573,10 +1631,12 @@ function renderFighterDatabase() {
 
 $('fighter-search')?.addEventListener('input', (e) => {
   fighterSearchQuery = e.target.value;
+  fighterPage = 1;
   renderFighterDatabase();
 });
 $('fighter-division')?.addEventListener('change', (e) => {
   fighterDivisionFilter = e.target.value;
+  fighterPage = 1;
   renderFighterDatabase();
 });
 
@@ -1811,32 +1871,42 @@ function currentDashboard(payload) {
     throw Error('Unrecognized dashboard response');
   }
   const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
-  return {...payload, upcoming: payload.upcoming.filter(f => f.date >= yesterday && f.odds?.state !== 'post')};
+  return {...payload, upcoming: payload.upcoming.filter(f => f.date >= yesterday && f.odds?.state !== 'post').map(f => ({...f,odds:f.odds ? {...f.odds,stale:f.odds.stale || !Number.isFinite(Date.parse(f.odds.fetched_at)) || Date.now()-Date.parse(f.odds.fetched_at)>Math.max((payload.refresh?.odds_seconds||900)*2,180)*1000} : undefined}))};
 }
 
+function compactCache(d) {
+  const {images, ...small} = d;
+  small.cache_format = 2;
+  small.fighters = (d.fighters || []).map(f => ({name:f.name,path:f.path,weight_class:f.weight_class,record:f.record,profile_page:f.profile_page}));
+  small.results = (d.results || []).slice(0,48);
+  if (d.model) small.model = {...d.model,metrics:{...d.model.metrics,events_history:undefined,holdout_bouts:undefined}};
+  return small;
+}
 function getCachedPredictions() {
   try {
-    let raw = localStorage.getItem(CACHE_KEY);
-    let time = parseInt(localStorage.getItem(CACHE_TIME_KEY), 10);
-    if (!raw) {
-      raw = localStorage.getItem(LEGACY_CACHE_KEY);
-      time = parseInt(localStorage.getItem(LEGACY_CACHE_TIME_KEY), 10);
-    }
-    if (raw && Number.isFinite(time)) {
-      return { data: JSON.parse(raw), timestamp: time };
+    const current = localStorage.getItem(CACHE_KEY);
+    const raw = current || localStorage.getItem(LEGACY_CACHE_KEY);
+    const timestamp = parseInt(localStorage.getItem(current ? CACHE_TIME_KEY : LEGACY_CACHE_TIME_KEY),10);
+    if (raw && Number.isFinite(timestamp)) {
+      let saved = JSON.parse(raw);
+      if (!current || saved.cache_format !== 2) {
+        saved = compactCache(saved);
+        localStorage.setItem(CACHE_KEY,JSON.stringify(saved));
+        localStorage.setItem(CACHE_TIME_KEY,String(timestamp));
+      }
+      localStorage.removeItem(LEGACY_CACHE_KEY);
+      localStorage.removeItem(LEGACY_CACHE_TIME_KEY);
+      return {data:saved,timestamp};
     }
   } catch (_) {}
   return null;
 }
-
 function saveCachedPredictions(d) {
   try {
-    const payload = JSON.stringify(d);
-    const nowStr = String(Date.now());
-    localStorage.setItem(CACHE_KEY, payload);
-    localStorage.setItem(CACHE_TIME_KEY, nowStr);
-    localStorage.setItem(LEGACY_CACHE_KEY, payload);
-    localStorage.setItem(LEGACY_CACHE_TIME_KEY, nowStr);
+    localStorage.setItem(CACHE_KEY,JSON.stringify(compactCache(d)));
+    localStorage.setItem(CACHE_TIME_KEY,String(Date.now()));
+    localStorage.removeItem(LEGACY_CACHE_KEY);
+    localStorage.removeItem(LEGACY_CACHE_TIME_KEY);
   } catch (_) {}
 }
 
@@ -1894,9 +1964,11 @@ async function load(force = false) {
         throw Error('Update check is unavailable');
       }
     }
-    const r = await fetch(`/api/dashboard?_t=${bust}`, { cache: 'no-store', signal: AbortSignal.timeout(20000) });
+    let r = await fetch(`/api/overview?_t=${bust}`, { cache: 'no-store', signal: AbortSignal.timeout(20000) });
+    if (r.status === 404) r = await fetch(`/api/dashboard?_t=${bust}`, {cache:'no-store',signal:AbortSignal.timeout(20000)});
     if (!r.ok) throw Error('Dashboard is unavailable');
     const freshData = await r.json();
+    if (data?.revision !== freshData.revision) loadedFighterPages.clear();
     data = currentDashboard(freshData);
     lastPollFailed = false;
     hasInitialNetworkSynced = true;
@@ -1926,14 +1998,24 @@ async function load(force = false) {
 async function refreshMatchup() {
   const pair = activeMatchup;
   if (!pair) return;
-  const r = await fetch('/api/matchup', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(pair),
-    signal: AbortSignal.timeout(20000)
-  });
-  const f = await r.json();
-  if (!r.ok) throw Error(f.error || 'Prediction unavailable');
+  let f;
+  if (data?.api_mode === 'static') {
+    const key = value => value.normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
+    const wanted = [key(pair.red),key(pair.blue)].sort().join('|');
+    f = data.upcoming.find(fight => [key(fight.red),key(fight.blue)].sort().join('|') === wanted);
+    if (!f) throw Error('Choose an announced pair from the current cards to view its published forecast. Hypothetical matchups require the prediction server.');
+  } else {
+    const r = await fetch('/api/matchup', {
+      method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(pair),signal:AbortSignal.timeout(20000)
+    });
+    f = await r.json();
+    if (!r.ok) throw Error(f.error || 'Prediction unavailable');
+  }
+  if (f.fighter_stats) {
+    const byName = new Map(Object.values(f.fighter_stats).filter(p=>p?.name).map(p=>[p.name,p]));
+    data.fighters = data.fighters.map(p=>byName.has(p.name)?{...p,...byName.get(p.name)}:p);
+  }
+
   if (activeMatchup !== pair) return;
 
   const redP = data?.fighters?.find(x => x.name.toLowerCase() === f.red.toLowerCase());

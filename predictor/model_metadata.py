@@ -17,6 +17,8 @@ def describe_model(bundle):
     names = names or []
     count = int(count) if count is not None else len(names)
     return dict(feature_count=count, feature_names=names, estimator_names=models,
+                input_policy=bundle.get('input_policy', 'market-free'),
+                market_comparison=bundle.get('metrics', {}).get('market_comparison'),
                 estimator_count=len(models), calibration_applied=False,
                 feature_importance_scope='Standardized logistic-component coefficients; not full-ensemble importance or causal effects.',
                 calibration_method='none', calibration_note=CALIBRATION_NOTE,

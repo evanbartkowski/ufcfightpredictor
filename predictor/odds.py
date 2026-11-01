@@ -9,6 +9,7 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 from .store import identity, now
+from .network import UPSTREAM
 
 SCOREBOARD = 'https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard'
 CORE = 'https://sports.core.api.espn.com/v2/sports/mma/leagues/ufc'
@@ -138,14 +139,16 @@ class ESPNOdds:
     def schedule(self):
         today = datetime.now(timezone.utc)
         dates = (today-timedelta(days=1)).strftime('%Y%m%d')+'-'+(today+timedelta(days=120)).strftime('%Y%m%d')
-        r = self.session.get(SCOREBOARD, params={'dates':dates, 'limit':100}, timeout=(10, 25))
+        with UPSTREAM.request():
+            r = self.session.get(SCOREBOARD, params={'dates':dates, 'limit':100}, timeout=(10,25))
         r.raise_for_status()
         return parse_schedule(r.json())
 
     def prices(self, bout):
         time.sleep(.15)
         url = f'{CORE}/events/{bout["event_id"]}/competitions/{bout["id"]}/odds'
-        r = self.session.get(url, timeout=(10, 20))
+        with UPSTREAM.request():
+            r = self.session.get(url, timeout=(10,20))
         if r.status_code == 404:
             return []
         r.raise_for_status()

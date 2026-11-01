@@ -42,6 +42,8 @@
 <p>These bins measure forecast reliability on the holdout. They do not calibrate the serving probabilities; small bins have limited support.</p>
 <div class="table-scroll"><table><thead><tr><th>Probability bin</th><th>Mean confidence</th><th>Observed pick accuracy</th><th>Bouts</th></tr></thead><tbody>{% for bin in m.metrics.calibration or [] %}{% if bin.count %}<tr><td>{{ bin.range }}</td><td>{{ '%.1f'|format(bin.expected * 100) }}%</td><td>{{ '%.1f'|format(bin.observed * 100) }}%</td><td>{{ bin.count }}</td></tr>{% endif %}{% endfor %}</tbody></table></div>
 <h3>{{ m.feature_count }} model inputs</h3><ol class="feature-list">{% for name in m.feature_names %}<li>{{ name }}</li>{% endfor %}</ol>
+<h3>Market-information policy</h3><p>The serving model is market-free: untimestamped archive moneylines cannot improve its backtest while being absent at prediction time. Eligible refreshed profiles are normalized and merged only before issue time and event start.</p>
+{% if m.market_comparison %}<p>Paired market comparison: {{ m.market_comparison.status }}. Eligible timestamped bouts: {{ m.market_comparison.eligible_bouts }} across {{ m.market_comparison.eligible_event_dates }} event dates. {{ m.market_comparison.reason or m.market_comparison.policy }}</p>{% endif %}
 <h3>Data and evaluation limits</h3><p>{{ m.limitations }}</p><p>Replay builds fighter histories before each event day, and a chronological holdout measures later outcomes. Missing measurements are imputed. Agreement between estimators is not a calibrated uncertainty interval.</p>
 {% else %}<p>The serving model is unavailable. No model architecture or measured accuracy is asserted.</p>{% endif %}
 {%- endmacro %}

@@ -1,0 +1,113 @@
+{
+  "environment": {
+    "platform": "Windows",
+    "python": "3.14.7",
+    "verified_bouts": 7541,
+    "fighter_profiles": 2570
+  },
+  "baseline": {
+    "scenario": "uncached dashboard and JSON serialization",
+    "requests": 12,
+    "p50_ms": 645.3297999978531,
+    "p95_ms": 666.0111000237521,
+    "connections_per_request": 18.0,
+    "bytes": 2867782,
+    "peak_memory_mib": 50.67788505554199
+  },
+  "after": {
+    "benchmark": "In-process concurrent Flask/WSGI requests with tracemalloc enabled; no external HTTP",
+    "endpoints": {
+      "/api/dashboard [1 workers]": {
+        "requests": 12,
+        "workers": 1,
+        "p50_ms": 1.755,
+        "p95_ms": 1.955,
+        "payload_bytes": 2632651,
+        "statuses": {
+          "200": 12
+        },
+        "peak_memory_mib": 0.084,
+        "dashboard_rebuilds": 0,
+        "resident_memory_mib": 213.414,
+        "connections_per_request": 1.0,
+        "statements_per_request": 1.0
+      },
+      "/api/dashboard [8 workers]": {
+        "requests": 64,
+        "workers": 8,
+        "p50_ms": 122.599,
+        "p95_ms": 125.745,
+        "payload_bytes": 2632651,
+        "statuses": {
+          "200": 64
+        },
+        "peak_memory_mib": 0.421,
+        "dashboard_rebuilds": 0,
+        "resident_memory_mib": 213.812,
+        "connections_per_request": 1.0,
+        "statements_per_request": 1.0
+      },
+      "/api/overview [8 workers]": {
+        "requests": 64,
+        "workers": 8,
+        "p50_ms": 122.81,
+        "p95_ms": 127.484,
+        "payload_bytes": 491715,
+        "statuses": {
+          "200": 64
+        },
+        "peak_memory_mib": 0.372,
+        "dashboard_rebuilds": 0,
+        "resident_memory_mib": 213.812,
+        "connections_per_request": 1.0,
+        "statements_per_request": 1.0
+      },
+      "/api/fighters?q=Silva&per_page=25 [8 workers]": {
+        "requests": 32,
+        "workers": 8,
+        "p50_ms": 59.853,
+        "p95_ms": 76.237,
+        "payload_bytes": 22620,
+        "statuses": {
+          "200": 32
+        },
+        "peak_memory_mib": 1.692,
+        "dashboard_rebuilds": 0,
+        "resident_memory_mib": 213.207,
+        "connections_per_request": 1.0,
+        "statements_per_request": 3.0
+      },
+      "/api/matchup [2 workers]": {
+        "requests": 24,
+        "workers": 2,
+        "p50_ms": 251.385,
+        "p95_ms": 288.881,
+        "payload_bytes": 7811,
+        "statuses": {
+          "200": 24
+        },
+        "peak_memory_mib": 2.395,
+        "dashboard_rebuilds": 0,
+        "resident_memory_mib": 217.488,
+        "connections_per_request": 1.0,
+        "statements_per_request": 1.0
+      }
+    },
+    "connection_reuse": {
+      "individual_operations": {
+        "elapsed_ms": 222.95599998324178,
+        "connections": 150
+      },
+      "request_scope": {
+        "elapsed_ms": 68.78169998526573,
+        "connections": 50
+      }
+    }
+  },
+  "notes": [
+    "Local in-process measurements with tracemalloc enabled; no Internet latency.",
+    "Cached single-worker latency is comparable to the single-worker baseline; concurrent measurements have separate worker counts.",
+    "peak_memory_mib is incremental traced Python allocation during each warm phase, not total resident memory.",
+    "Resident memory includes the prepared model and warm computed snapshots."
+  ]
+}

@@ -17,3 +17,7 @@ gha-creds-*.json
 /static/status/
 /static/sitemap.xml
 /static/robots.txt
+/static/api/fighters/
+/static/api/predictions/
+/static/api/analytics/
+/static/api/overview.json

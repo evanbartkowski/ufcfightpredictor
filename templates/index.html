@@ -13,13 +13,13 @@
   <meta property="og:description" content="Published UFC forecasts, model evidence, fighter records, and source freshness.">
   <meta name="description" content="MMA Cipher — Next-generation UFC fight forecasting, multi-model AI ensemble consensus, pre-bout statistical telemetry, and verified performance tracking.">
   <title>MMA Cipher — AI Fight Intelligence & UFC Predictions</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css', v='19') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css', v='20') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='content.css', v='1') }}">
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js" defer></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js" defer></script>
   <script src="{{ url_for('static', filename='firebase.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='app.js', v='19') }}" defer></script>
+  <script src="{{ url_for('static', filename='app.js', v='20') }}" defer></script>
 </head>
 <body>
   <header class="topbar">
@@ -151,6 +151,7 @@
       </div>
       <div id="fighter-results-summary" class="fighter-results-summary">Browse the latest recorded fighter profiles</div>
       <div id="fighter-grid" class="fighter-grid"></div>
+      <div id="fighter-pagination" class="public-pagination" aria-label="Fighter pages"></div>
     </section>
     <section id="analytics" class="panel" hidden>
       <div class="section-heading">

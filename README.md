@@ -40,7 +40,7 @@ The next run restores `api/sync-state.json.gz`, which contains public verified b
 
 Google Workload Identity Federation restricts the dedicated Hosting publisher to this repository ID and `main`; no long-lived personal Firebase token or service-account key is stored in GitHub. The updater retains 24 recent automated snapshots, protects manual releases and active content, and verifies the deployed APIs, HTML, model metadata, and saved state after publishing.
 
-The browser checks a small revision response every minute, downloads the full dashboard only when it changes, and retries network failures. The initial HTML already contains the latest upcoming card, counts, source timestamps, and model description. It remains readable without JavaScript.
+The browser checks a small revision response every minute, downloads a compact overview only when it changes, and loads fighter details and historical analytics on demand. It retries network failures. The initial HTML already contains the latest upcoming card, counts, source timestamps, and model description. It remains readable without JavaScript.
 
 ## Searchable records
 
@@ -72,7 +72,7 @@ A one-time public export, including indexable pages and production health metada
 .\.venv\Scripts\python scripts/verify_publication.py
 ```
 
-The hosted dashboard provides published forecasts. Arbitrary hypothetical Matchup Lab requests require the running Flask API.
+The hosted dashboard and Matchup Lab can display issued forecasts for announced pairs. Arbitrary hypothetical Matchup Lab requests require the running Flask API.
 
 ## Validation
 
@@ -85,3 +85,70 @@ The hosted dashboard provides published forecasts. Arbitrary hypothetical Matchu
 ```
 
 Browser checks require the local server. Generated records pages, runtime state, model binaries, local credentials, and browser captures are excluded from Git.
+
+## Input integrity and market comparison
+
+The serving model is now **market-free**. Its feature list excludes the two historical moneyline inputs. Bare CSV moneylines and unverified nested odds cannot affect either its training vectors or live estimates.
+
+A separate paired research comparison uses the same timestamp-verified bouts, chronological holdout dates, and standardized logistic estimator for both market-free and odds-aware variants. A snapshot must match the exact dated pair, precede the event start, and be observed within 24 hours of that start. Until 100 such bouts across 10 event dates exist, metadata reports `insufficient_data`, with no invented comparison score. Eligible pre-event snapshots are preserved in public updater state for future completed bouts.
+
+Current fighter profiles keep raw display values plus typed normalization. Heights and reaches become centimetres, weights become pounds, percentages become fractions, and birthdates yield age on the event date. Missing and non-finite measurements stay missing. Scheduled and hypothetical predictions merge only profiles observed before issue time and event start. Historical replay never reads current fighter profiles. The issued forecast records eligible input fields and observation timestamps.
+
+Replay examples carry their original fight IDs, event names, and divisions through chronological filtering. Draws, no contests, and input ordering cannot shift later holdout labels. Multiple events on the same date retain separate event attribution. Empty reliability bins expose null measurements rather than zero observed accuracy.
+
+## Serving performance and APIs
+
+`Service.dashboard()` computes one shared snapshot per database revision, model version, status change, or minute of freshness aging. `/api/dashboard` serves cached JSON bytes; committed writes invalidate the cache, while rolled-back writes do not. A cache miss reads all required tables and metadata in one SQLite snapshot. Callers must treat the shared computed dictionary as read-only; publication explicitly copies it before adding export metadata.
+
+SQLite retains WAL. Short request scopes reuse one connection and close it at teardown. Related metadata and prediction writes use transactions; network scraping does not hold an open write transaction. Indexed normalized fighter IDs resolve matchup participants, and an indexed fighter-bout relation supports bounded history queries. Fighter search enriches only its requested page using a bounded window query.
+
+| Purpose | Python service | Static Hosting |
+| --- | --- | --- |
+| Compact initial data | `/api/overview` | `/api/overview` |
+| Fighter search and pages | `/api/fighters?q=Silva&page=1&per_page=48` | Name index in overview, then `/api/fighters/page/1.json` |
+| Fighter lookup/history | `/api/fighters/MaxHolloway` and `/api/fighters/MaxHolloway/history` | Published profile JSON and indexable fighter pages |
+| Forecast pages | `/api/predictions?kind=upcoming&page=1&per_page=48` | `/api/predictions/upcoming/page/1.json` |
+| Retrospective analytics | `/api/analytics?kind=events&page=1&per_page=100` | `/api/analytics/events/page/1.json` |
+| Holdout bout attribution | `/api/analytics?kind=holdout&page=1` | `/api/analytics/holdout/page/1.json` |
+
+Page sizes are bounded at 100. Static Hosting does not execute query-based Flask APIs: its browser searches the small name index and fetches deterministic page files. The compatibility dashboard remains available, but new browser loads do not download its full fighter histories. Legacy browser cache data migrates once; only a smaller current-format payload is retained.
+
+`/api/matchup` validates name types and lengths, applies per-IP and process-wide limits, and bounds concurrent inference. It uses the socket address rather than trusting arbitrary forwarded-IP headers. Profile refreshes are deduplicated; all source sessions share a bounded request budget. A multi-process or multi-host deployment should use a shared rate-limit service instead of treating these process-local limits as a distributed quota.
+
+## Reproducible deployment and readiness
+
+`requirements.in` and `requirements-dev.in` are resolver inputs. The checked-in `.txt` files pin direct and transitive versions with artifact hashes for Python 3.12 and newer. Regenerate them together with:
+
+```powershell
+uv pip compile requirements.in --python-version 3.12 --universal --generate-hashes --output-file requirements.txt
+uv pip compile requirements-dev.in --constraint requirements.txt --python-version 3.12 --universal --generate-hashes --output-file requirements-dev.txt
+```
+
+The Docker base image is pinned by digest. CI performs a clean, uncached Docker build, installs hash-verified binary dependencies, runs `pip check`, and tests both prepared and unprepared server processes. Pull requests run the clean container checks without publishing. Production deployment requires those checks to pass.
+
+Model training is explicit, outside application initialization:
+
+```powershell
+.\.venv\Scripts\python app.py --prepare-model
+.\.venv\Scripts\python app.py --no-sync
+```
+
+The image prepares serving state during its build, then installs that state only into an empty runtime directory. Existing user databases are not replaced. The web factory never synchronously trains a model. With automatic updates enabled, a missing model can be rebuilt in a background worker; liveness remains available while readiness is unavailable.
+
+- `/health` is process liveness and remains HTTP 200 without a model.
+- `/ready` returns HTTP 503 if the model or required SQLite schema is unavailable, and HTTP 200 when serving dependencies are usable.
+- `/api/health` on the public static site describes the last publication and updater state, not a continuously running Flask process.
+
+UFCStats requests prefer HTTPS and validate every redirect and host. The upstream currently refuses TLS connections from this environment; a cached, same-host HTTP fallback is permitted only for connection failures. Certificate failures and HTTP errors are not silently downgraded. Cached data survives source failures and rate-limit responses.
+
+## Load testing and monitoring
+
+```powershell
+.\.venv\Scripts\python scripts/benchmark_api.py
+.\.venv\Scripts\python tests/browser_api.py
+.\.venv\Scripts\python scripts/monitor_production.py
+```
+
+The benchmark reports concurrent WSGI p50/p95 latency, payload bytes, resident memory, incremental Python allocations, cache rebuilds, SQL statements, and connection counts. It makes no upstream HTTP requests. These development measurements are not an Internet capacity guarantee; see `reports/api_performance_2026-11-01.json` for the measured workload and baseline.
+
+The freshness monitor fails if publication or odds checks are older than 45 minutes, or a successful fight-data pull is older than seven hours. The browser also identifies delayed publication heartbeats instead of describing an old snapshot as a fresh update. An hourly GitHub monitor workflow runs this check; the same CLI can run on an independent monitoring service. GitHub schedules can be delayed or dropped, so the monitor workflow itself is not independent of GitHub scheduling. Production metadata records the trigger event and job URL; a successful push/manual run alone is not proof that a timed trigger fired.

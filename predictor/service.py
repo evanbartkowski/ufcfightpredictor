@@ -4,6 +4,7 @@ import json
 import os
 from pathlib import Path
 import threading
+import time
 from collections import defaultdict
 from datetime import datetime, timezone, timedelta
 
@@ -12,9 +13,10 @@ import joblib
 from .model import IMPLEMENTATION_HASH, SCHEMA, predict, train
 from .model_metadata import describe_model
 from .links import event_path, fight_path, fighter_path
-from .odds import ESPNOdds, display_odds, forecast_open, match_market
+from .odds import ESPNOdds, display_odds, forecast_open, match_market, odds_identity
 from .source import UFCStats
 from .store import identity, now
+from .profiles import live_inputs
 
 log = logging.getLogger(__name__)
 
@@ -34,6 +36,11 @@ class Service:
         self.odds_interval = max(60, int(os.environ.get('ODDS_INTERVAL_SECONDS', '900')))
         self.odds_status = dict(running=False, error=None)
         self.bundle = None
+        self._dashboard_lock = threading.Lock()
+        self._dashboard_key = None
+        self._dashboard_value = None
+        self._dashboard_encoded = None
+        self.dashboard_builds = 0
         self.model_path = store.directory / 'model.joblib'
         self.status = dict(running=False, phase='Ready', error=None)
         self.fighter_images = {}
@@ -54,7 +61,9 @@ class Service:
                 log.exception('Cached model could not be read; rebuilding')
 
     def retrain(self):
-        bundle = train(self.store.rows('fights'))
+        snapshots = self.store.meta('pre_fight_markets', {})
+        fights = [dict(f, market_snapshot=snapshots[f['id']]) if f['id'] in snapshots else f for f in self.store.rows('fights')]
+        bundle = train(fights)
         temp = self.model_path.with_suffix('.tmp')
         joblib.dump(bundle, temp)
         os.replace(temp, self.model_path)
@@ -76,6 +85,8 @@ class Service:
 
     def _sync_worker(self):
         try:
+            if self.bundle is None:
+                self.retrain()
             self.sync()
         except Exception as exc:
             log.exception('UFCStats refresh failed')
@@ -149,20 +160,40 @@ class Service:
         self.status.update(phase='Up to date', error=None)
 
     def refresh_predictions(self, upcoming):
+        if self.bundle is None:
+            return
         markets = self.store.meta('markets', [])
-        profiles = {identity(f['name']): f for f in self.store.rows('fighters')}
+        profiles = self.store.fighters_by_names(f[corner] for f in upcoming for corner in ('red','blue'))
+        archive = self.store.meta('pre_fight_markets', {})
+        archive_changed = False
+        predictions = []
         for fight in upcoming:
             market = match_market(fight, markets)
             if not forecast_open(fight, market):
                 continue
+            if market and not market.get('error') and market.get('books') and market.get('fetched_at'):
+                prices = market['books'][0]['prices']
+                snapshot = dict(observed_at=market['fetched_at'], start_at=market.get('start_at'),
+                                fight_date=fight['date'], source='ESPN',
+                                prices={odds_identity(fight[c]): prices.get(odds_identity(fight[c])) for c in ('red','blue')})
+                if archive.get(fight['id']) != snapshot:
+                    archive[fight['id']] = snapshot
+                    archive_changed = True
+            observed = {corner: profiles.get(identity(fight[corner]), {}) for corner in ('red','blue')}
+            bout_meta = live_inputs(fight, observed, start_at=market.get('start_at') if market else None)
             prediction = dict(
                 fight,
-                **predict(self.bundle, fight['red'], fight['blue'], fight['date'], bout_meta=fight),
+                **predict(self.bundle, fight['red'], fight['blue'], fight['date'], bout_meta=bout_meta),
                 issued_at=now(),
-                fighter_stats={corner: profiles.get(identity(fight[corner]), {}) for corner in ('red', 'blue')},
+                input_provenance=bout_meta['input_provenance'],
+                fighter_stats=observed,
                 start_at=market.get('start_at') if market else None
             )
-            self.store.publish_prediction(prediction)
+            if forecast_open(fight, market):
+                predictions.append(prediction)
+        self.store.publish_predictions(predictions)
+        if archive_changed:
+            self.store.set_meta('pre_fight_markets', archive)
 
     def sync_odds(self):
         previous = {m['id']:m for m in self.store.meta('markets', [])}
@@ -184,12 +215,11 @@ class Service:
                                     error='Sportsbook refresh unavailable'))
                 failures.append(bout['id'])
                 log.warning('Odds fetch failed for bout %s: %s', bout['id'], exc)
-        self.store.set_meta('markets', markets)
-        self.store.set_meta('odds_feed_failed', False)
-        self.store.set_meta('odds_checked_at', now())
-        self.store.set_meta('odds_error', f'{len(failures)} markets could not be refreshed.' if failures else None)
+        metadata = dict(markets=markets, odds_feed_failed=False, odds_checked_at=now(),
+                        odds_error=f'{len(failures)} markets could not be refreshed.' if failures else None)
         if not failures:
-            self.store.set_meta('odds_last_sync', now())
+            metadata['odds_last_sync'] = now()
+        self.store.set_meta_many(metadata)
 
     def start_odds_sync(self):
         if not self.odds_lock.acquire(blocking=False):
@@ -238,9 +268,7 @@ class Service:
         def worker():
             try:
                 source = UFCStats()  # Separate HTTP/browser session from the card worker.
-                profiles = {identity(p['name']):p for p in self.store.rows('fighters')}
-                urls = {identity(f[corner]):f.get(corner+'_url') for f in self.store.rows('fights')
-                        for corner in ('red', 'blue') if f.get(corner+'_url')}
+                profiles = self.store.fighters_by_names(names)
                 for name in names:
                     attempted = self.profile_attempts.get(identity(name))
                     if attempted and (datetime.now(timezone.utc)-attempted).total_seconds() < self.sync_interval:
@@ -249,7 +277,7 @@ class Service:
                     fetched = old.get('fetched_at')
                     if fetched and (datetime.now(timezone.utc)-datetime.fromisoformat(fetched)).total_seconds() < self.sync_interval:
                         continue
-                    url = old.get('url') or urls.get(identity(name))
+                    url = old.get('url')
                     self.profile_attempts[identity(name)] = datetime.now(timezone.utc)
                     try:
                         self.store.save_fighter(source.fighter(url) if url else source.find_fighter(name))
@@ -271,7 +299,7 @@ class Service:
         if attempted and (at - datetime.fromisoformat(attempted)).total_seconds() < 300:
             return False
         completed = self.store.meta('last_sync')
-        return not completed or (at - datetime.fromisoformat(completed)).total_seconds() >= self.get_dynamic_sync_interval()
+        return (self.auto_updates and (self.bundle is None or self.store.meta('training_pending', False))) or not completed or (at - datetime.fromisoformat(completed)).total_seconds() >= self.get_dynamic_sync_interval()
 
     def scheduler(self, interval):
         while True:
@@ -285,14 +313,31 @@ class Service:
             threading.Event().wait(60)
 
     def dashboard(self):
+        """Return the shared computed snapshot; callers must not mutate it."""
+        with self._dashboard_lock:
+            key = (self.store.revision(), self.bundle.get('version') if self.bundle else None,
+                   json.dumps(self.status, sort_keys=True), json.dumps(self.odds_status, sort_keys=True), int(time.time() // 60))
+            if key != self._dashboard_key:
+                self._dashboard_value = self._build_dashboard(self.store.snapshot())
+                self._dashboard_encoded = json.dumps(self._dashboard_value, separators=(',', ':')).encode()
+                self._dashboard_key = key
+                self.dashboard_builds += 1
+            return self._dashboard_value
+
+    def dashboard_bytes(self):
+        self.dashboard()
+        return self._dashboard_encoded
+
+    def _build_dashboard(self, snapshot):
+        meta = lambda key, default=None: snapshot['meta'].get(key, default)
         today = datetime.now(timezone.utc).date().isoformat()
-        fights = {f['id']:f for f in self.store.rows('fights')}
-        saved = {p['id']:p for p in self.store.rows('predictions')}
-        latest = {p['id']:p for p in self.store.rows('latest_predictions')}
-        markets = self.store.meta('markets', [])
-        odds_failed = self.store.meta('odds_feed_failed', False)
+        fights = {f['id']:f for f in snapshot['tables']['fights']}
+        saved = {p['id']:p for p in snapshot['tables']['predictions']}
+        latest = {p['id']:p for p in snapshot['tables']['latest_predictions']}
+        markets = meta('markets', [])
+        odds_failed = meta('odds_feed_failed', False)
         upcoming = []
-        for f in self.store.meta('upcoming', []):
+        for f in meta('upcoming', []):
             if f['date'] < (datetime.now(timezone.utc)-timedelta(days=1)).date().isoformat() or f['id'] in fights:
                 continue
             p = latest.get(f['id'], saved.get(f['id']))
@@ -321,7 +366,7 @@ class Service:
         bundle = self.bundle
         model_info = None
         if bundle:
-            metrics = bundle.get('metrics', {})
+            metrics = {key:value for key,value in bundle.get('metrics', {}).items() if key != 'holdout_bouts'}
             model_info = {
                 'name': bundle.get('name', 'MMA Cipher Advanced Ensemble'),
                 'version': bundle.get('version'),
@@ -356,7 +401,7 @@ class Service:
                 })
 
         fighter_rows = []
-        for f in sorted(self.store.rows('fighters'), key=lambda item: item['name']):
+        for f in sorted(snapshot['tables']['fighters'], key=lambda item: item['name']):
             f_copy = dict(f)
             f_copy['path'] = fighter_path(f['name'])
             bouts = fights_by_fighter.get(identity(f['name']), [])
@@ -369,28 +414,37 @@ class Service:
         for fight in upcoming + results:
             for corner in ('red', 'blue'):
                 fight[corner + '_path'] = fighter_path(profile_names.get(identity(fight[corner]), fight[corner]))
-        return dict(revision=self.update_revision(), upcoming=sorted(upcoming, key=lambda f:f['date']), results=sorted(results, key=lambda f:f['date'], reverse=True),
+        return dict(revision=self.update_revision(snapshot), upcoming=sorted(upcoming, key=lambda f:f['date']), results=sorted(results, key=lambda f:f['date'], reverse=True),
                     fighters=fighter_rows,
                     images=self.fighter_images,
                     model=model_info,
-                    status=dict(self.status, last_sync=self.store.meta('last_sync'), last_error=self.store.meta('sync_error')),
+                    status=dict(self.status, last_sync=meta('last_sync'), last_error=meta('sync_error')),
                     refresh=dict(stats_seconds=dynamic_interval, odds_seconds=self.odds_interval, browser_seconds=60,
                                  automatic=self.auto_updates),
-                    odds_status=dict(self.odds_status, checked_at=self.store.meta('odds_checked_at'),
-                                     last_sync=self.store.meta('odds_last_sync'), error=self.store.meta('odds_error')),
-                    profile_errors=self.store.meta('profile_errors', []),
+                    odds_status=dict(self.odds_status, checked_at=meta('odds_checked_at'),
+                                     last_sync=meta('odds_last_sync'), error=meta('odds_error')),
+                    profile_errors=meta('profile_errors', []),
                     live_accuracy=sum(r['correct'] for r in scored)/len(scored) if scored else None,
                     scored_predictions=len(scored), total_fights=len(fights))
 
-    def update_revision(self):
+    def update_revision(self, snapshot=None):
+        keys = ('last_sync','sync_error','odds_checked_at','odds_error','profile_errors')
+        if snapshot is None:
+            with self.store.scope() as db:
+                if not db.in_transaction:
+                    db.execute('BEGIN')
+                data_revision = self.store.revision()
+                metadata = self.store.meta_many(keys)
+        else:
+            data_revision = snapshot['revision']
+            metadata = {key:snapshot['meta'][key] for key in keys if key in snapshot['meta']}
         state = dict(status=self.status, odds_status=self.odds_status,
                      model=self.bundle.get('version') if self.bundle else None,
-                     meta={key: self.store.meta(key) for key in
-                           ('last_sync', 'sync_error', 'odds_checked_at', 'odds_error', 'profile_errors')})
+                     data_revision=data_revision, meta=metadata)
         return hashlib.sha256(json.dumps(state, sort_keys=True).encode()).hexdigest()[:24]
 
     def matchup(self, red, blue):
-        fighters = {identity(f['name']): f for f in self.store.rows('fighters')}
+        fighters = self.store.fighters_by_names((red, blue))
         if identity(red) not in fighters or identity(blue) not in fighters:
             raise ValueError('Choose two fighters from the list.')
         if identity(red) == identity(blue):
@@ -399,33 +453,14 @@ class Service:
         blue_p = fighters[identity(blue)]
         red_name, blue_name = red_p['name'], blue_p['name']
         if self.auto_updates:
-            watched = self.store.meta('watched_fighters', {})
-            for name in (red_name, blue_name):
-                watched[name] = now()
-            self.store.set_meta('watched_fighters', dict(sorted(watched.items(), key=lambda item: item[1])[-20:]))
             self.refresh_selected_profiles((red_name, blue_name))
 
-        bout_meta = {
-            'red_age': red_p.get('age'),
-            'red_height': red_p.get('height'),
-            'red_reach': red_p.get('reach'),
-            'red_stance': red_p.get('stance'),
-            'red_sig_str_landed': red_p.get('SLpM'),
-            'red_sig_str_pct': red_p.get('sig_str_acc'),
-            'red_td_landed': red_p.get('td_avg'),
-            'red_td_pct': red_p.get('td_acc'),
-            'red_sub_att': red_p.get('sub_avg'),
-            'blue_age': blue_p.get('age'),
-            'blue_height': blue_p.get('height'),
-            'blue_reach': blue_p.get('reach'),
-            'blue_stance': blue_p.get('stance'),
-            'blue_sig_str_landed': blue_p.get('SLpM'),
-            'blue_sig_str_pct': blue_p.get('sig_str_acc'),
-            'blue_td_landed': blue_p.get('td_avg'),
-            'blue_td_pct': blue_p.get('td_acc'),
-            'blue_sub_att': blue_p.get('sub_avg'),
-        }
-        pred = predict(self.bundle, red_name, blue_name, datetime.now(timezone.utc).date().isoformat(), bout_meta=bout_meta)
+        at = datetime.now(timezone.utc)
+        bout = dict(red=red_name, blue=blue_name, date=at.date().isoformat())
+        bout_meta = live_inputs(bout, {'red':red_p, 'blue':blue_p}, at=at, start_at=at.isoformat())
+        pred = predict(self.bundle, red_name, blue_name, bout['date'], bout_meta=bout_meta)
+        pred['input_provenance'] = bout_meta['input_provenance']
+
         return dict(
             red=red_name,
             blue=blue_name,

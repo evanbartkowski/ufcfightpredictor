@@ -1,0 +1,14 @@
+name: Monitor production freshness
+on:
+  schedule:
+    - cron: '16 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 scripts/monitor_production.py

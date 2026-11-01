@@ -29,6 +29,13 @@ def verify(read, expected_commit=None):
     assert all(len(state['tables'][table]) == count for table, count in health['publication']['persisted_counts'].items()), 'Persisted table counts differ'
     assert model['version'] == dashboard['model']['version'] == health['model_version'], 'Serving model versions differ'
     assert model['feature_count'] == len(model['feature_names']), 'Feature metadata is inconsistent'
+    overview = json.loads(read('/api/overview'))
+    assert overview['revision'] == dashboard['revision'] and overview['api_mode'] == 'static', 'Overview is not from this static publication'
+    assert len(overview['fighters']) == len(dashboard['fighters']), 'Fighter search index differs'
+    assert 'events_history' not in overview['model']['metrics'], 'Historical analytics leaked into the initial overview'
+    assert json.loads(read('/api/fighters/page/1.json'))['per_page'] == 48
+    assert json.loads(read('/api/analytics/events/page/1.json'))['per_page'] == 100
+    assert json.loads(read('/api/predictions/upcoming/page/1.json'))['total'] == len(dashboard['upcoming'])
     for fight in dashboard['upcoming']:
         if fight.get('prediction_pending') or fight.get('locked'):
             continue
@@ -82,7 +89,7 @@ def main():
             response.raise_for_status()
             return response.content
         target = ROOT / 'static' / path.lstrip('/')
-        if path in ('/api/dashboard', '/api/update', '/api/health', '/api/model'):
+        if path in ('/api/dashboard', '/api/update', '/api/health', '/api/model', '/api/overview'):
             target = target.with_suffix('.json')
         if path.endswith('/'):
             target /= 'index.html'

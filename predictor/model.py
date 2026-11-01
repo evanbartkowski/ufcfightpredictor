@@ -21,6 +21,7 @@ import lightgbm as lgb
 import xgboost as xgb
 
 from .store import identity, now
+from .market_inputs import market_features, verified_market
 
 FEATURES = [
     'Elo',
@@ -59,11 +60,9 @@ FEATURES = [
     'Takedown threat interaction',
     'Ranking differential',
     'Five round experience',
-    'Ape index differential',
-    'Market implied edge',
-    'Market logit'
+    'Ape index differential'
 ]
-SCHEMA = 6
+SCHEMA = 7
 IMPLEMENTATION_HASH = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
 
 
@@ -81,11 +80,12 @@ def fresh():
 
 def _safe_float(val, default):
     if val is None or val == '':
-        return float(default)
+        return float(default) if default is not None else None
     try:
-        return float(val)
+        result = float(val)
+        return result if math.isfinite(result) else (float(default) if default is not None else None)
     except (ValueError, TypeError):
-        return float(default)
+        return float(default) if default is not None else None
 
 
 def compute_fighter_vector(state, day, attrs=None):
@@ -165,7 +165,7 @@ def compute_fighter_vector(state, day, attrs=None):
     }
 
 
-def features(states, red, blue, day, bout_meta=None):
+def features(states, red, blue, day, bout_meta=None, include_market=False):
     """Compute symmetric matchup differential features (Red minus Blue)."""
     meta = bout_meta or {}
     red_attrs = {
@@ -219,26 +219,6 @@ def features(states, red, blue, day, bout_meta=None):
     exp_diff = r['n'] - b['n']
     five_rounds_exp = (exp_diff / max(abs(exp_diff) + 1.0, 1.0)) if n_rounds >= 5.0 else 0.0
 
-    # Market Odds
-    red_odds = _safe_float(meta.get('red_odds'), None) if meta.get('red_odds') is not None else None
-    blue_odds = _safe_float(meta.get('blue_odds'), None) if meta.get('blue_odds') is not None else None
-
-    if red_odds is None and 'odds' in meta and isinstance(meta['odds'], dict):
-        books = meta['odds'].get('books', [])
-        if books and isinstance(books[0], dict):
-            red_odds = books[0].get('red')
-            blue_odds = books[0].get('blue')
-
-    if red_odds is not None and blue_odds is not None:
-        p_r = (100.0 / (red_odds + 100.0)) if red_odds > 0 else (-red_odds / (-red_odds + 100.0))
-        p_b = (100.0 / (blue_odds + 100.0)) if blue_odds > 0 else (-blue_odds / (-blue_odds + 100.0))
-        p_mkt = p_r / (p_r + p_b)
-        mkt_edge = p_mkt - 0.5
-        mkt_logit = np.log(np.clip(p_mkt, 0.01, 0.99) / (1.0 - np.clip(p_mkt, 0.01, 0.99)))
-    else:
-        mkt_edge = 0.0
-        mkt_logit = 0.0
-
     return np.array([
         r['elo'] - b['elo'],
         r['str_elo'] - b['str_elo'],
@@ -276,10 +256,8 @@ def features(states, red, blue, day, bout_meta=None):
         td_threat,
         rank_diff,
         five_rounds_exp,
-        r['ape_idx'] - b['ape_idx'],
-        mkt_edge,
-        mkt_logit
-    ], dtype=float)
+        r['ape_idx'] - b['ape_idx']
+    ] + (list(market_features(dict(meta, date=day, red=red, blue=blue))) if include_market else []), dtype=float)
 
 
 def replay(fights):
@@ -289,7 +267,7 @@ def replay(fights):
     return [(e[0], e[1], e[2]) for e in cleaned_examples], states
 
 
-def replay_with_methods(fights, histories=None):
+def replay_with_methods(fights, histories=None, include_market=False):
     """Replay helper returning (day, feat, y, m_cat) for multi-task training."""
     states = defaultdict(fresh)
     examples = []
@@ -300,7 +278,7 @@ def replay_with_methods(fights, histories=None):
         # All bouts on same date strictly use states before the day began
         for f in group:
             if f.get('winner') in ('red', 'blue'):
-                feat = features(states, f['red'], f['blue'], day, f)
+                feat = features(states, f['red'], f['blue'], day, f, include_market=include_market)
                 y = int(f['winner'] == 'red')
                 m_str = f.get('method', '').upper()
                 if any(k in m_str for k in ('KO', 'TKO')):
@@ -309,7 +287,7 @@ def replay_with_methods(fights, histories=None):
                     m_cat = 2
                 else:
                     m_cat = 0
-                examples.append((day, feat, y, m_cat))
+                examples.append((day, feat, y, m_cat, {key:f.get(key) for key in ('id','date','event','weight_class','red','blue')}))
 
         for f in group:
             if f.get('winner') not in ('red', 'blue'):
@@ -375,7 +353,9 @@ def replay_with_methods(fights, histories=None):
 
 def probability(model, x):
     """Enforce exact corner swap anti-symmetry for any binary estimator."""
-    x = np.asarray(x).reshape(-1, len(FEATURES))
+    x = np.asarray(x)
+    if x.ndim == 1:
+        x = x.reshape(1, -1)
     return (model.predict_proba(x)[:, 1] + 1.0 - model.predict_proba(-x)[:, 1]) / 2.0
 
 
@@ -411,6 +391,37 @@ def make_ensemble_factories():
             LogisticRegression(C=0.03, max_iter=1000, random_state=42)
         )
     }
+
+
+def compare_market_models(fights):
+    """Paired, chronological research comparison on the same eligible bouts.
+
+    Untimestamped archive moneylines never qualify. The comparison uses the
+    same regularized logistic estimator and dates for both input policies.
+    It is reported separately from the six-estimator serving model.
+    """
+    eligible = {f['id'] for f in fights if f.get('winner') in ('red','blue') and verified_market(f)}
+    examples, _ = replay_with_methods(fights, include_market=True)
+    rows = [row for row in examples if row[4]['id'] in eligible]
+    days = sorted({row[0] for row in rows})
+    result = dict(eligible_bouts=len(rows), eligible_event_dates=len(days),
+                  policy='Identical timestamp-verified bouts, event-date holdout, and regularized logistic estimator for both variants.')
+    if len(rows) < 100 or len(days) < 10:
+        return dict(result, status='insufficient_data', reason='At least 100 timestamp-verified bouts across 10 event dates are required. Untimestamped CSV odds are excluded.')
+    cutoff = days[int(len(days)*.8)]
+    x = np.asarray([r[1] for r in rows]); y = np.asarray([r[2] for r in rows])
+    before = np.asarray([r[0] < cutoff for r in rows])
+    if len(set(y[before])) < 2:
+        return dict(result, status='insufficient_data', reason='The training period lacks both outcome classes.')
+    scores = {}
+    for name, values in [('market_free',x[:,:len(FEATURES)]),('odds_aware',x)]:
+        estimator = make_pipeline(StandardScaler(), LogisticRegression(C=.03, max_iter=1000, random_state=42))
+        fit_symmetric(estimator, values[before], y[before])
+        p = probability(estimator, values[~before])
+        scores[name] = dict(accuracy=float(accuracy_score(y[~before], p>=.5)),
+                            brier=float(brier_score_loss(y[~before], p)),
+                            log_loss=float(log_loss(y[~before],p,labels=[0,1])))
+    return dict(result, status='measured', test_start=cutoff, test_bouts=int((~before).sum()), scores=scores)
 
 
 def train(fights):
@@ -526,13 +537,13 @@ def train(fights):
             obs_val = float(corrects[mask].mean())
             n_corr = int(corrects[mask].sum())
         else:
-            exp_val = (low + high) / 2
-            obs_val = 0.0
+            exp_val = None
+            obs_val = None
             n_corr = 0
         calibration.append({
             'range': f"{int(low*100)}–{int(high*100)}%",
-            'expected': round(exp_val, 3),
-            'observed': round(obs_val, 3),
+            'expected': round(exp_val, 3) if exp_val is not None else None,
+            'observed': round(obs_val, 3) if obs_val is not None else None,
             'count': cnt,
             'correct': n_corr
         })
@@ -551,14 +562,14 @@ def train(fights):
     # Holdout events history & accuracy over time
     test_bouts = []
     for idx_local, idx_global in enumerate(test_indices):
-        d, feat, y_true, m_cat = examples_with_method[idx_global]
-        orig_f = canonical[idx_global]
+        d, feat, y_true, m_cat, orig_f = examples_with_method[idx_global]
         p_val = float(p_te_clipped[idx_local])
         is_corr = int((p_val >= 0.5) == (y_true == 1))
         test_bouts.append({
+            'id': orig_f['id'],
             'date': d,
-            'event': orig_f.get('event', d),
-            'weight_class': orig_f.get('weight_class', 'Unknown'),
+            'event': orig_f.get('event') or d,
+            'weight_class': orig_f.get('weight_class') or 'Unknown',
             'correct': is_corr,
             'confidence': float(confidences[idx_local])
         })
@@ -566,7 +577,7 @@ def train(fights):
     events_history = []
     running_correct = 0
     running_total = 0
-    for ev_idx, (ev_date, b_group) in enumerate(groupby(test_bouts, key=lambda b: b['date'])):
+    for ev_idx, ((ev_date, ev_name), b_group) in enumerate(groupby(sorted(test_bouts, key=lambda b: (b['date'], b['event'] or '')), key=lambda b: (b['date'], b['event']))):
         b_list = list(b_group)
         n_ev = len(b_list)
         c_ev = sum(b['correct'] for b in b_list)
@@ -575,7 +586,7 @@ def train(fights):
         events_history.append({
             'index': ev_idx + 1,
             'date': ev_date,
-            'event': b_list[0]['event'],
+            'event': ev_name,
             'fights': n_ev,
             'correct': c_ev,
             'accuracy': round(c_ev / n_ev, 3) if n_ev else 0.0,
@@ -631,6 +642,8 @@ def train(fights):
         calibration=calibration,
         confidence_distribution=confidence_distribution,
         events_history=events_history,
+        holdout_bouts=test_bouts,
+        market_comparison=compare_market_models(canonical),
         weight_class_stats=weight_class_stats,
         feature_importances=feature_importances
     )
@@ -671,6 +684,7 @@ def train(fights):
         schema=SCHEMA,
         implementation_hash=IMPLEMENTATION_HASH,
         feature_names=list(FEATURES),
+        input_policy='market-free',
         calibration_method='none',
         trained_at=now(),
         through=days[-1]
@@ -745,10 +759,10 @@ def predict(bundle, red, blue, day, bout_meta=None):
     b = bundle['states'].get(identity(blue), fresh())
 
     tape = {
-        'age': {'red': a.get('age', 30.0), 'blue': b.get('age', 30.0), 'diff': float(x[16]) if len(x) > 16 else 0.0},
-        'height': {'red': a.get('height', 175.0), 'blue': b.get('height', 175.0), 'diff': float(x[17]) if len(x) > 17 else 0.0},
-        'reach': {'red': a.get('reach', 175.0), 'blue': b.get('reach', 175.0), 'diff': float(x[18]) if len(x) > 18 else 0.0},
-        'stance': {'red': a.get('stance', 'Orthodox'), 'blue': b.get('stance', 'Orthodox')}
+        'age': {'red': (bout_meta or {}).get('red_age') or a.get('age', 30.0), 'blue': (bout_meta or {}).get('blue_age') or b.get('age', 30.0), 'diff': float(x[16]) if len(x) > 16 else 0.0},
+        'height': {'red': (bout_meta or {}).get('red_height') or a.get('height', 175.0), 'blue': (bout_meta or {}).get('blue_height') or b.get('height', 175.0), 'diff': float(x[17]) if len(x) > 17 else 0.0},
+        'reach': {'red': (bout_meta or {}).get('red_reach') or a.get('reach', 175.0), 'blue': (bout_meta or {}).get('blue_reach') or b.get('reach', 175.0), 'diff': float(x[18]) if len(x) > 18 else 0.0},
+        'stance': {'red': (bout_meta or {}).get('red_stance') or a.get('stance', 'Orthodox'), 'blue': (bout_meta or {}).get('blue_stance') or b.get('stance', 'Orthodox')}
     }
 
     pick = red if p >= .5 else blue

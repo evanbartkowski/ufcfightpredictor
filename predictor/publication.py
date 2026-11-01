@@ -9,16 +9,19 @@ import json
 import os
 import hashlib
 import subprocess
+import copy
 from pathlib import Path
 
 import requests
 
 from .store import identity, now
+from .api_views import export_api
 
 TABLES = ('fights', 'fighters', 'predictions', 'latest_predictions', 'prediction_revisions')
 META = ('upcoming', 'markets', 'last_sync', 'sync_error', 'profile_errors',
         'odds_feed_failed', 'odds_checked_at', 'odds_last_sync', 'odds_error',
         'training_pending', 'source_parser_version', 'seeded', 'seeded_schema')
+META += ('pre_fight_markets',)
 
 
 def atomic_write(path, content):
@@ -89,7 +92,7 @@ def update_publication(service, directory, force=False):
     if service.bundle is not None:
         service.refresh_predictions(service.store.meta('upcoming', []))
     state = export_state(service.store)
-    dashboard = service.dashboard()
+    dashboard = copy.deepcopy(service.dashboard())
     dashboard['published_at'] = now()
     dashboard['revision'] = dashboard['published_at']
     dashboard['refresh'].update(automatic=True, delivery='scheduled', retry_seconds=900)
@@ -105,6 +108,7 @@ def update_publication(service, directory, force=False):
     with service.store.connect() as db:
         counts = {table: db.execute(f'SELECT COUNT(*) FROM {table}').fetchone()[0] for table in TABLES}
     dashboard['publication'] = dict(code_revision=commit, state_sha256=hashlib.sha256(state).hexdigest(),
+                                    job_event=os.environ.get('GITHUB_EVENT_NAME','local'),
                                     persisted_counts=counts, hosting='Firebase Hosting static export',
                                     job_url=f'https://github.com/evanbartkowski/ufcfightpredictor/actions/runs/{run_id}' if run_id else None)
     directory = Path(directory)
@@ -112,11 +116,13 @@ def update_publication(service, directory, force=False):
     atomic_write(directory / 'sync-state.json.gz', state)
     atomic_write(directory / 'update.json', json.dumps(dict(revision=dashboard['revision'])).encode())
     atomic_write(directory / 'model.json', json.dumps(dashboard['model']).encode())
+    export_api(directory,dashboard,service.bundle,atomic_write)
     atomic_write(directory / 'health.json', json.dumps(dict(
         revision=dashboard['revision'], published_at=dashboard['published_at'],
         last_sync=dashboard['status']['last_sync'], last_error=dashboard['status']['last_error'],
         odds_checked_at=dashboard['odds_status']['checked_at'], odds_error=dashboard['odds_status']['error'],
         upcoming_bouts=len(dashboard['upcoming']), verified_bouts=dashboard['total_fights'],
         model_version=dashboard['model']['version'] if dashboard['model'] else None,
+        refresh=dashboard['refresh'],
         publication=dashboard['publication'])).encode())
     return failures
