@@ -86,6 +86,10 @@ def create_app(data_dir=None, bootstrap=True, auto_updates=None):
         return Response(service.dashboard_bytes(),mimetype='application/json')
 
     small_views = {}
+    @app.get('/api/fighter-images.json')
+    def fighter_images():
+        return jsonify(service.fighter_images)
+
     @app.get('/api/overview')
     def api_overview():
         data = service.dashboard()

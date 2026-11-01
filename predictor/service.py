@@ -52,6 +52,9 @@ class Service:
                     break
                 except Exception:
                     log.exception('Could not read %s', p)
+        self.fighter_images.update(store.meta('fighter_images', {}))
+        self.fighter_images = {key:url for key,url in self.fighter_images.items()
+                               if isinstance(url, str) and url.startswith('https://a.espncdn.com/i/headshots/mma/players/full/')}
         if self.model_path.exists():
             try:
                 self.bundle = joblib.load(self.model_path)
@@ -198,6 +201,15 @@ class Service:
     def sync_odds(self):
         previous = {m['id']:m for m in self.store.meta('markets', [])}
         schedule = self.odds_source.schedule()
+        # Athlete IDs come from the UFC schedule, never a name-only image search
+        # that could match a basketball player or somebody with the same surname.
+        images = dict(self.fighter_images)
+        for bout in schedule:
+            for athlete_id, name in bout.get('athletes', {}).items():
+                if str(athlete_id).isdigit():
+                    images[identity(name)] = f'https://a.espncdn.com/i/headshots/mma/players/full/{athlete_id}.png'
+                    images[odds_identity(name)] = images[identity(name)]
+        self.fighter_images = images
         markets, failures = [], []
         for bout in schedule:
             if bout['state'] == 'post':
@@ -215,7 +227,7 @@ class Service:
                                     error='Sportsbook refresh unavailable'))
                 failures.append(bout['id'])
                 log.warning('Odds fetch failed for bout %s: %s', bout['id'], exc)
-        metadata = dict(markets=markets, odds_feed_failed=False, odds_checked_at=now(),
+        metadata = dict(markets=markets, fighter_images=images, odds_feed_failed=False, odds_checked_at=now(),
                         odds_error=f'{len(failures)} markets could not be refreshed.' if failures else None)
         if not failures:
             metadata['odds_last_sync'] = now()

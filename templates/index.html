@@ -1,4 +1,5 @@
-{% from '_public.html' import forecast, model_details %}
+{% from '_public.html' import forecast, model_details with context %}
+{% from '_chrome.html' import site_header, event_tile with context %}
 <!doctype html>
 <html lang="en">
 <head>
@@ -13,31 +14,18 @@
   <meta property="og:description" content="Published UFC forecasts, model evidence, fighter records, and source freshness.">
   <meta name="description" content="MMA Cipher — Next-generation UFC fight forecasting, multi-model AI ensemble consensus, pre-bout statistical telemetry, and verified performance tracking.">
   <title>MMA Cipher — AI Fight Intelligence & UFC Predictions</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css', v='20') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='content.css', v='1') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css', v='21') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='content.css', v='2') }}">
+  <script src="{{ url_for('static', filename='content.js', v='1') }}" defer></script>
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js" defer></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js" defer></script>
   <script src="{{ url_for('static', filename='firebase.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='app.js', v='20') }}" defer></script>
+  <script src="{{ url_for('static', filename='app.js', v='21') }}" defer></script>
 </head>
 <body>
-  <header class="topbar">
-    <div class="topbar-inner">
-      <a class="brand" href="/" aria-label="MMA Cipher home">
-        <img src="{{ url_for('static', filename='cipher-mark.svg') }}" class="brand-logo" alt="MMA Cipher All-Seeing Eye Logo">
-        <span class="brand-wordmark">MMA CIPHER<span>INTELLIGENCE</span></span>
-      </a>
-      <a class="next-event-link" id="next-event-link" href="#upcoming">
-        <span class="next-event-icon" aria-hidden="true">&#8599;</span>
-        <span>
-          <span class="next-event-label" id="next-event-label">{{ 'NEXT EVENT' if upcoming_events else 'EXPLORE' }}</span>
-          <strong id="next-event-date">{{ upcoming_events[0].date if upcoming_events else 'Fight cards' }}</strong>
-        </span>
-      </a>
-    </div>
-  </header>
-  <main>
+  {{ site_header('dashboard', upcoming_events[0] if upcoming_events else none) }}
+  <main id="main-content">
     <section class="hero">
       <div class="octagon-scene" aria-hidden="true">
         <div class="octagon-plane plane-one"></div>
@@ -74,8 +62,8 @@
       <button class="tab" data-tab="results" aria-pressed="false">Prediction record</button>
       <button class="tab" data-tab="model" aria-pressed="false">Inside the Algorithm</button>
     </nav>
-    <nav class="public-nav" aria-label="Records and methods"><a href="/events/">Event cards</a><a href="/fighters/">Fighter profiles</a><a href="/fights/">Issued forecasts</a><a href="/model/">Model methods and limits</a><a href="/status/">Data status</a></nav>
     <section id="upcoming" class="panel">
+      {% if upcoming_events %}<section class="event-shelf" aria-label="Upcoming event schedule"><div class="shelf-heading"><span class="eyebrow">ON THE CALENDAR</span><a href="/events/">All events <span aria-hidden="true">↗</span></a></div><div class="event-shelf-track">{% for event in upcoming_events %}{{ event_tile(event, compact=true) }}{% endfor %}</div></section>{% endif %}
       <div class="section-heading">
         <div>
           <div class="eyebrow">NEXT IN THE OCTAGON</div>
@@ -103,7 +91,6 @@
         {% endfor %}
         {% else %}<p>No upcoming announced bouts appear in the latest verified source pull. <a href="/status/">View data status</a>.</p>{% endif %}
       </div>
-      <div class="published-events">{% for event in upcoming_events %}<a class="public-link" href="{{ event.path }}">{{ event.date }} · {{ event.name }}</a>{% endfor %}</div>
     </section>
     <section id="matchup" class="panel" hidden>
       <div class="section-heading">

@@ -210,6 +210,23 @@ def test_monitor_detects_silent_schedule_failure():
     assert 'heartbeat' in assess(health,at+timedelta(hours=1))[0]
 
 
+def test_portraits_follow_verified_ufc_schedule_ids_and_survive_restart(tmp_path, monkeypatch):
+    store = Store(tmp_path)
+    service = Service(store)
+    monkeypatch.setattr(service.odds_source, 'schedule', lambda: [dict(
+        id='scheduled-bout', state='pre', athletes={'3146944':'Johnny Walker', '../other-sport':'Untrusted'})])
+    monkeypatch.setattr(service.odds_source, 'prices', lambda bout: [])
+    service.sync_odds()
+    url = 'https://a.espncdn.com/i/headshots/mma/players/full/3146944.png'
+    assert service.fighter_images['johnnywalker'] == url
+    assert store.meta('fighter_images')['johnnywalker'] == url
+    assert 'untrusted' not in service.fighter_images
+    store.set_meta('fighter_images',dict(service.fighter_images,wrong='https://a.espncdn.com/i/headshots/nba/players/full/1.png'))
+    restored = Service(store)
+    assert restored.fighter_images['johnnywalker'] == url
+    assert 'wrong' not in restored.fighter_images
+
+
 def test_successful_sync_does_not_apply_failure_backoff_to_a_short_configured_cadence(tmp_path):
     store=Store(tmp_path);service=Service(store);service.sync_interval=180
     start=datetime(2026,11,1,12,tzinfo=timezone.utc)

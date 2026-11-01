@@ -542,20 +542,22 @@ function renderCardPickButtons(fightId) {
 }
 
 let fighterImagesMap = {};
+let fighterImagesRequest = null;
 
 async function initFighterImages() {
-  if (data?.images && Object.keys(data.images).length > 0) {
-    fighterImagesMap = data.images;
-    return;
+  fighterImagesMap = {...fighterImagesMap, ...data?.images};
+  if (!fighterImagesRequest) {
+    fighterImagesRequest = (async () => {
+      try {
+        let res = await fetch('/api/fighter-images.json', {cache:'no-cache', signal:AbortSignal.timeout(10000)});
+        if (res.status === 404) res = await fetch(assetURL('fighter_images.json'));
+        if (res.ok) fighterImagesMap = {...fighterImagesMap, ...await res.json(), ...data?.images};
+      } catch (_) {
+        fighterImagesRequest = null;
+      }
+    })();
   }
-  try {
-    const res = await fetch(assetURL('fighter_images.json'));
-    if (res.ok) {
-      fighterImagesMap = await res.json();
-    }
-  } catch (e) {
-    // Graceful fallback
-  }
+  await fighterImagesRequest;
 }
 
 function getFighterImage(name) {
@@ -572,7 +574,7 @@ function renderFighterAvatar(name, corner='red') {
   const initials = (name || '').split(' ').map(n => n[0]).filter(Boolean).slice(0, 2).join('').toUpperCase() || 'MMA';
   if (imgUrl) {
     return `<div class="fighter-avatar-frame ${corner}-frame" title="${esc(name)}">
-      <img src="${esc(imgUrl)}" alt="${esc(name)}" class="fighter-img" loading="lazy" onerror="this.onerror=null; this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';" />
+      <img src="${esc(imgUrl)}" alt="${esc(name)}" class="fighter-img" loading="lazy" decoding="async" />
       <div class="fighter-initials" style="display:none">${esc(initials)}</div>
     </div>`;
   }
@@ -1936,7 +1938,7 @@ async function load(force = false) {
     try { data = currentDashboard(cached.data); } catch (_) {}
     if (data) {
       if (data?.images) fighterImagesMap = data.images;
-      initFighterImages().then(() => {});
+      initFighterImages().then(() => render());
       render();
     }
   }

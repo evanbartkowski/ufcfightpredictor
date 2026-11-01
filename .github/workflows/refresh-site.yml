@@ -77,6 +77,14 @@ jobs:
         run: python scripts/refresh_site.py --restore-url https://mma-oracle.web.app/api/sync-state.json.gz
       - name: Require complete publication
         run: python scripts/verify_publication.py
+      - name: Verify browser layouts and portraits
+        if: github.event_name != 'schedule'
+        run: |
+          python app.py --no-sync > /tmp/mma-cipher-browser.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"; cat /tmp/mma-cipher-browser.log' EXIT
+          python scripts/container_smoke.py http://127.0.0.1:8000
+          python tests/browser_design.py
       - name: Save model cache
         uses: actions/cache/save@v4
         with:

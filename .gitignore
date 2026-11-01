@@ -21,3 +21,4 @@ gha-creds-*.json
 /static/api/predictions/
 /static/api/analytics/
 /static/api/overview.json
+/static/api/fighter-images.json

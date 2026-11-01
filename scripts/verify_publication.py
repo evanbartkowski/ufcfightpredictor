@@ -31,6 +31,9 @@ def verify(read, expected_commit=None):
     assert model['version'] == dashboard['model']['version'] == health['model_version'], 'Serving model versions differ'
     assert model['feature_count'] == len(model['feature_names']), 'Feature metadata is inconsistent'
     overview = json.loads(read('/api/overview'))
+    portraits = json.loads(read('/api/fighter-images.json'))
+    assert portraits == dashboard.get('images', {}), 'Published portrait index differs from the dashboard'
+    assert all(url.startswith('https://a.espncdn.com/i/headshots/mma/players/full/') for url in portraits.values()), 'Portrait source is not an MMA athlete'
     assert overview['revision'] == dashboard['revision'] and overview['api_mode'] == 'static', 'Overview is not from this static publication'
     assert len(overview['fighters']) == len(dashboard['fighters']), 'Fighter search index differs'
     assert 'events_history' not in overview['model']['metrics'], 'Historical analytics leaked into the initial overview'

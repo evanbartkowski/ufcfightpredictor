@@ -1,0 +1,35 @@
+{% macro icon(name) -%}<svg class="art-icon" viewBox="0 0 48 48" aria-hidden="true"><use href="{{ url_for('static', filename='icon-art.svg') }}#{{ name }}"></use></svg>{%- endmacro %}
+
+{% macro site_header(active='dashboard', next_event=none) -%}
+<a class="skip-link" href="#main-content">Skip to content</a>
+<header class="topbar site-topbar"><div class="topbar-inner">
+  <a class="brand" href="/" aria-label="MMA Cipher home"><img src="{{ url_for('static', filename='cipher-mark.svg') }}" class="brand-logo" alt=""><span class="brand-wordmark">MMA CIPHER<span>FIGHT INTELLIGENCE</span></span></a>
+  <nav class="site-navigation" aria-label="Main navigation">
+    {% for key, href, label in [('dashboard','/','Dashboard'),('events','/events/','Events'),('fighters','/fighters/','Fighters'),('fights','/fights/','Forecasts'),('model','/model/','Model'),('status','/status/','Status')] %}
+    <a href="{{ href }}"{% if active == key %} class="is-current" aria-current="page"{% endif %}>{{ label }}</a>
+    {% endfor %}
+  </nav>
+  {% if next_event %}<a class="next-event-link" id="next-event-link" href="{{ next_event.path }}"><span class="next-event-icon" aria-hidden="true">↗</span><span><span class="next-event-label" id="next-event-label">NEXT EVENT</span><strong id="next-event-date">{{ date_label(next_event.date) }}</strong></span></a>
+  {% else %}<a class="header-dashboard-link" href="/">Live dashboard <span aria-hidden="true">↗</span></a>{% endif %}
+</div></header>
+{%- endmacro %}
+
+{% macro portrait_image(name, large=false) -%}
+<span class="portrait{{ ' portrait-large' if large else '' }}" aria-hidden="true"><span class="portrait-initials">{{ (name.split()|first)[:1] }}{{ (name.split()|last)[:1] }}</span>{% if portrait(name) %}<img src="{{ portrait(name) }}" alt="" loading="lazy" decoding="async" data-fighter-portrait>{% endif %}</span>
+{%- endmacro %}
+
+{% macro event_tile(e, compact=false, upcoming=true) -%}
+<a class="event-tile{{ ' event-tile-compact' if compact else '' }}" href="{{ e.path }}">
+  <time class="event-date-block" datetime="{{ e.date }}"><span>{{ date_label(e.date)[:3]|upper }}</span><strong>{{ e.date[8:10]|int }}</strong><small>{{ e.date[:4] }}</small></time>
+  <span class="event-tile-copy"><span class="tile-kicker">{{ e.name.split(': ')[0] if ': ' in e.name else 'UFC EVENT' }}</span><strong>{{ e.name.split(': ', 1)[1] if ': ' in e.name else e.name }}</strong><span class="tile-meta">{{ e.fights|length }} bouts <span aria-hidden="true">·</span> {{ 'Upcoming card' if upcoming else 'Event archive' }}</span></span>
+  <span class="tile-arrow" aria-hidden="true">↗</span>
+</a>
+{%- endmacro %}
+
+{% macro fighter_tile(p) -%}
+<a class="fighter-tile" href="{{ p.path }}">{{ portrait_image(p.name) }}<span class="fighter-tile-copy"><strong>{{ p.name }}</strong><span>{{ p.record or 'View UFC record' }}</span><small>{{ p.weight_class or 'Fighter profile' }}</small></span><span class="tile-arrow" aria-hidden="true">↗</span></a>
+{%- endmacro %}
+
+{% macro site_footer() -%}
+<footer class="public-footer"><div><a class="footer-wordmark" href="/">MMA <span>CIPHER</span></a><p>Records. Predictions. The evidence behind every pick.</p></div><div><p>Fight data updated {{ date_label(last_sync, true) }}.</p><p>UFCStats records · ESPN schedule and available odds.</p><p>Probabilities are estimates and have not been separately calibrated.</p></div><a class="footer-status" href="/status/">View data status <span aria-hidden="true">↗</span></a></footer>
+{%- endmacro %}

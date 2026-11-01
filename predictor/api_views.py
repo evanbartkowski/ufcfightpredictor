@@ -52,6 +52,7 @@ def export_api(directory, dashboard, bundle, write):
     def emit(path,value):
         write(directory/path,json.dumps(value,separators=(',',':')).encode())
     emit('overview.json',overview(dashboard,mode='static'))
+    emit('fighter-images.json',dashboard.get('images', {}))
     for kind in ('upcoming','results'):
         for number in range(1,max(1,(len(dashboard[kind])+PAGE_SIZE-1)//PAGE_SIZE)+1):
             emit(f'predictions/{kind}/page/{number}.json',prediction_page(dashboard,kind,number))

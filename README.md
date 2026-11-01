@@ -146,6 +146,7 @@ UFCStats requests prefer HTTPS and validate every redirect and host. The upstrea
 ```powershell
 .\.venv\Scripts\python scripts/benchmark_api.py
 .\.venv\Scripts\python tests/browser_api.py
+.\.venv\Scripts\python tests/browser_design.py
 .\.venv\Scripts\python scripts/monitor_production.py
 ```
 

@@ -1,6 +1,6 @@
 """Indexable views of verified records and issued forecasts, without JavaScript."""
 from collections import defaultdict
-from datetime import date
+from datetime import date, datetime
 
 from .links import event_path, fight_path, fighter_path
 from .model import replay_with_methods
@@ -11,6 +11,14 @@ ORIGIN = 'https://mma-oracle.web.app'
 
 def percent(value):
     return f'{value:.1%}' if value is not None else 'Unavailable'
+
+
+def date_label(value, with_time=False):
+    try:
+        parsed = datetime.fromisoformat(str(value).replace('Z', '+00:00'))
+        return parsed.strftime('%b %d, %Y' + (' · %H:%M UTC' if with_time else ''))
+    except (ValueError, TypeError):
+        return 'Not available'
 
 
 class Catalog:
@@ -73,6 +81,8 @@ class Catalog:
         model = self.dashboard.get('model')
         self._common = dict(dashboard=self.dashboard, model=model, origin=ORIGIN,
                     fighter_path=self.fighter_url, event_path=event_path, fight_path=fight_path,
+                    portrait=lambda name: self.dashboard.get('images', {}).get(identity(name)),
+                    date_label=date_label,
                     pct=percent, last_sync=self.dashboard['status'].get('last_sync'),
                     events=self.event_list, fighters=sorted(self.fighters.values(), key=lambda p: p['name']),
                     forecasts=sorted(self.forecasts.values(), key=lambda f: f['date'], reverse=True),
@@ -132,6 +142,8 @@ class Catalog:
         data['path'] = path
         if path == '/fighters/':
             data.update(kind='fighters', title='UFC fighter records and profiles', description='Browse career snapshots, recorded UFC bouts, Elo histories, and upcoming fights.')
+            data['directory_items'] = [dict(name=p['name'], path=self.fighter_url(p['name']),
+                image=data['portrait'](p['name']), record=p.get('record'), weight_class=p.get('weight_class')) for p in data['fighters']]
         elif path == '/events/':
             data.update(kind='events', title='UFC events and fight cards', description='Upcoming cards and verified historical UFC results, linked to fighter profiles and published forecasts.')
         elif path == '/fights/':
