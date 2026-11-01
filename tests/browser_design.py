@@ -7,6 +7,17 @@ BASE = os.environ.get('DESIGN_TEST_URL', 'http://127.0.0.1:8000').rstrip('/')
 OUT = Path(__file__).resolve().parents[1] / 'test-results'
 OUT.mkdir(exist_ok=True)
 
+
+def check_width(page, label):
+    diagnostics = page.evaluate('''() => ({
+      viewport:innerWidth, content:document.documentElement.scrollWidth,
+      elements:[...document.querySelectorAll('body *')].filter(e => {
+        const rect=e.getBoundingClientRect();
+        return rect.width>0 && rect.right>innerWidth+1 && !e.closest('.tabs,.event-shelf-track,.site-navigation,.table-scroll');
+      }).slice(0,12).map(e=>({tag:e.tagName,class:String(e.className),right:e.getBoundingClientRect().right}))
+    })''')
+    assert diagnostics['content'] <= diagnostics['viewport'], (label,diagnostics)
+
 with sync_playwright() as p:
     browser = p.chromium.launch(headless=True)
     page = browser.new_page(viewport={'width':1440, 'height':1050})
@@ -29,7 +40,12 @@ with sync_playwright() as p:
     page.screenshot(path=str(OUT / 'design-home-desktop.png'), full_page=False)
     for width in (390,320,768):
         page.set_viewport_size({'width':width,'height':844})
-        assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), ('homepage',width)
+        check_width(page, ('homepage',width))
+    # Linux and Windows use different system fonts. Also exercise wider metrics.
+    wider_font = page.add_style_tag(content='body * {font-family:Arial!important}')
+    page.set_viewport_size({'width':320,'height':844})
+    check_width(page, 'homepage with Arial')
+    wider_font.evaluate('(element) => element.remove()')
     page.set_viewport_size({'width':390,'height':844})
     page.locator('.event-shelf').scroll_into_view_if_needed()
     page.screenshot(path=str(OUT / 'design-home-schedule-mobile.png'))
@@ -44,7 +60,7 @@ with sync_playwright() as p:
         page.screenshot(path=str(OUT / ('design-' + route.strip('/').replace('/','-') + '-desktop.png')))
         for width in (390, 320, 768):
             page.set_viewport_size({'width':width,'height':844})
-            assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), (route,width)
+            check_width(page, (route,width))
         if route in ('/events/','/fighters/',fighter_path):
             page.set_viewport_size({'width':390,'height':844})
             page.screenshot(path=str(OUT / ('design-' + route.strip('/').replace('/','-') + '-mobile.png')))

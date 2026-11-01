@@ -242,6 +242,10 @@ a.forecast-card-link:hover { color:var(--accent); }
   .public-footer>div { width:100%; }
 }
 @media(max-width:540px) {
+  .upcoming-controls { min-width:0; max-width:100%; }
+  .filter-pills { flex-wrap:wrap; max-width:100%; border-radius:12px; }
+  .undercard-summary { flex-wrap:wrap; gap:12px; }
+  .undercard-summary-info { min-width:0; }
   .fight-grid { grid-template-columns:minmax(0,1fr); }
   .fight-card { min-width:0; }
   .fight-top { flex-wrap:wrap; }
