@@ -39,9 +39,9 @@
   {% elif kind == 'fight' %}
     <section class="public-section"><p><a href="{{ fight.event_path }}">{{ fight.event }} · {{ fight.date }}</a></p><p><a href="{{ fight.red_path }}">{{ fight.red }} profile</a> · <a href="{{ fight.blue_path }}">{{ fight.blue }} profile</a></p>
     {% if fight.removed %}<div class="evidence-note">This issued matchup is absent from the current announced card. The forecast is retained as an archive.</div>{% endif %}
-    <h2>Issued prediction</h2><p class="published-pick">{{ fight.pick }} · {{ pct(fight.confidence) }}</p><p>Model {{ fight.model_version }} · issued {{ fight.issued_at or 'at an unreported time' }}.</p>
+    {% if fight.pick %}<h2>Issued prediction</h2><p class="published-pick">{{ fight.pick }} · {{ pct(fight.confidence) }}</p><p>Model {{ fight.model_version }} · issued {{ fight.issued_at or 'at an unreported time' }}.</p>
     {% if fight.winner in ('red','blue') %}<p>Verified winner: <strong>{{ fight[fight.winner] }}</strong> · {{ fight.method or 'method unavailable' }}. The settled forecast uses the original issued pick.</p>{% elif fight.winner %}<p>Draw / no contest. This forecast is not scored as a win or loss.</p>{% endif %}
-    <h2>Evidence and uncertainty</h2>{{ evidence(fight) }}</section>
+    <h2>Evidence and uncertainty</h2>{{ evidence(fight) }}{% else %}<h2>Announced matchup</h2><p>No eligible pre-event forecast has been issued for this matchup. A probability and explanation are unavailable.</p>{% endif %}</section>
   {% elif kind == 'event' %}
     <section class="public-section"><h2>Fight card and available results</h2><div class="table-scroll"><table><thead><tr><th>Matchup</th><th>Division</th><th>Forecast / result</th></tr></thead><tbody>{% for f in event.fights %}<tr><td><a href="{{ f.red_path }}">{{ f.red }}</a> vs. <a href="{{ f.blue_path }}">{{ f.blue }}</a></td><td>{{ f.weight_class or 'Unreported' }}</td><td>{% if f.path in forecast_paths %}<a href="{{ f.path }}">{{ f.pick }} · {{ pct(f.confidence) }}</a>{% elif f.winner in ('red','blue') %}Winner: {{ f[f.winner] }} · {{ f.method }}{% elif f.winner %}Draw / NC{% else %}Prediction pending{% endif %}</td></tr>{% endfor %}</tbody></table></div></section>
   {% elif kind == 'fighters' %}

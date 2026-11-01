@@ -135,6 +135,17 @@ def test_profile_name_spacing_variants_share_one_canonical_path(public_app):
             assert fight['blue_path'] in catalog.paths()
 
 
+def test_announced_bout_without_an_issued_forecast_has_a_readable_page(public_app):
+    service = public_app.extensions['predictor']
+    with service.store.connect() as db:
+        db.execute('DELETE FROM predictions')
+        db.execute('DELETE FROM latest_predictions')
+    fight = service.store.meta('upcoming')[0]
+    response = public_app.test_client().get(fight_path(fight))
+    assert response.status_code == 200
+    assert b'No eligible pre-event forecast has been issued' in response.data
+
+
 def test_exported_pages_and_state_verify_together(public_app, tmp_path, monkeypatch):
     service = public_app.extensions['predictor']
     monkeypatch.setattr(service, 'sync_odds', lambda: None)
