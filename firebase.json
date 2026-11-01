@@ -37,6 +37,15 @@
             "value": "no-cache, no-store, must-revalidate, max-age=0"
           }
         ]
+      },
+      {
+        "source": "/api/**",
+        "headers": [
+          {
+            "key": "X-Robots-Tag",
+            "value": "noindex, nofollow"
+          }
+        ]
       }
     ]
   }

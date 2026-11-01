@@ -2,12 +2,12 @@
 from pathlib import Path
 import json
 from urllib.parse import urlencode
-import xml.etree.ElementTree as ET
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from .catalog import Catalog, ORIGIN
+from .catalog import Catalog
 from .publication import atomic_write
+from .discovery import indexable, robots_text, sitemap_bytes
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -34,14 +34,6 @@ def export_pages(service, directory=None, dashboard=None):
         context = catalog.page(path)
         context['url_for'] = static_url
         atomic_write(directory / path.strip('/') / 'index.html', html_bytes(template.render(**context)))
-    namespace = 'http://www.sitemaps.org/schemas/sitemap/0.9'
-    ET.register_namespace('', namespace)
-    root = ET.Element('{' + namespace + '}urlset')
-    for path in ['/'] + catalog.paths():
-        node = ET.SubElement(root, '{' + namespace + '}url')
-        ET.SubElement(node, '{' + namespace + '}loc').text = ORIGIN + path
-        if catalog.dashboard['status'].get('last_sync'):
-            ET.SubElement(node, '{' + namespace + '}lastmod').text = catalog.dashboard['status']['last_sync']
-    atomic_write(directory / 'sitemap.xml', ET.tostring(root, encoding='utf-8', xml_declaration=True))
-    atomic_write(directory / 'robots.txt', ('User-agent: *\nAllow: /\nDisallow: /api/\nSitemap: ' + ORIGIN + '/sitemap.xml\n').encode())
-    return len(catalog.paths()) + 1
+    atomic_write(directory / 'sitemap.xml',sitemap_bytes(catalog,catalog.discovery_state))
+    atomic_write(directory / 'robots.txt',robots_text().encode())
+    return sum(indexable(catalog,path) for path in ['/']+catalog.paths())

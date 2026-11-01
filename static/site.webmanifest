@@ -1,0 +1,21 @@
+{
+  "name": "MMA Cipher (MMACipher)",
+  "short_name": "MMA Cipher",
+  "description": "UFC predictions, fighter records, and model evidence",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#030507",
+  "theme_color": "#030507",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

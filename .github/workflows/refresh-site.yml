@@ -106,6 +106,22 @@ jobs:
         env:
           GOOGLE_ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}
         run: python scripts/hosting_retention.py
+      - name: Restore search-engine notification state
+        uses: actions/cache/restore@v4
+        with:
+          path: data/indexnow-state.json
+          key: indexnow-v1-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: indexnow-v1-${{ runner.os }}-
+      - name: Notify IndexNow of changed public pages
+        id: indexnow
+        continue-on-error: true
+        run: python scripts/submit_indexnow.py
+      - name: Save search-engine notification state
+        if: steps.indexnow.outcome == 'success'
+        uses: actions/cache/save@v4
+        with:
+          path: data/indexnow-state.json
+          key: indexnow-v1-${{ runner.os }}-${{ github.run_id }}
       - name: Report upstream failure
         if: steps.refresh.outcome == 'failure'
         run: |

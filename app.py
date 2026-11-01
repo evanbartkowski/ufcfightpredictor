@@ -65,6 +65,8 @@ def create_app(data_dir=None, bootstrap=True, auto_updates=None):
     @app.get('/fights/<slug>/')
     @app.get('/model/')
     @app.get('/status/')
+    @app.get('/about/')
+    @app.get('/sitemap/')
     def public_page(slug=None):
         context = catalog().page(request.path)
         if context is None:
@@ -73,13 +75,14 @@ def create_app(data_dir=None, bootstrap=True, auto_updates=None):
 
     @app.get('/robots.txt')
     def robots():
-        return Response('User-agent: *\nAllow: /\nDisallow: /api/\nSitemap: ' + ORIGIN + '/sitemap.xml\n', mimetype='text/plain')
+        from predictor.discovery import robots_text
+        return Response(robots_text(),mimetype='text/plain')
 
     @app.get('/sitemap.xml')
     def sitemap():
-        from xml.sax.saxutils import escape
-        urls = ''.join('<url><loc>' + escape(ORIGIN + path) + '</loc></url>' for path in ['/'] + catalog().paths())
-        return Response('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + urls + '</urlset>', mimetype='application/xml')
+        from predictor.discovery import sitemap_bytes
+        view=catalog()
+        return Response(sitemap_bytes(view,view.discovery_state),mimetype='application/xml')
 
     @app.get('/api/dashboard')
     def dashboard():
@@ -215,6 +218,7 @@ def create_app(data_dir=None, bootstrap=True, auto_updates=None):
     def headers(response):
         if request.path.startswith('/api/'):
             response.headers['Cache-Control'] = 'no-store'
+            response.headers['X-Robots-Tag'] = 'noindex, nofollow'
         response.headers['X-Content-Type-Options'] = 'nosniff'
         response.headers['Content-Security-Policy'] = "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' https://www.gstatic.com; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.google-analytics.com https://*.firebasestorage.app; img-src 'self' data: https://*.google-analytics.com https://*.espncdn.com; frame-ancestors 'none'"
         return response

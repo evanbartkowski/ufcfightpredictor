@@ -21,7 +21,7 @@ TABLES = ('fights', 'fighters', 'predictions', 'latest_predictions', 'prediction
 META = ('upcoming', 'markets', 'last_sync', 'sync_error', 'profile_errors',
         'odds_feed_failed', 'odds_checked_at', 'odds_last_sync', 'odds_error',
         'training_pending', 'source_parser_version', 'seeded', 'seeded_schema')
-META += ('pre_fight_markets', 'fighter_images', 'card_sections', 'card_section_checks')
+META += ('pre_fight_markets', 'fighter_images', 'card_sections', 'card_section_checks', 'discovery_state')
 
 
 def atomic_write(path, content):
@@ -91,6 +91,10 @@ def update_publication(service, directory, force=False):
     # implementation. Original issued forecasts and started events stay frozen.
     if service.bundle is not None:
         service.refresh_predictions(service.store.meta('upcoming', []))
+    from .catalog import Catalog
+    from .discovery import update_state
+    discovery = update_state(Catalog(service),service.store.meta('discovery_state',{}),now())
+    service.store.set_meta('discovery_state',discovery)
     state = export_state(service.store)
     dashboard = copy.deepcopy(service.dashboard())
     dashboard['published_at'] = now()
@@ -117,6 +121,7 @@ def update_publication(service, directory, force=False):
     atomic_write(directory / 'update.json', json.dumps(dict(revision=dashboard['revision'])).encode())
     atomic_write(directory / 'model.json', json.dumps(dashboard['model']).encode())
     export_api(directory,dashboard,service.bundle,atomic_write)
+    atomic_write(directory / 'discovery.json',json.dumps(discovery,separators=(',',':')).encode())
     atomic_write(directory / 'health.json', json.dumps(dict(
         revision=dashboard['revision'], published_at=dashboard['published_at'],
         last_sync=dashboard['status']['last_sync'], last_error=dashboard['status']['last_error'],

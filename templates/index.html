@@ -7,15 +7,9 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='cipher-mark.svg') }}">
-  <meta name="theme-color" content="#06070a">
-  <link rel="canonical" href="{{ origin }}/">
-  <meta property="og:title" content="MMA Cipher — UFC predictions and fighter records">
-  <meta property="og:description" content="Published UFC forecasts, model evidence, fighter records, and source freshness.">
-  <meta name="description" content="MMA Cipher — Next-generation UFC fight forecasting, multi-model AI ensemble consensus, pre-bout statistical telemetry, and verified performance tracking.">
-  <title>MMA Cipher — AI Fight Intelligence & UFC Predictions</title>
+  {% include '_seo.html' %}
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css', v='22') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='content.css', v='3') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='content.css', v='4') }}">
   {% include '_visual_head.html' %}
   <script src="{{ url_for('static', filename='content.js', v='2') }}" defer></script>
   <!-- Firebase SDK -->
@@ -110,7 +104,7 @@
       {% include '_library.html' %}
       <div class="section-heading">
         <div>
-          <div class="eyebrow">OFFICIAL UFC ROSTER &amp; CAREER INTELLIGENCE</div>
+          <div class="eyebrow">UFC ROSTER &amp; CAREER INTELLIGENCE</div>
           <h2>Fighter Database</h2>
         </div>
         <div class="fighter-controls">
@@ -293,7 +287,7 @@
         </div>
       </div>
       <div class="bottom-disclaimer">
-        <span class="footer-brand">MMA CIPHER PREDICTIONS</span>
+        <a class="footer-brand" href="/about/">ABOUT MMA CIPHER</a>
         <span>Probabilities are model estimates and have not been separately calibrated. Historical data has completeness and timestamp limitations.</span>
       </div>
     </footer>

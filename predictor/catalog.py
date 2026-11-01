@@ -5,6 +5,7 @@ from datetime import date, datetime
 from .links import event_path, fight_path, fighter_path
 from .model import replay_with_methods
 from .store import identity
+from .discovery import metadata, indexable
 
 ORIGIN = 'https://mma-oracle.web.app'
 
@@ -23,6 +24,7 @@ def date_label(value, with_time=False):
 
 class Catalog:
     def __init__(self, service, dashboard=None):
+        self.discovery_state = service.store.meta('discovery_state', {})
         self.dashboard = dashboard or service.dashboard()
         self.verified = service.store.rows('fights')
         self.original = {f['id']: f for f in service.store.rows('predictions')}
@@ -109,6 +111,7 @@ class Catalog:
                     forecasts=sorted(self.forecasts.values(), key=lambda f: f['date'], reverse=True),
                     forecast_paths=set(self.forecasts),
                     upcoming_events=sorted((e for e in self.events.values() if any(f['id'] in self.upcoming_ids for f in e['fights'])), key=lambda e: e['date']))
+        self._common['seo'] = metadata(self,'/',self._common,self.discovery_state)
         return dict(self._common)
 
     def fighter(self, path):
@@ -176,22 +179,29 @@ class Catalog:
             data.update(kind='model', title='Model methods and measured performance', description='Serving estimators, actual input count, held-out metrics, probability reliability, and limitations.')
         elif path == '/status/':
             data.update(kind='status', title='Data and publication status', description='Last successful source pulls, published data counts, and production build provenance.')
+        elif path == '/about/':
+            data.update(kind='about',title='About MMA Cipher (MMACipher)',description='Learn how MMA Cipher publishes UFC predictions, verifies its main-card record, and uses UFCStats and ESPN data. Independent MMA analysis with transparent model limits.')
+        elif path == '/sitemap/':
+            data.update(kind='sitemap',title='MMA Cipher Record Index',description='Browse the complete MMA Cipher index of UFC fighter profiles, event cards, published forecasts, and model information without JavaScript.')
+            data['sitemap_fighters'] = [p for path,p in self.fighters.items() if indexable(self,path)]
         elif path in self.fighters:
             data.update(self.fighter(path))
-            data.update(kind='fighter', title=data['profile']['name'] + ' — UFC record and Elo history',
-                        description='Career snapshot, recorded UFC results, opponent history, striking and grappling statistics, and upcoming fights for ' + data['profile']['name'] + '.')
+            data.update(kind='fighter', title=data['profile']['name'] + ' — UFC Record & Stats',
+                        description=f"{data['profile']['name']} UFC stats: {data['wins']} wins and {data['losses']} losses in this dataset. Explore career snapshots, opponents, Elo history, and upcoming matchups.")
             data['structured'] = {'@context': 'https://schema.org', '@type': 'Person', 'name': data['profile']['name'], 'url': ORIGIN + path}
         elif path in self.events:
             event = self.events[path]
-            data.update(kind='event', event=event, title=event['name'] + ' — ' + event['date'], description=f"Fight card, published forecasts, and available results for {event['name']} on {event['date']}.")
+            data.update(kind='event', event=event, title=event['name'] + ' — ' + event['date'], description=f"{event['name']} on {event['date']}: {len(event['fights'])} recorded matchups, available UFC results, fighter stats, and published predictions with model evidence.")
             data['structured'] = {'@context': 'https://schema.org', '@type': 'SportsEvent', 'name': event['name'], 'startDate': event['date'], 'url': ORIGIN + path, 'sport': 'Mixed martial arts'}
         elif path in self.forecasts:
             fight = self.forecasts[path]
             data.update(kind='fight', fight=fight, title=f"{fight['red']} vs. {fight['blue']} — {fight['date']}",
-                        description=f"Issued MMA Cipher forecast for {fight['red']} vs. {fight['blue']}, with model evidence, data support, uncertainty, and available result.")
+                        description=f"{'Archived' if fight.get('removed') else 'Issued' if fight.get('pick') else 'Upcoming'} UFC matchup: {fight['red']} vs. {fight['blue']} on {fight['date']}. View MMA Cipher predictions, fighter records, forecast evidence, and available results.")
+            data['title'] = f"{fight['red']} vs. {fight['blue']} {'Archived Forecast' if fight.get('removed') else 'Prediction' if fight.get('pick') else 'UFC Matchup'} — {fight['date']}"
         else:
             return None
+        data['seo'] = metadata(self,path,data,self.discovery_state)
         return data
 
     def paths(self):
-        return ['/fighters/', '/events/', '/fights/', '/model/', '/status/'] + sorted(set(self.fighters) | set(self.events) | set(self.forecasts))
+        return ['/fighters/', '/events/', '/fights/', '/model/', '/status/', '/about/', '/sitemap/'] + sorted(set(self.fighters) | set(self.events) | set(self.forecasts))

@@ -6,6 +6,7 @@
     <a class="library-shortcut" href="{{ href }}">{{ icon(symbol) }}<span><strong>{{ label }}</strong><small>{{ description }}</small></span><span class="tile-arrow" aria-hidden="true">↗</span></a>
     {% endfor %}
   </div>
+  <a class="record-index-link" href="/sitemap/">Browse the complete record index <span aria-hidden="true">↗</span></a>
   <div class="archive-finder" data-archive-finder>
     <label class="archive-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><span class="sr-only">Search all fight records</span><input type="search" id="archive-query" placeholder="Search a fighter, matchup, event, or date…" autocomplete="off"><kbd>/</kbd></label>
     <div class="archive-filters" role="group" aria-label="Search record types">{% for key, label in [('all','All records'),('fighters','Fighters'),('events','Event cards'),('forecasts','Forecasts')] %}<button type="button" data-archive-kind="{{ key }}" aria-pressed="{{ 'true' if loop.first else 'false' }}" class="{{ 'active' if loop.first else '' }}">{{ label }}</button>{% endfor %}</div>

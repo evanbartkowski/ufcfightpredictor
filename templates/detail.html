@@ -4,29 +4,26 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{ title }} | MMA Cipher</title>
-  <meta name="description" content="{{ description }}">
-  <link rel="canonical" href="{{ origin }}{{ path }}">
-  <meta property="og:title" content="{{ title }} | MMA Cipher"><meta property="og:description" content="{{ description }}"><meta property="og:url" content="{{ origin }}{{ path }}">
-  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='cipher-mark.svg') }}">
+  {% include '_seo.html' %}
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css', v='22') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='content.css', v='3') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='content.css', v='4') }}">
   {% include '_visual_head.html' %}
   <script src="{{ url_for('static', filename='content.js', v='2') }}" defer></script>
-  {% if structured %}<script type="application/ld+json">{{ structured|tojson }}</script>{% endif %}
 </head>
 <body>
 {{ site_header('fighters' if kind == 'fighter' else 'events' if kind == 'event' else 'fights' if kind == 'fight' else kind, upcoming_events[0] if upcoming_events else none) }}
 <main class="directory-page" id="main-content">
   <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Dashboard</a><span aria-hidden="true">/</span>{% if kind in ('fighter','event','fight') %}<a href="/{{ 'fighters' if kind == 'fighter' else 'events' if kind == 'event' else 'fights' }}/">{{ 'Fighters' if kind == 'fighter' else 'Events' if kind == 'event' else 'Forecasts' }}</a><span aria-hidden="true">/</span><span>{{ profile.name if kind == 'fighter' else event.date if kind == 'event' else fight.date }}</span>{% else %}<span>{{ 'Data status' if kind == 'status' else 'Model methods' if kind == 'model' else kind|capitalize }}</span>{% endif %}</nav>
   <section class="page-hero page-hero-{{ kind }}">
-    <div class="page-hero-copy"><p class="eyebrow">{{ 'THE FIGHTER FILES' if kind in ('fighter','fighters') else 'FIGHT NIGHT, IN FOCUS' if kind in ('events','event') else 'EVERY PICK, ON THE RECORD' if kind in ('fights','fight') else 'BEHIND THE NUMBERS' if kind == 'model' else 'SOURCE INTELLIGENCE' }}</p>
+    <div class="page-hero-copy"><p class="eyebrow">{{ 'THE FIGHTER FILES' if kind in ('fighter','fighters') else 'FIGHT NIGHT, IN FOCUS' if kind in ('events','event') else 'EVERY PICK, ON THE RECORD' if kind in ('fights','fight') else 'BEHIND THE NUMBERS' if kind == 'model' else 'ABOUT THE PROJECT' if kind == 'about' else 'EXPLORE THE ARCHIVE' if kind == 'sitemap' else 'SOURCE INTELLIGENCE' }}</p>
     <h1>{{ profile.name if kind == 'fighter' else event.name if kind == 'event' else fight.red + ' vs. ' + fight.blue if kind == 'fight' else 'The fighter files.' if kind == 'fighters' else 'Every card. Every matchup.' if kind == 'events' else 'The forecast ledger.' if kind == 'fights' else 'Inside the algorithm.' if kind == 'model' else 'Know what’s current.' }}</h1><p class="lead">{{ description }}</p>
     <div class="hero-tags">{% if kind in ('fighter','fighters') %}<span>{{ '{:,}'.format(fighters|length) }} fighter profiles</span><span>Records &amp; Elo history</span>{% elif kind in ('event','events') %}<span>{{ date_label(event.date) if kind == 'event' else (upcoming_events|length|string) + ' upcoming events' }}</span><span>{{ (event.fights|length|string) + ' bouts' if kind == 'event' else 'Verified results archive' }}</span>{% elif kind in ('fight','fights') %}<span>{{ date_label(fight.date) if kind == 'fight' else (forecasts|length|string) + ' published matchups' }}</span><span>Issued picks &amp; evidence</span>{% elif kind == 'model' and model %}<span>{{ model.estimator_count }} serving estimators</span><span>{{ model.feature_count }} pre-bout inputs</span>{% else %}<span>{{ dashboard.upcoming|length }} upcoming bouts</span><span>{{ '{:,}'.format(dashboard.total_fights) }} verified records</span>{% endif %}</div>
     </div>
     <div class="page-hero-art" aria-hidden="true">{% if kind == 'fighter' %}{{ portrait_image(profile.name, large=true) }}{% elif kind == 'fighters' and upcoming_events %}<div class="roster-hero-portraits">{{ portrait_image(upcoming_events[0].fights[0].red, large=true) }}{{ portrait_image(upcoming_events[0].fights[0].blue, large=true) }}</div>{% elif kind == 'fight' %}<div class="matchup-portraits">{{ portrait_image(fight.red, large=true) }}<span>VS</span>{{ portrait_image(fight.blue, large=true) }}</div>{% else %}{{ icon('glove' if kind in ('event','events') else 'swords' if kind == 'fights' else 'chart' if kind == 'model' else 'clock' if kind == 'status' else 'scales') }}{% endif %}</div>
   </section>
-  {% if kind == 'fighter' %}
+  {% if kind in ('about','sitemap') %}
+    {% include '_discovery_pages.html' %}
+  {% elif kind == 'fighter' %}
     <section class="public-section">
       <h2>Career snapshot and recorded UFC performance</h2>
       <dl class="public-facts"><div><dt>Career record{% if profile.source %} · {{ profile.source }}{% endif %}</dt><dd>{{ profile.record or 'Unavailable' }}</dd></div><div><dt>UFC data record</dt><dd>{{ wins }}–{{ losses }}{% if other %} · {{ other }} draw / NC{% endif %}</dd></div><div><dt>Latest replay Elo</dt><dd>{{ '%.1f'|format(current_elo) if current_elo is not none else 'No decided bouts recorded' }}</dd></div><div><dt>Recent decided bouts</dt><dd>{{ recent_wins }} wins in {{ recent|length }} bouts</dd></div></dl>

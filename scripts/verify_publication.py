@@ -76,13 +76,17 @@ def verify(read, expected_commit=None):
     assert html.select_one('link[rel="canonical"]'), 'Canonical URL is missing'
     urls = [node.text for node in ET.fromstring(read('/sitemap.xml')).iter('{http://www.sitemaps.org/schemas/sitemap/0.9}loc')]
     assert len(urls) == len(set(urls)), 'Sitemap contains duplicate URLs'
-    for kind in ('fighters', 'events', 'fights', 'model', 'status'):
+    for kind in ('fighters', 'events', 'fights', 'model', 'about', 'sitemap'):
         candidates = [urlparse(url).path for url in urls if urlparse(url).path.startswith('/' + kind + '/')]
         assert candidates, 'Missing indexable ' + kind + ' pages'
         path = next((p for p in candidates if p.count('/') > 2), candidates[0])
         page = BeautifulSoup(read(path), 'html.parser')
         assert page.h1 and page.select_one('link[rel="canonical"]'), 'Invalid detail page: ' + path
     assert b'Sitemap:' in read('/robots.txt'), 'robots.txt does not advertise the sitemap'
+    assert '/status/' not in [urlparse(url).path for url in urls], 'Utility status page should not be submitted for indexing'
+    graph=json.loads(html.select_one('script[type="application/ld+json"]').string)['@graph']
+    assert any(item.get('@type')=='WebSite' and 'MMACipher' in item.get('alternateName',[]) for item in graph), 'Search engines cannot resolve the MMACipher site name'
+    assert html.select_one('meta[property="og:image"]') and html.select_one('meta[name="twitter:card"]'), 'Sharing metadata is missing'
     return dict(revision=dashboard['revision'], code_revision=health['publication']['code_revision'],
                 last_sync=health['last_sync'], odds_checked_at=health['odds_checked_at'],
                 upcoming_bouts=health['upcoming_bouts'], persisted_counts=health['publication']['persisted_counts'],

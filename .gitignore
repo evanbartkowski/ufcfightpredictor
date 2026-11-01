@@ -23,3 +23,6 @@ gha-creds-*.json
 /static/api/overview.json
 /static/api/fighter-images.json
 /static/api/search-index.json
+/static/api/discovery.json
+/static/about/
+/static/sitemap/

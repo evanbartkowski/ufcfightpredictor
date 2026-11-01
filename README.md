@@ -46,6 +46,17 @@ The browser checks a small revision response every minute, downloads a compact o
 
 ## Searchable records
 
+MMA Cipher is also branded as **MMACipher**. Public pages include canonical URLs, Open Graph/Twitter preview metadata, browser icons, and a shared WebSite/Organization graph. Fighter, event, and forecast pages add the appropriate entity and breadcrumb metadata. `/about/` describes automated authorship and source limits; `/sitemap/` exposes the complete record index as ordinary HTML links. Technical status and empty placeholder profiles are excluded from the XML sitemap and marked `noindex`.
+
+Sitemap modification dates are based on persistent hashes of meaningful page content, not every refresh timestamp. `discovery_state` travels with the published fight-state snapshot. After deployment, CI submits only changed/deleted URLs through IndexNow and caches accepted submission hashes. The public ownership key is deliberately hosted as a text file; it is not an account credential. Submission errors retain the previous notification state for retry and do not roll back a successful site deployment.
+
+Google can discover the XML sitemap through `robots.txt`. Search Console submission requires a Google account authorized for that property; the existing Firebase CLI authorization does not grant Search Console access. Do not use Google's retired sitemap-ping URL or its restricted Indexing API for these ordinary fight pages. IndexNow acceptance is a delivery acknowledgment and does not promise indexing or rankings.
+
+```powershell
+.\.venv\Scripts\python scripts/render_brand_assets.py
+.\.venv\Scripts\python scripts/submit_indexnow.py
+```
+
 The export and Flask app share the same templates and catalog:
 
 - `/events/` and individual event pages contain announced cards and verified results.
