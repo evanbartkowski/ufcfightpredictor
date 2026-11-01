@@ -208,3 +208,14 @@ def test_monitor_detects_silent_schedule_failure():
     health=dict(published_at=at.isoformat(),last_sync=at.isoformat(),odds_checked_at=at.isoformat(),model_version='v')
     assert assess(health,at)==[]
     assert 'heartbeat' in assess(health,at+timedelta(hours=1))[0]
+
+
+def test_successful_sync_does_not_apply_failure_backoff_to_a_short_configured_cadence(tmp_path):
+    store=Store(tmp_path);service=Service(store);service.sync_interval=180
+    start=datetime(2026,11,1,12,tzinfo=timezone.utc)
+    store.set_meta_many(dict(sync_attempt_at=start.isoformat(),last_sync=(start+timedelta(seconds=1)).isoformat()))
+    assert not service.sync_due(start+timedelta(seconds=180))
+    assert service.sync_due(start+timedelta(seconds=181))
+    store.set_meta('sync_attempt_at',(start+timedelta(seconds=181)).isoformat())
+    assert not service.sync_due(start+timedelta(seconds=200))
+    assert service.sync_due(start+timedelta(seconds=482))

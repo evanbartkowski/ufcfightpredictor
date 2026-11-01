@@ -295,11 +295,12 @@ class Service:
         at = at or datetime.now(timezone.utc)
         if self.status['running']:
             return False
-        attempted = self.store.meta('sync_attempt_at')
-        if attempted and (at - datetime.fromisoformat(attempted)).total_seconds() < 300:
+        metadata = self.store.meta_many(('sync_attempt_at','last_sync','training_pending'))
+        attempted, completed = metadata.get('sync_attempt_at'), metadata.get('last_sync')
+        failed_attempt = attempted and (not completed or datetime.fromisoformat(attempted) > datetime.fromisoformat(completed))
+        if failed_attempt and (at - datetime.fromisoformat(attempted)).total_seconds() < 300:
             return False
-        completed = self.store.meta('last_sync')
-        return (self.auto_updates and (self.bundle is None or self.store.meta('training_pending', False))) or not completed or (at - datetime.fromisoformat(completed)).total_seconds() >= self.get_dynamic_sync_interval()
+        return (self.auto_updates and (self.bundle is None or metadata.get('training_pending', False))) or not completed or (at - datetime.fromisoformat(completed)).total_seconds() >= self.get_dynamic_sync_interval()
 
     def scheduler(self, interval):
         while True:
