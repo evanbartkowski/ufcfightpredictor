@@ -7,14 +7,18 @@
   <meta http-equiv="Expires" content="0">
   <link rel="icon" type="image/svg+xml" href="/cipher-mark.svg">
   <meta name="theme-color" content="#06070a">
+  <link rel="canonical" href="https://mma-oracle.web.app/">
+  <meta property="og:title" content="MMA Cipher — UFC predictions and fighter records">
+  <meta property="og:description" content="Published UFC forecasts, model evidence, fighter records, and source freshness.">
   <meta name="description" content="MMA Cipher — Next-generation UFC fight forecasting, multi-model AI ensemble consensus, pre-bout statistical telemetry, and verified performance tracking.">
   <title>MMA Cipher — AI Fight Intelligence & UFC Predictions</title>
-  <link rel="stylesheet" href="/style.css?v=18">
+  <link rel="stylesheet" href="/style.css?v=19">
+  <link rel="stylesheet" href="/content.css?v=1">
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js" defer></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js" defer></script>
   <script src="/firebase.js" defer></script>
-  <script src="/app.js?v=18" defer></script>
+  <script src="/app.js?v=19" defer></script>
 </head>
 <body>
   <header class="topbar">
@@ -26,8 +30,8 @@
       <a class="next-event-link" id="next-event-link" href="#upcoming">
         <span class="next-event-icon" aria-hidden="true">&#8599;</span>
         <span>
-          <span class="next-event-label" id="next-event-label">EXPLORE</span>
-          <strong id="next-event-date">Fight cards</strong>
+          <span class="next-event-label" id="next-event-label">NEXT EVENT</span>
+          <strong id="next-event-date">2026-11-07</strong>
         </span>
       </a>
     </div>
@@ -44,31 +48,32 @@
       <div class="hero-copy">
         <div class="eyebrow">MMA CIPHER · ADVANCED MULTI-MODEL AI</div>
         <h1>MMA CIPHER<br><span>PREDICTIONS.</span></h1>
-        <p>Multi-model ensemble consensus. Strict zero-leakage training. Calibrated win probabilities.</p>
+        <p>Chronological model evaluation. Published estimates and their supporting evidence. Probabilities have not been separately calibrated.</p>
       </div>
       <aside class="model-intro" aria-label="How the prediction algorithm works">
         <div class="eyebrow">HOW THE PREDICTION ALGORITHM WORKS</div>
-        <p id="model-summary">MMA Cipher synthesizes an ensemble of gradient-boosted trees, LightGBM, regularized logistic, and random forests using walk-forward chronological backtesting and 24 pre-bout statistical indicators.</p>
+        <p id="model-summary">6 fitted estimators combine 39 pre-bout inputs. Serving models: Extra Trees, Random Forest, XGBoost, LightGBM, HistGradientBoosting, Logistic Regression. Probabilities are model estimates and have not been separately calibrated. Holdout reliability bins measure agreement with outcomes; they do not apply a calibration transform.</p>
       </aside>
     </section>
     <div class="sync-strip" aria-label="Data freshness">
-      <div id="notice" class="notice" role="status">Loading MMA Cipher intelligence…</div>
-      <div id="odds-sync" class="odds-sync" role="status">Loading sportsbook odds...</div>
+      <div id="notice" class="notice" role="status">Last successful fight-data pull: 2026-11-01T19:07:14.870429+00:00</div>
+      <div id="odds-sync" class="odds-sync" role="status">Odds checked 2026-11-01T19:42:39.699127+00:00</div>
     </div>
     <section class="metrics" aria-label="Model overview">
-      <div><span class="metric-label">HISTORICAL TEST ACCURACY</span><strong id="accuracy">—</strong><small id="test-count">Chronological holdout</small></div>
-      <div><span class="metric-label">RECORDED FIGHTS</span><strong id="fight-count">—</strong><small>Confirmed outcomes</small></div>
-      <div><span class="metric-label">LIVE PREDICTION RECORD</span><strong id="live-accuracy">—</strong><small id="live-count">Awaiting settled forecasts</small></div>
-      <div><span class="metric-label">LAST SUCCESSFUL SYNC</span><strong class="date-metric" id="last-sync">Not yet</strong><small id="sync-state">Dynamic update cadence</small></div>
+      <div><span class="metric-label">HISTORICAL TEST ACCURACY</span><strong id="accuracy">63.4%</strong><small id="test-count">1580 chronological holdout bouts</small></div>
+      <div><span class="metric-label">RECORDED FIGHTS</span><strong id="fight-count">7,541</strong><small>Confirmed outcomes</small></div>
+      <div><span class="metric-label">LIVE PREDICTION RECORD</span><strong id="live-accuracy">50.0%</strong><small id="live-count">30 settled forecasts</small></div>
+      <div><span class="metric-label">LAST SUCCESSFUL SYNC</span><strong class="date-metric" id="last-sync">2026-11-01 19:07 UTC</strong><small id="sync-state">Fight data every 6h · page checks every minute</small></div>
     </section>
     <nav class="tabs" aria-label="Dashboard sections">
-      <button class="tab active" data-tab="upcoming" aria-pressed="true">Upcoming fights <span id="card-count">0</span></button>
+      <button class="tab active" data-tab="upcoming" aria-pressed="true">Upcoming fights <span id="card-count">45</span></button>
       <button class="tab" data-tab="matchup" aria-pressed="false">Matchup lab</button>
-      <button class="tab" data-tab="fighters" aria-pressed="false">Fighter database <span id="fighters-count" class="tab-badge">2.4k</span></button>
+      <button class="tab" data-tab="fighters" aria-pressed="false">Fighter database <span id="fighters-count" class="tab-badge">2570</span></button>
       <button class="tab" data-tab="analytics" aria-pressed="false">AI Analytics</button>
       <button class="tab" data-tab="results" aria-pressed="false">Prediction record</button>
       <button class="tab" data-tab="model" aria-pressed="false">Inside the Algorithm</button>
     </nav>
+    <nav class="public-nav" aria-label="Records and methods"><a href="/events/">Event cards</a><a href="/fighters/">Fighter profiles</a><a href="/fights/">Issued forecasts</a><a href="/model/">Model methods and limits</a><a href="/status/">Data status</a></nav>
     <section id="upcoming" class="panel">
       <div class="section-heading">
         <div>
@@ -82,11 +87,99 @@
             <button class="filter-pill pill-fav" data-filter="favorites"><svg class="art-icon" viewBox="0 0 48 48" aria-hidden="true"><use href="/icon-art.svg#star"></use></svg> Favorites <span class="pill-badge" id="fav-pill-count">0</span></button>
           </div>
           <select id="event-filter" aria-label="Choose an event">
-            <option value="">Loading events…</option>
-          </select>
+            <option value="all">All upcoming events</option>
+<option value="2026-11-07|UFC Fight Night: Cortes Acosta vs. Walker" selected>UFC Fight Night: Cortes Acosta vs. Walker</option><option value="2026-11-14|UFC 334: Gane vs. Hokit" >UFC 334: Gane vs. Hokit</option><option value="2026-11-21|UFC Fight Night: Prochazka vs. Stirling" >UFC Fight Night: Prochazka vs. Stirling</option><option value="2026-12-12|UFC 335: Oliveira vs. Lopes" >UFC 335: Oliveira vs. Lopes</option><option value="2027-01-30|UFC 336: Van vs. Kape" >UFC 336: Van vs. Kape</option>          </select>
         </div>
       </div>
-      <div id="cards"></div>
+      <div id="cards" data-server-rendered="true">
+        <div class="event-heading"><h3><a class="public-link" href="/events/2026-11-07-ufc-fight-night-cortes-acosta-vs-walker/">UFC Fight Night: Cortes Acosta vs. Walker</a></h3><time datetime="2026-11-07">2026-11-07</time></div>
+<section class="card-section" aria-label="Main card"><h4>Main card</h4><div class="fight-grid"><article class="fight-card published-card" data-fight-id="2067d4387a55c843a1e190f4">
+  <div class="fight-top"><span>Heavyweight</span><time datetime="2026-11-07">2026-11-07</time></div>
+  <h3><a href="/fighters/waldo-cortes-acosta/">Waldo Cortes Acosta</a> <span class="muted">vs.</span> <a href="/fighters/johnny-walker/">Johnny Walker</a></h3>
+<p class="published-pick">Model pick: <strong>Waldo Cortes Acosta</strong> · 51.1%</p>
+  <p class="muted">Estimate · not separately calibrated · Issued 2026-11-01</p>
+  <a class="public-link" href="/fights/2026-11-07-waldo-cortes-acosta-vs-johnny-walker-2067d438/">Forecast evidence and matchup details →</a>
+</article><article class="fight-card published-card" data-fight-id="65894a973febb428bd33c7ac">
+  <div class="fight-top"><span>Women&#39;s Strawweight</span><time datetime="2026-11-07">2026-11-07</time></div>
+  <h3><a href="/fighters/tatiana-suarez/">Tatiana Suarez</a> <span class="muted">vs.</span> <a href="/fighters/virna-jandiroba/">Virna Jandiroba</a></h3>
+<p class="published-pick">Model pick: <strong>Tatiana Suarez</strong> · 59.8%</p>
+  <p class="muted">Estimate · not separately calibrated · Issued 2026-11-01</p>
+  <a class="public-link" href="/fights/2026-11-07-tatiana-suarez-vs-virna-jandiroba-65894a97/">Forecast evidence and matchup details →</a>
+</article><article class="fight-card published-card" data-fight-id="3d186fdbedfdff81badb5ca5">
+  <div class="fight-top"><span>Bantamweight</span><time datetime="2026-11-07">2026-11-07</time></div>
+  <h3><a href="/fighters/davey-grant/">Davey Grant</a> <span class="muted">vs.</span> <a href="/fighters/elijah-smith/">Elijah Smith</a></h3>
+<p class="published-pick">Model pick: <strong>Elijah Smith</strong> · 57.4%</p>
+  <p class="muted">Estimate · not separately calibrated · Issued 2026-11-01</p>
+  <a class="public-link" href="/fights/2026-11-07-davey-grant-vs-elijah-smith-3d186fdb/">Forecast evidence and matchup details →</a>
+</article><article class="fight-card published-card" data-fight-id="8438b8f1ab3d7f7a72808888">
+  <div class="fight-top"><span>Welterweight</span><time datetime="2026-11-07">2026-11-07</time></div>
+  <h3><a href="/fighters/seokhyeon-ko/">Seokhyeon Ko</a> <span class="muted">vs.</span> <a href="/fighters/wellington-turman/">Wellington Turman</a></h3>
+<p class="published-pick">Model pick: <strong>Wellington Turman</strong> · 50.1%</p>
+  <p class="muted">Estimate · not separately calibrated · Issued 2026-11-01</p>
+  <a class="public-link" href="/fights/2026-11-07-seokhyeon-ko-vs-wellington-turman-8438b8f1/">Forecast evidence and matchup details →</a>
+</article><article class="fight-card published-card" data-fight-id="d0811380ef5077c846be66a0">
+  <div class="fight-top"><span>Light Heavyweight</span><time datetime="2026-11-07">2026-11-07</time></div>
+  <h3><a href="/fighters/billy-elekana/">Billy Elekana</a> <span class="muted">vs.</span> <a href="/fighters/lucas-fernando/">Lucas Fernando</a></h3>
+<p class="published-pick">Model pick: <strong>Billy Elekana</strong> · 50.1%</p>
+  <p class="muted">Estimate · not separately calibrated · Issued 2026-11-01</p>
+  <a class="public-link" href="/fights/2026-11-07-billy-elekana-vs-lucas-fernando-d0811380/">Forecast evidence and matchup details →</a>
+</article><article class="fight-card published-card" data-fight-id="945356597f5d459c8b434692">
+  <div class="fight-top"><span>Middleweight</span><time datetime="2026-11-07">2026-11-07</time></div>
+  <h3><a href="/fighters/mantas-kondratavicius/">Mantas Kondratavicius</a> <span class="muted">vs.</span> <a href="/fighters/andre-petroski/">Andre Petroski</a></h3>
+<p class="published-pick">Model pick: <strong>Mantas Kondratavicius</strong> · 53.4%</p>
+  <p class="muted">Estimate · not separately calibrated · Issued 2026-11-01</p>
+  <a class="public-link" href="/fights/2026-11-07-mantas-kondratavicius-vs-andre-petroski-94535659/">Forecast evidence and matchup details →</a>
+</article></div></section>
+<details class="undercard-dropdown card-section" aria-label="Undercard / Prelims"><summary class="undercard-summary"><span>Undercard / Prelims · 7 bouts</span><span>Click to show undercard</span></summary><div class="undercard-content fight-grid"><article class="fight-card published-card" data-fight-id="8f09391ce9d781cc27f09e0c">
+  <div class="fight-top"><span>Heavyweight</span><time datetime="2026-11-07">2026-11-07</time></div>
+  <h3><a href="/fighters/gabriel-lorenco/">Gabriel Lorenco</a> <span class="muted">vs.</span> <a href="/fighters/thomas-petersen/">Thomas Petersen</a></h3>
+<p class="published-pick">Model pick: <strong>Thomas Petersen</strong> · 52.2%</p>
+  <p class="muted">Estimate · not separately calibrated · Issued 2026-11-01</p>
+  <a class="public-link" href="/fights/2026-11-07-gabriel-lorenco-vs-thomas-petersen-8f09391c/">Forecast evidence and matchup details →</a>
+</article><article class="fight-card published-card" data-fight-id="1261f8532db8513c1cb92a7f">
+  <div class="fight-top"><span>Women&#39;s Flyweight</span><time datetime="2026-11-07">2026-11-07</time></div>
+  <h3><a href="/fighters/karine-silva/">Karine Silva</a> <span class="muted">vs.</span> <a href="/fighters/gabriella-fernandes/">Gabriella Fernandes</a></h3>
+<p class="published-pick">Model pick: <strong>Karine Silva</strong> · 50.6%</p>
+  <p class="muted">Estimate · not separately calibrated · Issued 2026-11-01</p>
+  <a class="public-link" href="/fights/2026-11-07-karine-silva-vs-gabriella-fernandes-1261f853/">Forecast evidence and matchup details →</a>
+</article><article class="fight-card published-card" data-fight-id="f02bda85ee8bfd06871394d6">
+  <div class="fight-top"><span>Flyweight</span><time datetime="2026-11-07">2026-11-07</time></div>
+  <h3><a href="/fighters/mitch-raposo/">Mitch Raposo</a> <span class="muted">vs.</span> <a href="/fighters/marcos-degli/">Marcos Degli</a></h3>
+<p class="published-pick">Model pick: <strong>Mitch Raposo</strong> · 51.2%</p>
+  <p class="muted">Estimate · not separately calibrated · Issued 2026-11-01</p>
+  <a class="public-link" href="/fights/2026-11-07-mitch-raposo-vs-marcos-degli-f02bda85/">Forecast evidence and matchup details →</a>
+</article><article class="fight-card published-card" data-fight-id="69310fd90ae39196dc3b5361">
+  <div class="fight-top"><span>Featherweight</span><time datetime="2026-11-07">2026-11-07</time></div>
+  <h3><a href="/fighters/jose-delano/">Jose Delano</a> <span class="muted">vs.</span> <a href="/fighters/murtazali-magomedov/">Murtazali Magomedov</a></h3>
+<p class="published-pick">Model pick: <strong>Murtazali Magomedov</strong> · 50.4%</p>
+  <p class="muted">Estimate · not separately calibrated · Issued 2026-11-01</p>
+  <a class="public-link" href="/fights/2026-11-07-jose-delano-vs-murtazali-magomedov-69310fd9/">Forecast evidence and matchup details →</a>
+</article><article class="fight-card published-card" data-fight-id="7408ab77951df2e739803bb2">
+  <div class="fight-top"><span>Featherweight</span><time datetime="2026-11-07">2026-11-07</time></div>
+  <h3><a href="/fighters/keiichiro-nakamura/">Keiichiro Nakamura</a> <span class="muted">vs.</span> <a href="/fighters/ollie-schmid/">Ollie Schmid</a></h3>
+<p class="published-pick">Model pick: <strong>Keiichiro Nakamura</strong> · 54.2%</p>
+  <p class="muted">Estimate · not separately calibrated · Issued 2026-11-01</p>
+  <a class="public-link" href="/fights/2026-11-07-keiichiro-nakamura-vs-ollie-schmid-7408ab77/">Forecast evidence and matchup details →</a>
+</article><article class="fight-card published-card" data-fight-id="4ef088ff2f7dded03ef2f8de">
+  <div class="fight-top"><span>Featherweight</span><time datetime="2026-11-07">2026-11-07</time></div>
+  <h3><a href="/fighters/austin-bashi/">Austin Bashi</a> <span class="muted">vs.</span> <a href="/fighters/lucas-brennan/">Lucas Brennan</a></h3>
+<p class="published-pick">Model pick: <strong>Austin Bashi</strong> · 50.9%</p>
+  <p class="muted">Estimate · not separately calibrated · Issued 2026-11-01</p>
+  <a class="public-link" href="/fights/2026-11-07-austin-bashi-vs-lucas-brennan-4ef088ff/">Forecast evidence and matchup details →</a>
+</article><article class="fight-card published-card" data-fight-id="f51ea8974271938d0a73ebd7">
+  <div class="fight-top"><span>Women&#39;s Bantamweight</span><time datetime="2026-11-07">2026-11-07</time></div>
+  <h3><a href="/fighters/priscila-cachoeira/">Priscila Cachoeira</a> <span class="muted">vs.</span> <a href="/fighters/nina-milosevic/">Nina Milosevic</a></h3>
+<p class="published-pick">Model pick: <strong>Nina Milosevic</strong> · 60.2%</p>
+  <p class="muted">Estimate · not separately calibrated · Issued 2026-11-01</p>
+  <a class="public-link" href="/fights/2026-11-07-priscila-cachoeira-vs-nina-milosevic-f51ea897/">Forecast evidence and matchup details →</a>
+</article></div></details><details class="undercard-dropdown card-section" aria-label="Card placement pending"><summary class="undercard-summary"><span>Card placement pending · 1 bouts</span><span>Click to show undercard</span></summary><div class="undercard-content fight-grid"><article class="fight-card published-card" data-fight-id="dd8e5539750017dde0bdf774">
+  <div class="fight-top"><span>Welterweight</span><time datetime="2026-11-07">2026-11-07</time></div>
+  <h3><a href="/fighters/jonny-parsons/">Jonny Parsons</a> <span class="muted">vs.</span> <a href="/fighters/jose-souza/">Jose Souza</a></h3>
+<p class="published-pick">Model pick: <strong>Jose Souza</strong> · 52.9%</p>
+  <p class="muted">Estimate · not separately calibrated · Issued 2026-11-01</p>
+  <a class="public-link" href="/fights/2026-11-07-jonny-parsons-vs-jose-souza-dd8e5539/">Forecast evidence and matchup details →</a>
+</article></div></details>      </div>
+      <div class="published-events"><a class="public-link" href="/events/2026-11-07-ufc-fight-night-cortes-acosta-vs-walker/">2026-11-07 · UFC Fight Night: Cortes Acosta vs. Walker</a><a class="public-link" href="/events/2026-11-14-ufc-334-gane-vs-hokit/">2026-11-14 · UFC 334: Gane vs. Hokit</a><a class="public-link" href="/events/2026-11-21-ufc-fight-night-prochazka-vs-stirling/">2026-11-21 · UFC Fight Night: Prochazka vs. Stirling</a><a class="public-link" href="/events/2026-12-12-ufc-335-oliveira-vs-lopes/">2026-12-12 · UFC 335: Oliveira vs. Lopes</a><a class="public-link" href="/events/2027-01-30-ufc-336-van-vs-kape/">2027-01-30 · UFC 336: Van vs. Kape</a></div>
     </section>
     <section id="matchup" class="panel" hidden>
       <div class="section-heading">
@@ -114,7 +207,7 @@
           <h2>Fighter Database</h2>
         </div>
         <div class="fighter-controls">
-          <input type="search" id="fighter-search" placeholder="Search 2,400+ fighters by name…" autocomplete="off" aria-label="Search fighters">
+          <input type="search" id="fighter-search" placeholder="Search fighters by name…" autocomplete="off" aria-label="Search fighters">
           <select id="fighter-division" aria-label="Filter by weight class">
             <option value="all">All weight classes</option>
             <option value="Heavyweight">Heavyweight</option>
@@ -132,7 +225,7 @@
           </select>
         </div>
       </div>
-      <div id="fighter-results-summary" class="fighter-results-summary">Showing 2,472 active &amp; historical fighters</div>
+      <div id="fighter-results-summary" class="fighter-results-summary">Browse the latest recorded fighter profiles</div>
       <div id="fighter-grid" class="fighter-grid"></div>
     </section>
     <section id="analytics" class="panel" hidden>
@@ -142,7 +235,7 @@
           <h2>AI Performance Analytics</h2>
         </div>
         <div class="analytics-time-pills" role="toolbar" aria-label="Analytics scope">
-          <button class="pill-scope active" data-scope="all">All 113 Events</button>
+          <button class="pill-scope active" data-scope="all">All measured events</button>
           <button class="pill-scope" data-scope="50">Last 50 Events</button>
           <button class="pill-scope" data-scope="25">Last 25 Events</button>
           <button class="pill-scope" data-scope="10">Last 10 Events</button>
@@ -154,7 +247,7 @@
         <div class="chart-header">
           <div>
             <h3>AI Prediction Accuracy Over Time</h3>
-            <p>Chronological walk-forward test accuracy across confirmed UFC events (Strict zero leakage)</p>
+            <p>Chronological walk-forward test accuracy across confirmed UFC events (chronological holdout)</p>
           </div>
           <div class="chart-legend">
             <span class="legend-item"><span class="legend-dot cyan"></span>Cumulative Accuracy</span>
@@ -171,18 +264,18 @@
           <div class="chart-header">
             <div>
               <h3>Ensemble Model Comparison</h3>
-              <p>Independent candidate algorithms evaluated on pristine unseen holdout</p>
+              <p>Fitted candidate algorithms evaluated on a chronological holdout</p>
             </div>
           </div>
           <div id="models-leaderboard" class="models-leaderboard"></div>
         </div>
 
-        <!-- AI Confidence Calibration -->
+        <!-- Observed Probability Reliability -->
         <div class="analytics-card half">
           <div class="chart-header">
             <div>
-              <h3>AI Confidence Calibration</h3>
-              <p>Nominal predicted probability vs actual observed historical win frequency</p>
+              <h3>Observed Probability Reliability</h3>
+              <p>Measured holdout bins; no separate calibration transform is applied</p>
             </div>
           </div>
           <div id="calibration-chart-container" class="calibration-container"></div>
@@ -218,8 +311,8 @@
       <div class="analytics-card">
         <div class="chart-header">
           <div>
-            <h3>Core Predictive Indicators &amp; Feature Attribution</h3>
-            <p>Primary indicators weighted by mathematical importance in the prediction algorithm</p>
+            <h3>Logistic Component Coefficients</h3>
+            <p>Standardized coefficient magnitudes from the logistic component; these are not full-ensemble or causal attributions.</p>
           </div>
         </div>
         <div id="feature-importance-grid" class="feature-importance-grid"></div>
@@ -241,7 +334,21 @@
           <h2>Inside the Algorithm</h2>
         </div>
       </div>
-      <div id="model-info"></div>
+      <div id="model-info" class="public-section"><p class="lead">6 fitted estimators combine 39 pre-bout inputs. Serving models: Extra Trees, Random Forest, XGBoost, LightGBM, HistGradientBoosting, Logistic Regression.</p>
+<div class="evidence-note"><strong>Probability calibration: no separate transform</strong><p>Probabilities are model estimates and have not been separately calibrated. Holdout reliability bins measure agreement with outcomes; they do not apply a calibration transform.</p></div>
+<dl class="public-facts"><div><dt>Model version</dt><dd>98540026c734</dd></div><div><dt>Actual inputs</dt><dd>39</dd></div><div><dt>Results through</dt><dd>2026-10-31</dd></div><div><dt>Training rows</dt><dd>7528</dd></div></dl>
+<h3>Measured chronological holdout</h3>
+<p>1580 decided bouts, 2023-10-21 through 2026-10-31. These are retrospective held-out measurements, separate from the live issued-pick record.</p>
+<div class="table-scroll"><table><thead><tr><th scope="col">Accuracy</th><th scope="col">Brier score</th><th scope="col">Log loss</th><th scope="col">Elo baseline accuracy</th></tr></thead><tbody><tr><td>63.4%</td><td>0.2334</td><td>0.6588</td><td>55.4%</td></tr></tbody></table></div>
+<h3>Serving estimators and blend weights</h3>
+<ul><li>MMA Cipher Extra Trees · 23.52%</li><li>MMA Cipher Random Forest · 27.42%</li><li>MMA Cipher XGBoost · 23.38%</li><li>MMA Cipher LightGBM · 7.04%</li><li>MMA Cipher HistGradientBoosting · 16.06%</li><li>MMA Cipher Logistic Regression · 2.58%</li></ul>
+<p>Validation accuracy minus 0.25 times Brier score, transformed to softmax weights; the logistic component is capped before normalization. The final chronological holdout does not choose these weights.</p>
+<h3>Observed probability reliability</h3>
+<p>These bins measure forecast reliability on the holdout. They do not calibrate the serving probabilities; small bins have limited support.</p>
+<div class="table-scroll"><table><thead><tr><th>Probability bin</th><th>Mean confidence</th><th>Observed pick accuracy</th><th>Bouts</th></tr></thead><tbody><tr><td>50–60%</td><td>52.4%</td><td>60.9%</td><td>1324</td></tr><tr><td>60–70%</td><td>64.8%</td><td>71.9%</td><td>153</td></tr><tr><td>70–80%</td><td>75.3%</td><td>82.2%</td><td>101</td></tr><tr><td>80–90%</td><td>80.8%</td><td>100.0%</td><td>2</td></tr></tbody></table></div>
+<h3>39 model inputs</h3><ol class="feature-list"><li>Elo</li><li>Striking Elo</li><li>Grappling Elo</li><li>Recorded wins</li><li>Recorded losses</li><li>Win streak</li><li>Recent form</li><li>KO win rate</li><li>Submission win rate</li><li>Experience</li><li>Days since last fight</li><li>Recent overperformance</li><li>Smoothed win rate</li><li>Finish loss rate</li><li>Recent three form</li><li>Log inactivity</li><li>Age differential</li><li>Height differential</li><li>Reach differential</li><li>Stance advantage</li><li>Sig strike rate differential</li><li>Sig strike accuracy differential</li><li>Takedown rate differential</li><li>Takedown accuracy differential</li><li>Submission attempt differential</li><li>Total rounds differential</li><li>Age cliff differential</li><li>Longest win streak differential</li><li>Title bouts differential</li><li>KO wins differential</li><li>Submission wins differential</li><li>Decision dominance differential</li><li>Reach stance interaction</li><li>Takedown threat interaction</li><li>Ranking differential</li><li>Five round experience</li><li>Ape index differential</li><li>Market implied edge</li><li>Market logit</li></ol>
+<h3>Data and evaluation limits</h3><p>Chronological replay reduces outcome leakage. Historical source completeness and the timestamps of imported attributes are not independently audited. Missing inputs use baseline values.</p><p>Replay builds fighter histories before each event day, and a chronological holdout measures later outcomes. Missing measurements are imputed. Agreement between estimators is not a calibrated uncertainty interval.</p>
+</div>
     </section>
     <dialog id="share-modal" class="share-modal" aria-label="Share MMA Cipher prediction card">
       <div class="modal-content">
@@ -292,7 +399,7 @@
       </div>
       <div class="bottom-disclaimer">
         <span class="footer-brand">MMA CIPHER PREDICTIONS</span>
-        <span>Probabilities are algorithmic estimates, not financial guarantees. Strictly zero information leakage.</span>
+        <span>Probabilities are model estimates and have not been separately calibrated. Historical data has completeness and timestamp limitations.</span>
       </div>
     </footer>
   </main>

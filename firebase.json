@@ -8,6 +8,14 @@
     ],
     "rewrites": [
       {
+        "source": "/api/model",
+        "destination": "/api/model.json"
+      },
+      {
+        "source": "/api/health",
+        "destination": "/api/health.json"
+      },
+      {
         "source": "/api/update",
         "destination": "/api/update.json"
       },

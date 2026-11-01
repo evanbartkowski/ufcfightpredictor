@@ -1,17 +1,17 @@
-"""MMA Cipher Advanced Feature Engineering & Multi-Model AI Ensemble Pipeline.
+"""Chronological replay, model evaluation, and uncalibrated serving estimates.
 
-Strict zero-leakage guarantee: every historical feature is reconstructed solely
-from information available prior to the bout date.
+Replay excludes same-day and later outcomes from fighter state. Imported
+attribute timestamps and source completeness remain data-quality assumptions.
 """
 import hashlib
 import json
 from collections import defaultdict
 from datetime import date
 from itertools import groupby
+from pathlib import Path
 import math
 
 import numpy as np
-from scipy.optimize import minimize
 from sklearn.ensemble import ExtraTreesClassifier, HistGradientBoostingClassifier, RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, brier_score_loss, log_loss
@@ -64,6 +64,7 @@ FEATURES = [
     'Market logit'
 ]
 SCHEMA = 6
+IMPLEMENTATION_HASH = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
 
 
 def fresh():
@@ -288,7 +289,7 @@ def replay(fights):
     return [(e[0], e[1], e[2]) for e in cleaned_examples], states
 
 
-def replay_with_methods(fights):
+def replay_with_methods(fights, histories=None):
     """Replay helper returning (day, feat, y, m_cat) for multi-task training."""
     states = defaultdict(fresh)
     examples = []
@@ -314,6 +315,7 @@ def replay_with_methods(fights):
             if f.get('winner') not in ('red', 'blue'):
                 continue
             a, b = states[identity(f['red'])], states[identity(f['blue'])]
+            before = {corner: state['elo'] for corner, state in [('red', a), ('blue', b)]}
             y = int(f['winner'] == 'red')
             exp = 1 / (1 + 10 ** ((b['elo'] - a['elo']) / 400))
             fin = f.get('method', '').upper()
@@ -364,6 +366,9 @@ def replay_with_methods(fights):
                 if f.get(corner + '_longest_streak') is not None: state['longest_streak'] = f[corner + '_longest_streak']
                 if f.get(corner + '_title_bouts') is not None: state['title_bouts'] = f[corner + '_title_bouts']
                 if f.get(corner + '_rank') is not None: state['rank'] = f[corner + '_rank']
+                if histories is not None:
+                    histories.setdefault(identity(f[corner]), []).append(dict(
+                        id=f['id'], date=day, before=before[corner], after=state['elo']))
 
     return examples, dict(states)
 
@@ -470,7 +475,8 @@ def train(fights):
     fitted_val = {name: factory().fit(x_tr_sym, y_tr_sym) for name, factory in factories.items()}
     val_preds = np.column_stack([probability(fitted_val[name], x[va]) for name in factories])
 
-    # Optimization driven by out-of-fold validation classification skill and calibration
+    # Blend scores use the held-out 65%-80% validation window. Expanding-window
+    # log losses above are diagnostic and choose the single-model fallback.
     val_accs = np.array([accuracy_score(y[va], val_preds[:, i] >= .5) for i in range(len(factories))])
     val_briers = np.array([brier_score_loss(y[va], val_preds[:, i]) for i in range(len(factories))])
     val_scores = val_accs - 0.25 * val_briers
@@ -589,7 +595,8 @@ def train(fights):
         if tot >= 10
     }
 
-    # Feature importances from regularized logistic pipeline
+    # Standardized coefficients of the logistic component, not global ensemble
+    # feature importance or causal attributions.
     lr_for_importance = eval_models.get('MMA Cipher Logistic Regression')
     feature_importances = []
     if lr_for_importance and hasattr(lr_for_importance, 'named_steps'):
@@ -648,7 +655,9 @@ def train(fights):
     best_candidate_name = min(validation_log_loss, key=validation_log_loss.get)
     primary_model = production_models[best_candidate_name]
 
-    version = hashlib.sha256((str(SCHEMA) + json.dumps(sorted(fights, key=lambda f: f['id']), sort_keys=True)).encode()).hexdigest()[:12]
+    version = hashlib.sha256((str(SCHEMA) + IMPLEMENTATION_HASH
+                             + json.dumps(ensemble_weights, sort_keys=True)
+                             + json.dumps(sorted(fights, key=lambda f: f['id']), sort_keys=True)).encode()).hexdigest()[:12]
 
     return dict(
         model=primary_model,
@@ -660,95 +669,12 @@ def train(fights):
         name='MMA Cipher Advanced Ensemble',
         version=version,
         schema=SCHEMA,
+        implementation_hash=IMPLEMENTATION_HASH,
+        feature_names=list(FEATURES),
+        calibration_method='none',
         trained_at=now(),
         through=days[-1]
     )
-
-
-def _format_advantage(name, diff, is_red_pick):
-    d = diff if is_red_pick else -diff
-    if name == 'Elo':
-        return f"Opponent-adjusted Elo rating edge (+{abs(d):.0f} rating points)"
-    elif name == 'Striking Elo':
-        return f"Striking exchanges & knockout rating edge (+{abs(d):.0f} points)"
-    elif name == 'Grappling Elo':
-        return f"Wrestling control & submission rating edge (+{abs(d):.0f} points)"
-    elif name == 'Age differential':
-        return f"Youth & prime advantage ({abs(d):.1f} years younger)"
-    elif name == 'Age cliff differential':
-        return "Prime athletic window advantage (Opponent is past age 35 cliff)"
-    elif name == 'Sig strike rate differential':
-        return f"Striking volume rate advantage (+{abs(d):.1f} SLpM)"
-    elif name == 'Sig strike accuracy differential':
-        return f"Striking accuracy precision edge (+{abs(d)*100:.1f}%)"
-    elif name == 'Takedown rate differential':
-        return f"Offensive takedown volume advantage (+{abs(d):.1f} TD / 15m)"
-    elif name == 'Takedown accuracy differential':
-        return f"Takedown accuracy completion edge (+{abs(d)*100:.1f}%)"
-    elif name == 'Takedown threat interaction':
-        return "Offensive wrestling vs opponent takedown defense leverage"
-    elif name == 'Submission attempt differential':
-        return f"Submission grappling threat (+{abs(d):.1f} sub att / 15m)"
-    elif name == 'Reach differential':
-        return f"Reach wingspan advantage (+{abs(d):.1f} cm)"
-    elif name == 'Reach stance interaction':
-        return "Open stance reach leverage advantage"
-    elif name == 'Height differential':
-        return f"Height leverage advantage (+{abs(d):.1f} cm)"
-    elif name == 'Ape index differential':
-        return "Ape index anatomical wingspan ratio advantage"
-    elif name == 'Ranking differential':
-        return f"Official UFC division ranking advantage (+{abs(d):.1f} ranking tier)"
-    elif name == 'Win streak':
-        return f"Momentum & active win streak (+{abs(d):.0f} consecutive wins)"
-    elif name == 'Longest win streak differential':
-        return f"Historical career peak streak (+{abs(d):.0f} wins ceiling)"
-    elif name == 'Title bouts differential':
-        return f"Championship title fight experience (+{abs(d):.0f} title bouts)"
-    elif name == 'Total rounds differential':
-        return f"Octagon cage time experience (+{abs(d):.0f} rounds logged)"
-    elif name == 'KO wins differential' or name == 'KO win rate':
-        return f"Knockout finishing power (+{abs(d):.0f} UFC KO wins)"
-    elif name == 'Submission wins differential' or name == 'Submission win rate':
-        return f"Submission finishing threat (+{abs(d):.0f} submission wins)"
-    elif name == 'Decision dominance differential':
-        return "15-minute fight pace and judging dominance"
-    elif name == 'Finish loss rate':
-        return "Durability profile and finish resistance"
-    elif name == 'Stance advantage':
-        return "Stance matchup angle advantage (Southpaw / Switch)"
-    elif name == 'Recent three form':
-        return "Recent three-bout victory momentum"
-    elif name == 'Recorded wins':
-        return f"Professional experience depth (+{abs(d):.0f} recorded wins)"
-    elif name == 'Market implied edge' or name == 'Market logit':
-        return "Betting market consensus favorite"
-    return f"Statistical advantage in {name.lower()}"
-
-
-def _format_risk(name, diff, is_red_pick):
-    d = -diff if is_red_pick else diff
-    if name == 'Age differential':
-        return f"Opponent holds youth advantage ({abs(d):.1f} years younger)"
-    elif name == 'Age cliff differential':
-        return "Fighter is in late-career athletic drop-off window (>35 yrs)"
-    elif name == 'Reach differential':
-        return f"Opponent has longer wingspan (+{abs(d):.1f} cm reach)"
-    elif name == 'Height differential':
-        return f"Opponent is taller (+{abs(d):.1f} cm)"
-    elif name == 'Sig strike rate differential':
-        return f"Opponent lands higher striking output (+{abs(d):.1f} SLpM)"
-    elif name == 'Takedown rate differential' or name == 'Takedown threat interaction':
-        return f"Opponent is an offensive grappling threat (+{abs(d):.1f} TD / 15m)"
-    elif name == 'Submission attempt differential':
-        return f"Opponent possesses dangerous ground submissions (+{abs(d):.1f} sub att)"
-    elif name == 'Total rounds differential':
-        return f"Opponent has more octagon cage time (+{abs(d):.0f} rounds)"
-    elif name == 'Ranking differential':
-        return "Opponent holds higher official UFC division ranking"
-    elif name == 'Market implied edge' or name == 'Market logit':
-        return "Market odds favor opponent"
-    return f"Opponent statistical threat in {name.lower()}"
 
 
 def _build_radar(fighter_state, attrs):
@@ -776,36 +702,42 @@ def predict(bundle, red, blue, day, bout_meta=None):
     models_dict = bundle.get('models', {})
     weights_dict = bundle.get('weights', {})
     ensemble_breakdown = {}
-    weighted_p = 0.0
+    # Evaluate the actual ensemble and one-input-at-a-time neutralizations in
+    # one batch. These are local sensitivities, not causal feature effects.
+    probes = np.tile(x, (len(FEATURES) + 1, 1))
+    probes[np.arange(1, len(FEATURES) + 1), np.arange(len(FEATURES))] = 0.0
+    weighted_p = np.zeros(len(probes))
 
     if models_dict and weights_dict:
         total_w = sum(weights_dict.values()) or 1.0
         for name, m in models_dict.items():
-            p_m = float(probability(m, x)[0])
+            probed = probability(m, probes)
+            p_m = float(probed[0])
             w = weights_dict.get(name, 0.0) / total_w
-            weighted_p += w * p_m
+            weighted_p += w * probed
             ensemble_breakdown[name] = {
                 'red_probability': p_m,
                 'blue_probability': 1.0 - p_m,
                 'weight': round(w, 3)
             }
-        p = float(np.clip(weighted_p, 0.005, 0.995))
+        probed_probabilities = np.clip(weighted_p, 0.005, 0.995)
     else:
-        p = float(probability(bundle['model'], x)[0])
+        probed_probabilities = probability(bundle['model'], probes)
+    p = float(probed_probabilities[0])
 
     # Method of victory prediction
-    method_probs = {'decision': 0.50, 'ko': 0.32, 'submission': 0.18}
-    likely_method = 'Decision'
+    method_probs = None
+    likely_method = None
     if 'method_model' in bundle and bundle['method_model'] is not None:
         try:
             m_probs = bundle['method_model'].predict_proba(x.reshape(1, -1))[0]
-            method_probs = {
-                'decision': round(float(m_probs[0]), 3),
-                'ko': round(float(m_probs[1]), 3),
-                'submission': round(float(m_probs[2]), 3)
-            }
-            method_names = ['Decision', 'KO/TKO', 'Submission']
-            likely_method = method_names[int(np.argmax(m_probs))]
+            classes = bundle['method_model'].classes_
+            categories = {0: 'decision', 1: 'ko', 2: 'submission'}
+            method_probs = {name: 0.0 for name in categories.values()}
+            for category, value in zip(classes, m_probs):
+                method_probs[categories[int(category)]] = round(float(value), 3)
+            method_names = {'decision': 'Decision', 'ko': 'KO/TKO', 'submission': 'Submission'}
+            likely_method = method_names[max(method_probs, key=method_probs.get)]
         except Exception:
             pass
 
@@ -823,59 +755,50 @@ def predict(bundle, red, blue, day, bout_meta=None):
     is_red_pick = (pick == red)
     confidence = max(p, 1.0 - p)
 
-    # Feature attribution explanation engine
+    # Explain the full serving ensemble. Equalizing one differential input can
+    # create an unrealistic combination of correlated inputs, so do not present
+    # these sensitivities as causal explanations or additive SHAP attributions.
     advantages = []
     risks = []
-    lr_prod = models_dict.get('MMA Cipher Logistic Regression')
-    if lr_prod and hasattr(lr_prod, 'named_steps'):
-        coefs = lr_prod.named_steps['logisticregression'].coef_[0]
-        scales = lr_prod.named_steps['standardscaler'].scale_
-        contributions = (x / scales) * coefs
-        items = []
-        for f_name, diff_val, c_val in zip(FEATURES, x, contributions):
-            pick_contribution = c_val if is_red_pick else -c_val
-            items.append({
-                'feature': f_name,
-                'diff': float(diff_val),
-                'contribution': float(pick_contribution)
-            })
-
-        items.sort(key=lambda it: it['contribution'], reverse=True)
-        for it in items[:4]:
-            if it['contribution'] > 0.005:
-                advantages.append({
-                    'title': _format_advantage(it['feature'], it['diff'], is_red_pick),
-                    'feature': it['feature'],
-                    'diff': round(it['diff'], 2),
-                    'impact': 'high' if it['contribution'] > 0.20 else 'medium'
-                })
-
-        for it in reversed(items):
-            if it['contribution'] < -0.005 and len(risks) < 2:
-                risks.append({
-                    'title': _format_risk(it['feature'], it['diff'], is_red_pick),
-                    'feature': it['feature'],
-                    'diff': round(it['diff'], 2),
-                    'impact': 'high' if it['contribution'] < -0.18 else 'moderate'
-                })
-
-    adv_summary = f"{pick} is favored primarily by " + (", ".join(a['title'].split('(')[0].strip() for a in advantages[:2]) if advantages else "overall algorithmic rating") + "."
-    if risks:
-        adv_summary += f" Key matchup risk: {risks[0]['title'].split('(')[0].strip()}."
-
-    explanation = {
-        'pick': pick,
-        'summary': adv_summary,
-        'advantages': advantages,
-        'risks': risks
-    }
+    items = []
+    for index, (name, diff) in enumerate(zip(FEATURES, x), 1):
+        without = float(probed_probabilities[index])
+        without_pick = without if is_red_pick else 1.0 - without
+        effect = confidence - without_pick
+        items.append(dict(feature=name, diff=round(float(diff), 3),
+                          effect_points=round(effect * 100, 4),
+                          neutral_probability=without_pick,
+                          title=f'{name}: {abs(effect) * 100:.2f} percentage-point sensitivity',
+                          detail=f'Red minus blue input: {diff:+.3f}. Equalizing this input changes the picked fighter estimate to {without_pick:.1%}.',
+                          impact='high' if abs(effect) >= .02 else 'moderate'))
+    items.sort(key=lambda item: item['effect_points'], reverse=True)
+    advantages = [item for item in items if item['effect_points'] > .0001][:3]
+    risks = sorted((item for item in items if item['effect_points'] < -.0001), key=lambda item: item['effect_points'])[:2]
 
     model_count = len(ensemble_breakdown)
     agreed_count = sum(1 for m in ensemble_breakdown.values() if (m['red_probability'] >= 0.5) == is_red_pick) if model_count else 1
     agreement_pct = round(agreed_count / max(model_count, 1), 2)
     probs_list = [m['red_probability'] for m in ensemble_breakdown.values()] if model_count else [p]
     spread = round(max(probs_list) - min(probs_list), 3) if probs_list else 0.0
-    uncertainty = 'Low' if spread < 0.10 else ('Moderate' if spread < 0.18 else 'Elevated')
+    red_support = a['wins'] + a['losses']
+    blue_support = b['wins'] + b['losses']
+    uncertainty = 'Elevated' if min(red_support, blue_support) < 3 or confidence < .55 or spread >= .18 else 'Moderate'
+    if min(red_support, blue_support) < 3:
+        major_uncertainty = 'At least one fighter has fewer than three decided UFC bouts in the model history; baseline inputs have more influence.'
+    elif confidence < .55:
+        major_uncertainty = f'The estimate is close to even ({confidence:.1%}); small input changes can reverse the pick.'
+    elif spread >= .10:
+        major_uncertainty = f'The fitted estimators differ by {spread * 100:.1f} percentage points. Agreement is not a confidence interval.'
+    else:
+        major_uncertainty = 'These probabilities have not been separately calibrated, and historical attribute completeness is not independently audited.'
+    explanation = dict(pick=pick, summary=f'{pick} has a {confidence:.1%} model estimate. '
+                       + ('The strongest supporting input sensitivities are ' + ', '.join(item['feature'] for item in advantages) + '.' if advantages else 'No individual supporting sensitivity exceeds the reporting threshold.'),
+                       advantages=advantages, risks=risks, major_uncertainty=major_uncertainty,
+                       support=dict(red_bouts=red_support, blue_bouts=blue_support,
+                                    training_bouts=bundle.get('metrics', {}).get('training_fights'),
+                                    through=bundle.get('through')),
+                       method='one_input_at_a_time_sensitivity', scope='full serving ensemble', causal=False,
+                       basis_note='Each input is set to zero while other inputs stay fixed. Correlated inputs make these effects non-additive; they describe model sensitivity, not causes of winning.')
     consensus_tier = f"Unanimous ({agreed_count}/{model_count})" if agreed_count == model_count else f"Majority ({agreed_count}/{model_count})" if agreed_count > model_count / 2 else "Split Consensus"
 
     consensus = {

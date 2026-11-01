@@ -1,12 +1,18 @@
 """Offline browser regression checks for card indicators and responsive layout."""
 from pathlib import Path
-from flask import Flask, render_template
+import sys
+from tempfile import TemporaryDirectory
+from flask import render_template
 from playwright.sync_api import sync_playwright
 
 root=Path(__file__).resolve().parents[1]
-app=Flask(__name__,template_folder=str(root/'templates'),static_folder=str(root/'static'))
-with app.test_request_context('/'):
-    html=render_template('index.html')
+sys.path.insert(0, str(root))
+from app import create_app
+from predictor.catalog import Catalog
+with TemporaryDirectory() as directory:
+    app=create_app(directory, bootstrap=False, auto_updates=False)
+    with app.test_request_context('/'):
+        html=render_template('index.html', **Catalog(app.extensions['predictor']).common())
 with sync_playwright() as pw:
     browser=pw.chromium.launch(headless=True)
     page=browser.new_page(viewport={'width':1440,'height':1100})

@@ -104,82 +104,23 @@ function updateFavCounts() {
 }
 
 // ==========================================
-// Community Predictions & Consensus
+// Personal picks saved on this browser
 // ==========================================
-const COMMUNITY_VOTES_KEY = 'mma_cipher_community_votes';
 const USER_PICKS_KEY = 'mma_cipher_user_picks';
 
 function getUserPicks() {
   try {
-    const raw = localStorage.getItem(USER_PICKS_KEY);
-    return raw ? JSON.parse(raw) : {};
-  } catch (_) {
-    return {};
-  }
-}
-
-function getCommunityVotes() {
-  try {
-    const raw = localStorage.getItem(COMMUNITY_VOTES_KEY);
-    return raw ? JSON.parse(raw) : {};
-  } catch (_) {
-    return {};
-  }
-}
-
-function saveCommunityVotes(votes) {
-  try {
-    localStorage.setItem(COMMUNITY_VOTES_KEY, JSON.stringify(votes));
-  } catch (_) {}
-}
-
-function getCommunityConsensus(f) {
-  const fightId = f.id || `${f.red}_${f.blue}`;
-  const votes = getCommunityVotes();
-  // Starts strictly at 50/50% baseline
-  const current = votes[fightId] || { red: 50, blue: 50 };
-  const rVotes = Math.max(0, current.red ?? 50);
-  const bVotes = Math.max(0, current.blue ?? 50);
-  const total = rVotes + bVotes;
-  const redPct = total > 0 ? (rVotes / total) : 0.50;
-  const bluePct = 1.0 - redPct;
-
-  return {
-    red: redPct,
-    blue: bluePct,
-    redVotes: rVotes,
-    blueVotes: bVotes,
-    totalVotes: total
-  };
+    const picks = JSON.parse(localStorage.getItem(USER_PICKS_KEY) || '{}');
+    return picks && typeof picks === 'object' && !Array.isArray(picks) ? picks : {};
+  } catch (_) { return {}; }
 }
 
 function setUserPick(fightId, side) {
+  if (!['red', 'blue'].includes(side)) return;
   const picks = getUserPicks();
-  const votes = getCommunityVotes();
-  if (!votes[fightId]) {
-    votes[fightId] = { red: 50, blue: 50 };
-  }
-
-  const prevPick = picks[fightId];
-  if (prevPick === side) {
-    // Deselect pick
-    delete picks[fightId];
-    if (side === 'red') votes[fightId].red = Math.max(50, votes[fightId].red - 1);
-    if (side === 'blue') votes[fightId].blue = Math.max(50, votes[fightId].blue - 1);
-  } else {
-    // Switch or apply new pick
-    if (prevPick === 'red') votes[fightId].red = Math.max(50, votes[fightId].red - 1);
-    if (prevPick === 'blue') votes[fightId].blue = Math.max(50, votes[fightId].blue - 1);
-    picks[fightId] = side;
-    if (side === 'red') votes[fightId].red += 1;
-    if (side === 'blue') votes[fightId].blue += 1;
-  }
-
-  try {
-    localStorage.setItem(USER_PICKS_KEY, JSON.stringify(picks));
-    saveCommunityVotes(votes);
-  } catch (_) {}
-
+  if (picks[fightId] === side) delete picks[fightId];
+  else picks[fightId] = side;
+  try { localStorage.setItem(USER_PICKS_KEY, JSON.stringify(picks)); } catch (_) {}
   renderCardPickButtons(fightId);
 }
 
@@ -511,6 +452,7 @@ function renderEnsemble(f) {
 function renderExplanation(f) {
   const exp = f.explanation;
   if (!exp) return '';
+  if (exp.method !== 'one_input_at_a_time_sensitivity') return '';
   const advs = exp.advantages || [];
   const risks = exp.risks || [];
   const consensus = f.consensus || {};
@@ -518,17 +460,17 @@ function renderExplanation(f) {
   return `
     <details class="prediction-explanation">
       <summary>
-        <span>${art('bolt')} WHY THE AI CHOSE THIS FIGHTER</span>
+        <span>${art('bolt')} MODEL EVIDENCE & UNCERTAINTY</span>
         <span class="cipher-pill">${esc(exp.pick)} ADVANTAGE</span>
       </summary>
       <div class="explanation-body">
         <p class="explanation-summary-text">${esc(exp.summary || '')}</p>
         ${advs.length ? `
           <div class="factors-group">
-            <div class="factors-heading">PRIMARY STATISTICAL ADVANTAGES</div>
+            <div class="factors-heading">STRONGEST SUPPORTING INPUT SENSITIVITIES</div>
             ${advs.map(a => `
               <div class="factor-item">
-                <span>${esc(a.title)}</span>
+                <span>${esc(a.title)}<small class="factor-detail">${esc(a.detail)}</small></span>
                 <span class="badge-impact ${a.impact==='high'?'high':''}">${esc(a.impact.toUpperCase())}</span>
               </div>
             `).join('')}
@@ -536,22 +478,25 @@ function renderExplanation(f) {
         ` : ''}
         ${risks.length ? `
           <div class="factors-group">
-            <div class="factors-heading risk">KEY MATCHUP RISKS / VULNERABILITIES</div>
+            <div class="factors-heading risk">OPPOSING INPUT SENSITIVITIES</div>
             ${risks.map(r => `
               <div class="factor-item">
-                <span>${esc(r.title)}</span>
+                <span>${esc(r.title)}<small class="factor-detail">${esc(r.detail)}</small></span>
                 <span class="badge-impact risk">${esc(r.impact.toUpperCase())}</span>
               </div>
             `).join('')}
           </div>
         ` : ''}
+        <p class="evidence-note"><strong>Major uncertainty:</strong> ${esc(exp.major_uncertainty)}</p>
+        <p class="muted">History: ${esc(exp.support?.red_bouts)} decided UFC bouts for ${esc(f.red)}; ${esc(exp.support?.blue_bouts)} for ${esc(f.blue)}. Training: ${esc(exp.support?.training_bouts)} bouts through ${esc(exp.support?.through)}.</p>
+        <p class="muted">${esc(exp.basis_note)}</p>
         <div class="consensus-hud">
           <div class="consensus-status">
             <span>MODEL CONSENSUS:</span>
             <strong>${esc(consensus.tier || 'Ensemble Consensus')}</strong>
           </div>
           <span class="uncertainty-pill ${(consensus.uncertainty||'').toLowerCase()}">
-            UNCERTAINTY: ${esc(consensus.uncertainty || 'LOW')}
+            UNCERTAINTY: ${esc(consensus.uncertainty || 'UNREPORTED')}
           </span>
         </div>
       </div>
@@ -575,44 +520,13 @@ function renderUpsetBanner(f) {
 }
 
 function renderUserPickButtons(f) {
-  if (f.prediction_pending) return '';
+  if (f.prediction_pending || !f.id) return '';
   const userPick = getUserPicks()[f.id];
-  const comm = getCommunityConsensus(f);
-  const isLocked = f.locked || false;
-  const redLast = esc(f.red.split(' ').pop());
-  const blueLast = esc(f.blue.split(' ').pop());
-  const redPct = Math.round(comm.red * 100);
-  const bluePct = Math.round(comm.blue * 100);
-
-  return `
-    <div class="user-pick-container" id="pick-box-${esc(f.id)}">
-      <div class="user-pick-header">
-        <span class="user-pick-tag"><span class="pulse-dot"></span> COMMUNITY CONSENSUS</span>
-        <span class="user-pick-action">${userPick ? (userPick === 'red' ? 'PICKED ' + redLast.toUpperCase() : 'PICKED ' + blueLast.toUpperCase()) : 'SELECT WINNER'}</span>
-      </div>
-      <div class="user-pick-btns">
-        <button class="pick-btn ${userPick==='red'?'selected-red':''}" data-pick-fight="${esc(f.id)}" data-pick-side="red" ${isLocked?'disabled':''} aria-label="Vote for ${esc(f.red)}">
-          <span class="pick-btn-name">${esc(f.red)}</span>
-          <span class="pick-btn-pct">${redPct}%</span>
-          <span class="pick-status-icon">${userPick==='red'?'✓':'+'}</span>
-        </button>
-        <button class="pick-btn ${userPick==='blue'?'selected-blue':''}" data-pick-fight="${esc(f.id)}" data-pick-side="blue" ${isLocked?'disabled':''} aria-label="Vote for ${esc(f.blue)}">
-          <span class="pick-btn-name">${esc(f.blue)}</span>
-          <span class="pick-btn-pct">${bluePct}%</span>
-          <span class="pick-status-icon">${userPick==='blue'?'✓':'+'}</span>
-        </button>
-      </div>
-      <div class="community-vs-ai">
-        <div class="cvsa-labels">
-          <span>AI Forecast: <strong>${esc(f.pick)}</strong> (${pct(f.confidence)})</span>
-          <span>Community: <strong>${redPct}%</strong> ${redLast} &middot; <strong>${bluePct}%</strong> ${blueLast}</span>
-        </div>
-        <div class="cvsa-bar" role="progressbar" aria-label="Community split: ${redPct}% ${redLast} vs ${bluePct}% ${blueLast}">
-          <div class="cvsa-fill" style="width: ${(comm.red * 100).toFixed(1)}%"></div>
-        </div>
-      </div>
-    </div>
-  `;
+  return `<div class="user-pick-container" id="pick-box-${esc(f.id)}">
+    <div class="user-pick-header"><span class="user-pick-tag">YOUR PERSONAL PICK</span><span class="user-pick-action">${userPick ? 'PICK SAVED' : 'SELECT WINNER'}</span></div>
+    <div class="user-pick-btns">${['red','blue'].map(side => `<button class="pick-btn ${userPick===side?'selected-'+side:''}" data-pick-fight="${esc(f.id)}" data-pick-side="${side}" ${f.locked?'disabled':''} aria-pressed="${userPick===side}" aria-label="Pick ${esc(f[side])}"><span class="pick-btn-name">${esc(f[side])}</span><span class="pick-btn-pct">Model ${pct(f[side+'_probability'])}</span><span class="pick-status-icon">${userPick===side?'\u2713':'+'}</span></button>`).join('')}</div>
+    <p class="personal-pick-note">Saved on this browser. Your pick: ${userPick ? esc(f[userPick]) : 'none selected'}. Model pick: ${esc(f.pick)} (${pct(f.confidence)}).</p>
+  </div>`;
 }
 
 function renderCardPickButtons(fightId) {
@@ -954,6 +868,7 @@ function card(f, withProfiles=false, isMainEvent=false, mainCardInfo=null) {
       </div>
       <span>${f.locked?'FORECAST LOCKED':'MMA CIPHER PROBABILITY'}</span>
     </div>
+    <a class="public-link forecast-detail-link" href="${esc(f.path || '/fights/')}">Full forecast and evidence</a>
     ${renderUpsetBanner(f)}
     ${edge?`<div class="model-edge"><strong>${art('star')} MODEL EDGE</strong><span>${esc(f.pick)} &middot; ${pct(edge.probability)} model chance &middot; ${line(edge.price)} at ${esc(edge.name)}</span><small>+${(edge.edge*100).toFixed(1)} points vs. ${pct(edge.implied)} break-even probability. Model estimate, not a guaranteed return.</small></div>`:''}
     ${countdown(f)}
@@ -965,7 +880,7 @@ function card(f, withProfiles=false, isMainEvent=false, mainCardInfo=null) {
         <div class="fighter-details">
           <div class="corner">FIRST FIGHTER</div>
           <div class="fighter-name">
-            ${esc(f.red)}
+            <a class="public-link" href="${esc(f.red_path || '/fighters/')}">${esc(f.red)}</a>
             <button class="fav-btn ${favs.has(f.red)?'is-fav':''}" data-fav-name="${esc(f.red)}" aria-label="Favorite ${esc(f.red)}" title="Favorite ${esc(f.red)}">${art('star')}</button>
           </div>
         </div>
@@ -978,7 +893,7 @@ function card(f, withProfiles=false, isMainEvent=false, mainCardInfo=null) {
         <div class="fighter-details">
           <div class="corner blue">SECOND FIGHTER</div>
           <div class="fighter-name">
-            ${esc(f.blue)}
+            <a class="public-link" href="${esc(f.blue_path || '/fighters/')}">${esc(f.blue)}</a>
             <button class="fav-btn ${favs.has(f.blue)?'is-fav':''}" data-fav-name="${esc(f.blue)}" aria-label="Favorite ${esc(f.blue)}" title="Favorite ${esc(f.blue)}">${art('star')}</button>
           </div>
         </div>
@@ -1194,7 +1109,7 @@ function attachCardListeners() {
       toggleFavorite(b.dataset.favName);
     };
   });
-  // Community pick buttons
+  // Personal pick buttons
   document.querySelectorAll('.pick-btn').forEach(b => {
     b.onclick = (e) => {
       e.stopPropagation();
@@ -1242,24 +1157,14 @@ function attachCardListeners() {
 // Main Dashboard Render
 // ==========================================
 function render() {
+  if (!data) return;
   const m = data.model;
   if (m) {
     $('model-summary').innerHTML = `
-      <span class="model-overview">MMA Cipher runs an advanced prediction algorithm combining gradient-boosted decision trees, LightGBM, regularized logistic, and random forests.</span>
-      <span class="model-selection">
-        <span class="model-kicker">PREDICTION ALGORITHM</span>
-        <strong class="active-model">${esc(m.name)}</strong>
-        <span class="model-estimator">Out-of-Fold Nelder-Mead Optimization · Schema v${esc(m.schema)}</span>
-      </span>
-      <span class="model-training">Trained on <strong class="glow-blue">${m.metrics.training_fights.toLocaleString()} confirmed UFC bouts</strong> with strict zero-leakage guarantee.</span>
-      <span class="model-inputs compact-inputs" role="list" aria-label="Feature engineering">
-        <span role="listitem">Opponent-adjusted Elo</span>
-        <span role="listitem">Age differential</span>
-        <span role="listitem">Height &amp; reach differential</span>
-        <span role="listitem">Striking pace &amp; accuracy</span>
-        <span role="listitem">Takedown success &amp; volume</span>
-        <span role="listitem">Finish resistance &amp; durability</span>
-      </span>
+      <span class="model-overview">${esc(m.description || m.name)}</span>
+      <span class="model-selection"><span class="model-kicker">DEPLOYED MODEL</span><strong class="active-model">${esc(m.name)}</strong><span class="model-estimator">Version ${esc(m.version)} &middot; ${esc(m.feature_count ?? 'unreported')} inputs &middot; Schema ${esc(m.schema)}</span></span>
+      <span class="model-training">${m.metrics.training_fights.toLocaleString()} training bouts &middot; ${m.metrics.test_fights.toLocaleString()} held-out bouts.</span>
+      <span class="model-inputs compact-inputs">${esc(m.calibration_note || 'Probabilities have not been separately calibrated.')}</span>
     `;
   }
   $('accuracy').textContent = pct(m?.metrics.accuracy);
@@ -1298,7 +1203,7 @@ function render() {
   $('event-filter').innerHTML = '<option value="all">All upcoming events</option>' + Object.entries(groups).map(([key, fs]) => `<option value="${esc(key)}">${esc(fs[0].event)}</option>`).join('');
   $('event-filter').value = selection;
   const visible = selection === 'all' ? Object.values(groups) : [groups[selection]];
-  $('cards').innerHTML = data.upcoming.length ? visible.map(fs => `<div class="event-heading"><h3>${esc(fs[0].event)}</h3><span class="tag">${esc(day(fs[0].date))}</span></div>${cardSections(fs)}`).join('') : empty('The next card is on its way', 'Upcoming predictions appear after a successful UFCStats refresh. In the meantime, compare any two fighters in the MMA Cipher Matchup Lab.', true);
+  $('cards').innerHTML = data.upcoming.length ? visible.map(fs => `<div class="event-heading"><h3><a class="public-link" href="${esc(fs[0].event_path || '/events/')}">${esc(fs[0].event)}</a></h3><span class="tag">${esc(day(fs[0].date))}</span></div>${cardSections(fs)}`).join('') : empty('The next card is on its way', 'Upcoming predictions appear after a successful UFCStats refresh. In the meantime, compare any two fighters in the MMA Cipher Matchup Lab.', true);
   
   document.querySelectorAll('#cards .fight-card').forEach(c => c.querySelectorAll('details').forEach((d, i) => {
     d.open = expanded.has(c.dataset.fightId + '|' + i);
@@ -1329,18 +1234,13 @@ function render() {
               <strong>Holdout: ${pct(candAccs[name])} · Weight: ${(w*100).toFixed(1)}%</strong>
             </div>
           `).join('')}
-          <p style="margin-top:14px;">Ensemble blend weights are determined using out-of-fold Nelder-Mead optimization across expanding chronological windows, strictly penalizing overconfidence and minimizing Log Loss.</p>
+          <p style="margin-top:14px;">${esc(m.weight_selection)}</p>
         </div>
         <div class="info-box">
-          <h3>Strict Zero-Leakage Guarantee</h3>
-          <ol>
-            <li>Every feature for a bout is calculated purely from data available prior to the calendar day.</li>
-            <li>No post-fight statistics, career averages from the future, or end-of-career ratings are ever leaked.</li>
-            <li>Symmetric corner invariance ensures p(A, B) = 1 - p(B, A).</li>
-            <li>Walk-forward chronological backtesting reserves the final 20% of event dates as a pristine unseen holdout.</li>
-            <li>Method of victory (KO/TKO, Submission, Decision) is modeled via calibrated multi-class regularized estimation.</li>
-          </ol>
-          <p>The historical database contains over 6,500 UFC bouts spanning 2010 through 2024. Dynamic Elo ratings update chronologically after each verified bout outcome.</p>
+          <h3>Probability reliability and data limits</h3>
+          <p>${esc(m.calibration_note)}</p><p>${esc(m.limitations)}</p>
+          <p>Chronological holdout: ${esc(m.metrics.test_start)} through ${esc(m.metrics.test_end)}. Corner symmetry enforces p(A, B) = 1 - p(B, A).</p>
+          <p><a class="public-link" href="/model/">All ${esc(m.feature_count)} inputs, serving models, and measured reliability bins</a></p>
         </div>
       </div>
     `;
@@ -1481,7 +1381,7 @@ function renderModelsLeaderboard() {
 function renderCalibrationChart() {
   const container = $('calibration-chart-container');
   if (!container || !data?.model?.metrics?.calibration) return;
-  const calib = data.model.metrics.calibration;
+  const calib = data.model.metrics.calibration.filter(bin => bin.count > 0);
 
   const w = 340;
   const h = 200;
@@ -1512,7 +1412,7 @@ function renderCalibrationChart() {
       ${points}
     </svg>
     <div style="font-size:10px;color:#9499ab;text-align:center;margin-top:4px;">
-      Diagonal line = Perfect Calibration · Cyan bubbles = Empirical Bins (size by volume)
+      Reference diagonal and observed holdout bins (size by sample count). No separate calibration transform is applied.
     </div>
   `;
 }
@@ -1857,7 +1757,7 @@ function drawShareCard(f) {
   // Footer Disclaimers
   ctx.fillStyle = '#64748b';
   ctx.font = '14px system-ui, sans-serif';
-  ctx.fillText('Strict zero-leakage chronological training · Algorithmic estimates, not financial guarantees.', 50, 625);
+  ctx.fillText('Chronological evaluation. Estimates have not been separately calibrated.', 50, 625);
   ctx.textAlign = 'right';
   ctx.fillText('mmacipher.web.app', w - 50, 625);
   ctx.textAlign = 'left';
@@ -1945,6 +1845,7 @@ function shouldPull() {
   return !lastNetworkAttempt || Date.now() - lastNetworkAttempt >= interval;
 }
 
+const serverRendered = $('cards')?.dataset.serverRendered === 'true';
 let loading = false;
 let hasInitialNetworkSynced = false;
 let lastNetworkAttempt = 0;
@@ -1956,7 +1857,7 @@ async function load(force = false) {
   const cached = getCachedPredictions();
 
   // 1. Instant paint from cache so user experiences zero wait time
-  if (!data && cached) {
+  if (!data && cached && !serverRendered) {
     try { data = currentDashboard(cached.data); } catch (_) {}
     if (data) {
       if (data?.images) fighterImagesMap = data.images;
@@ -2007,7 +1908,7 @@ async function load(force = false) {
   } catch (e) {
     lastPollFailed = true;
     hasInitialNetworkSynced = true;
-    if (!data && cached) {
+    if (!data && cached && !serverRendered) {
       try { data = currentDashboard(cached.data); } catch (_) {}
       if (data) {
         if (data?.images) fighterImagesMap = data.images;

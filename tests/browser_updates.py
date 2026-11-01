@@ -92,7 +92,9 @@ with sync_playwright() as p:
     offline.route('**/api/dashboard?*', lambda route: route.abort())
     offline.goto('http://127.0.0.1:8000', wait_until='networkidle')
     offline.get_by_text('Connection interrupted.', exact=False).wait_for()
-    assert offline.locator('#card-count').inner_text() == '0'
+    # Current pre-rendered HTML remains useful even if an old browser cache and
+    # an interrupted request are both present.
+    assert offline.locator('#card-count').inner_text() == str(len(payload['upcoming']))
     assert 'Expired October card' not in offline.locator('#cards').inner_text()
     assert not errors, errors
     browser.close()

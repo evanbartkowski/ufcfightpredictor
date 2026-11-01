@@ -3,9 +3,7 @@ import argparse
 import logging
 from pathlib import Path
 import sys
-from urllib.parse import urlencode
-
-from jinja2 import Environment, FileSystemLoader, select_autoescape
+import json
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -13,16 +11,7 @@ sys.path.insert(0, str(ROOT))
 from predictor.publication import download_state, update_publication
 from predictor.service import Service
 from predictor.store import Store
-
-
-def build_static_page():
-    env = Environment(loader=FileSystemLoader(ROOT / 'templates'), autoescape=select_autoescape(['html']))
-    def static_url(endpoint, filename, **query):
-        if endpoint != 'static':
-            raise ValueError('Only static assets belong in the Hosting export')
-        return '/' + filename + ('?' + urlencode(query) if query else '')
-    html = env.get_template('index.html').render(url_for=static_url)
-    (ROOT / 'static' / 'index.html').write_text(html, encoding='utf-8')
+from predictor.rendering import export_pages
 
 
 def main():
@@ -42,7 +31,9 @@ def main():
     if service.bundle is None or store.meta('training_pending') or service.bundle.get('through') != latest_result:
         service.retrain()
     failures = update_publication(service, ROOT / 'static' / 'api', force=args.force)
-    build_static_page()
+    dashboard = json.loads((ROOT / 'static' / 'api' / 'dashboard.json').read_text(encoding='utf-8'))
+    page_count = export_pages(service, dashboard=dashboard)
+    logging.info('Rendered %s indexable pages, sitemap, and robots.txt', page_count)
     for failure in failures:
         logging.error('%s', failure)
     logging.info('Publication ready: %s', store.meta('last_sync'))

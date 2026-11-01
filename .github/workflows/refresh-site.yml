@@ -35,9 +35,12 @@ jobs:
           node-version: '22'
       - name: Install updater
         run: |
-          python -m pip install -r requirements.txt
+          python -m pip install -r requirements-dev.txt
           python -m playwright install --with-deps chromium
           npm install --global firebase-tools@14
+      - name: Test source changes
+        if: github.event_name != 'schedule'
+        run: python -m pytest -q
       - name: Restore model cache
         uses: actions/cache/restore@v4
         with:
@@ -49,7 +52,7 @@ jobs:
         continue-on-error: true
         run: python scripts/refresh_site.py --restore-url https://mma-oracle.web.app/api/sync-state.json.gz
       - name: Require complete publication
-        run: test -s static/api/sync-state.json.gz
+        run: python scripts/verify_publication.py
       - name: Save model cache
         uses: actions/cache/save@v4
         with:
@@ -65,6 +68,8 @@ jobs:
           service_account: mma-cipher-publisher@mma-oracle.iam.gserviceaccount.com
       - name: Publish website and fight state together
         run: firebase deploy --only hosting --project mma-oracle --non-interactive --message '[mma-cipher-auto] Scheduled data and website update'
+      - name: Verify production APIs, HTML, and persisted state
+        run: python scripts/verify_publication.py --url https://mma-oracle.web.app
       - name: Retain recent automated snapshots
         env:
           GOOGLE_ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}

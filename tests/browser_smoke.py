@@ -51,7 +51,7 @@ with sync_playwright() as p:
     page.get_by_role('button', name='Prediction record',exact=True).click()
     assert page.locator('#results').is_visible()
     page.locator('button[data-tab="model"]').click()
-    assert page.get_by_text('Brier score', exact=False).is_visible()
+    assert page.get_by_text('Brier score (lower is better)', exact=True).is_visible()
     page.set_viewport_size({'width':390,'height':844})
     page.get_by_role('button', name='Upcoming fights').click()
     assert page.evaluate('document.documentElement.scrollWidth <= window.innerWidth')

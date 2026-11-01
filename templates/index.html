@@ -1,3 +1,4 @@
+{% from '_public.html' import forecast, model_details %}
 <!doctype html>
 <html lang="en">
 <head>
@@ -7,14 +8,18 @@
   <meta http-equiv="Expires" content="0">
   <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='cipher-mark.svg') }}">
   <meta name="theme-color" content="#06070a">
+  <link rel="canonical" href="{{ origin }}/">
+  <meta property="og:title" content="MMA Cipher — UFC predictions and fighter records">
+  <meta property="og:description" content="Published UFC forecasts, model evidence, fighter records, and source freshness.">
   <meta name="description" content="MMA Cipher — Next-generation UFC fight forecasting, multi-model AI ensemble consensus, pre-bout statistical telemetry, and verified performance tracking.">
   <title>MMA Cipher — AI Fight Intelligence & UFC Predictions</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css', v='18') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css', v='19') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='content.css', v='1') }}">
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js" defer></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js" defer></script>
   <script src="{{ url_for('static', filename='firebase.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='app.js', v='18') }}" defer></script>
+  <script src="{{ url_for('static', filename='app.js', v='19') }}" defer></script>
 </head>
 <body>
   <header class="topbar">
@@ -26,8 +31,8 @@
       <a class="next-event-link" id="next-event-link" href="#upcoming">
         <span class="next-event-icon" aria-hidden="true">&#8599;</span>
         <span>
-          <span class="next-event-label" id="next-event-label">EXPLORE</span>
-          <strong id="next-event-date">Fight cards</strong>
+          <span class="next-event-label" id="next-event-label">{{ 'NEXT EVENT' if upcoming_events else 'EXPLORE' }}</span>
+          <strong id="next-event-date">{{ upcoming_events[0].date if upcoming_events else 'Fight cards' }}</strong>
         </span>
       </a>
     </div>
@@ -44,31 +49,32 @@
       <div class="hero-copy">
         <div class="eyebrow">MMA CIPHER · ADVANCED MULTI-MODEL AI</div>
         <h1>MMA CIPHER<br><span>PREDICTIONS.</span></h1>
-        <p>Multi-model ensemble consensus. Strict zero-leakage training. Calibrated win probabilities.</p>
+        <p>Chronological model evaluation. Published estimates and their supporting evidence. Probabilities have not been separately calibrated.</p>
       </div>
       <aside class="model-intro" aria-label="How the prediction algorithm works">
         <div class="eyebrow">HOW THE PREDICTION ALGORITHM WORKS</div>
-        <p id="model-summary">MMA Cipher synthesizes an ensemble of gradient-boosted trees, LightGBM, regularized logistic, and random forests using walk-forward chronological backtesting and 24 pre-bout statistical indicators.</p>
+        <p id="model-summary">{{ model.description if model else 'Serving model unavailable.' }} {% if model %}{{ model.calibration_note }}{% endif %}</p>
       </aside>
     </section>
     <div class="sync-strip" aria-label="Data freshness">
-      <div id="notice" class="notice" role="status">Loading MMA Cipher intelligence…</div>
-      <div id="odds-sync" class="odds-sync" role="status">Loading sportsbook odds...</div>
+      <div id="notice" class="notice" role="status">{% if dashboard.status.last_error %}Fight-data refresh delayed. {% endif %}Last successful fight-data pull: {{ dashboard.status.last_sync or 'No successful sync recorded' }}</div>
+      <div id="odds-sync" class="odds-sync" role="status">Odds checked {{ dashboard.odds_status.checked_at or 'at an unreported time' }}</div>
     </div>
     <section class="metrics" aria-label="Model overview">
-      <div><span class="metric-label">HISTORICAL TEST ACCURACY</span><strong id="accuracy">—</strong><small id="test-count">Chronological holdout</small></div>
-      <div><span class="metric-label">RECORDED FIGHTS</span><strong id="fight-count">—</strong><small>Confirmed outcomes</small></div>
-      <div><span class="metric-label">LIVE PREDICTION RECORD</span><strong id="live-accuracy">—</strong><small id="live-count">Awaiting settled forecasts</small></div>
-      <div><span class="metric-label">LAST SUCCESSFUL SYNC</span><strong class="date-metric" id="last-sync">Not yet</strong><small id="sync-state">Dynamic update cadence</small></div>
+      <div><span class="metric-label">HISTORICAL TEST ACCURACY</span><strong id="accuracy">{{ pct(model.metrics.accuracy) if model else 'Unavailable' }}</strong><small id="test-count">{{ model.metrics.test_fights if model else 0 }} chronological holdout bouts</small></div>
+      <div><span class="metric-label">RECORDED FIGHTS</span><strong id="fight-count">{{ '{:,}'.format(dashboard.total_fights) }}</strong><small>Confirmed outcomes</small></div>
+      <div><span class="metric-label">LIVE PREDICTION RECORD</span><strong id="live-accuracy">{{ pct(dashboard.live_accuracy) }}</strong><small id="live-count">{{ dashboard.scored_predictions }} settled forecasts</small></div>
+      <div><span class="metric-label">LAST SUCCESSFUL SYNC</span><strong class="date-metric" id="last-sync">{{ (dashboard.status.last_sync[:16]|replace('T', ' ')) + ' UTC' if dashboard.status.last_sync else 'Unreported' }}</strong><small id="sync-state">Fight data every 6h · page checks every minute</small></div>
     </section>
     <nav class="tabs" aria-label="Dashboard sections">
-      <button class="tab active" data-tab="upcoming" aria-pressed="true">Upcoming fights <span id="card-count">0</span></button>
+      <button class="tab active" data-tab="upcoming" aria-pressed="true">Upcoming fights <span id="card-count">{{ dashboard.upcoming|length }}</span></button>
       <button class="tab" data-tab="matchup" aria-pressed="false">Matchup lab</button>
-      <button class="tab" data-tab="fighters" aria-pressed="false">Fighter database <span id="fighters-count" class="tab-badge">2.4k</span></button>
+      <button class="tab" data-tab="fighters" aria-pressed="false">Fighter database <span id="fighters-count" class="tab-badge">{{ dashboard.fighters|length }}</span></button>
       <button class="tab" data-tab="analytics" aria-pressed="false">AI Analytics</button>
       <button class="tab" data-tab="results" aria-pressed="false">Prediction record</button>
       <button class="tab" data-tab="model" aria-pressed="false">Inside the Algorithm</button>
     </nav>
+    <nav class="public-nav" aria-label="Records and methods"><a href="/events/">Event cards</a><a href="/fighters/">Fighter profiles</a><a href="/fights/">Issued forecasts</a><a href="/model/">Model methods and limits</a><a href="/status/">Data status</a></nav>
     <section id="upcoming" class="panel">
       <div class="section-heading">
         <div>
@@ -82,11 +88,22 @@
             <button class="filter-pill pill-fav" data-filter="favorites"><svg class="art-icon" viewBox="0 0 48 48" aria-hidden="true"><use href="{{ url_for('static', filename='icon-art.svg') }}#star"></use></svg> Favorites <span class="pill-badge" id="fav-pill-count">0</span></button>
           </div>
           <select id="event-filter" aria-label="Choose an event">
-            <option value="">Loading events…</option>
+            <option value="all">All upcoming events</option>
+            {% for event in upcoming_events %}<option value="{{ event.date }}|{{ event.name }}" {{ 'selected' if loop.first else '' }}>{{ event.name }}</option>{% endfor %}
           </select>
         </div>
       </div>
-      <div id="cards"></div>
+      <div id="cards" data-server-rendered="{{ 'true' if dashboard.upcoming else 'false' }}">
+        {% if upcoming_events %}{% set event = upcoming_events[0] %}
+        <div class="event-heading"><h3><a class="public-link" href="{{ event.path }}">{{ event.name }}</a></h3><time datetime="{{ event.date }}">{{ event.date }}</time></div>
+        {% for section, label in [('main','Main card'),('prelims','Undercard / Prelims'),('early','Early prelims'),('unassigned','Card placement pending')] %}
+          {% set group = [] %}{% for f in event.fights %}{% if (f.odds.card_section or 'unassigned') == section %}{% set _ = group.append(f) %}{% endif %}{% endfor %}
+          {% if group %}{% if section == 'main' %}<section class="card-section" aria-label="{{ label }}"><h4>{{ label }}</h4><div class="fight-grid">{% for f in group %}{{ forecast(f) }}{% endfor %}</div></section>
+          {% else %}<details class="undercard-dropdown card-section" aria-label="{{ label }}"><summary class="undercard-summary"><span>{{ label }} · {{ group|length }} bouts</span><span>Click to show undercard</span></summary><div class="undercard-content fight-grid">{% for f in group %}{{ forecast(f) }}{% endfor %}</div></details>{% endif %}{% endif %}
+        {% endfor %}
+        {% else %}<p>No upcoming announced bouts appear in the latest verified source pull. <a href="/status/">View data status</a>.</p>{% endif %}
+      </div>
+      <div class="published-events">{% for event in upcoming_events %}<a class="public-link" href="{{ event.path }}">{{ event.date }} · {{ event.name }}</a>{% endfor %}</div>
     </section>
     <section id="matchup" class="panel" hidden>
       <div class="section-heading">
@@ -114,7 +131,7 @@
           <h2>Fighter Database</h2>
         </div>
         <div class="fighter-controls">
-          <input type="search" id="fighter-search" placeholder="Search 2,400+ fighters by name…" autocomplete="off" aria-label="Search fighters">
+          <input type="search" id="fighter-search" placeholder="Search fighters by name…" autocomplete="off" aria-label="Search fighters">
           <select id="fighter-division" aria-label="Filter by weight class">
             <option value="all">All weight classes</option>
             <option value="Heavyweight">Heavyweight</option>
@@ -132,7 +149,7 @@
           </select>
         </div>
       </div>
-      <div id="fighter-results-summary" class="fighter-results-summary">Showing 2,472 active &amp; historical fighters</div>
+      <div id="fighter-results-summary" class="fighter-results-summary">Browse the latest recorded fighter profiles</div>
       <div id="fighter-grid" class="fighter-grid"></div>
     </section>
     <section id="analytics" class="panel" hidden>
@@ -142,7 +159,7 @@
           <h2>AI Performance Analytics</h2>
         </div>
         <div class="analytics-time-pills" role="toolbar" aria-label="Analytics scope">
-          <button class="pill-scope active" data-scope="all">All 113 Events</button>
+          <button class="pill-scope active" data-scope="all">All measured events</button>
           <button class="pill-scope" data-scope="50">Last 50 Events</button>
           <button class="pill-scope" data-scope="25">Last 25 Events</button>
           <button class="pill-scope" data-scope="10">Last 10 Events</button>
@@ -154,7 +171,7 @@
         <div class="chart-header">
           <div>
             <h3>AI Prediction Accuracy Over Time</h3>
-            <p>Chronological walk-forward test accuracy across confirmed UFC events (Strict zero leakage)</p>
+            <p>Chronological walk-forward test accuracy across confirmed UFC events (chronological holdout)</p>
           </div>
           <div class="chart-legend">
             <span class="legend-item"><span class="legend-dot cyan"></span>Cumulative Accuracy</span>
@@ -171,18 +188,18 @@
           <div class="chart-header">
             <div>
               <h3>Ensemble Model Comparison</h3>
-              <p>Independent candidate algorithms evaluated on pristine unseen holdout</p>
+              <p>Fitted candidate algorithms evaluated on a chronological holdout</p>
             </div>
           </div>
           <div id="models-leaderboard" class="models-leaderboard"></div>
         </div>
 
-        <!-- AI Confidence Calibration -->
+        <!-- Observed Probability Reliability -->
         <div class="analytics-card half">
           <div class="chart-header">
             <div>
-              <h3>AI Confidence Calibration</h3>
-              <p>Nominal predicted probability vs actual observed historical win frequency</p>
+              <h3>Observed Probability Reliability</h3>
+              <p>Measured holdout bins; no separate calibration transform is applied</p>
             </div>
           </div>
           <div id="calibration-chart-container" class="calibration-container"></div>
@@ -218,8 +235,8 @@
       <div class="analytics-card">
         <div class="chart-header">
           <div>
-            <h3>Core Predictive Indicators &amp; Feature Attribution</h3>
-            <p>Primary indicators weighted by mathematical importance in the prediction algorithm</p>
+            <h3>Logistic Component Coefficients</h3>
+            <p>Standardized coefficient magnitudes from the logistic component; these are not full-ensemble or causal attributions.</p>
           </div>
         </div>
         <div id="feature-importance-grid" class="feature-importance-grid"></div>
@@ -241,7 +258,7 @@
           <h2>Inside the Algorithm</h2>
         </div>
       </div>
-      <div id="model-info"></div>
+      <div id="model-info" class="public-section">{{ model_details(model) }}</div>
     </section>
     <dialog id="share-modal" class="share-modal" aria-label="Share MMA Cipher prediction card">
       <div class="modal-content">
@@ -292,7 +309,7 @@
       </div>
       <div class="bottom-disclaimer">
         <span class="footer-brand">MMA CIPHER PREDICTIONS</span>
-        <span>Probabilities are algorithmic estimates, not financial guarantees. Strictly zero information leakage.</span>
+        <span>Probabilities are model estimates and have not been separately calibrated. Historical data has completeness and timestamp limitations.</span>
       </div>
     </footer>
   </main>

@@ -3,11 +3,12 @@ import logging
 import os
 from pathlib import Path
 
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, render_template, request, abort, Response
 from waitress import serve
 
 from predictor.service import Service
 from predictor.store import Store
+from predictor.catalog import Catalog, ORIGIN
 
 ROOT = Path(__file__).resolve().parent
 
@@ -25,9 +26,40 @@ def create_app(data_dir=None, bootstrap=True, auto_updates=None):
     if auto_updates if auto_updates is not None else bootstrap:
         service.start_background_updates()
 
+    page_cache = {}
+    def catalog():
+        revision = service.update_revision()
+        if page_cache.get('revision') != revision:
+            page_cache.update(revision=revision, catalog=Catalog(service))
+        return page_cache['catalog']
+
     @app.get('/')
     def index():
-        return render_template('index.html')
+        return render_template('index.html', **catalog().common())
+
+    @app.get('/fighters/')
+    @app.get('/fighters/<slug>/')
+    @app.get('/events/')
+    @app.get('/events/<slug>/')
+    @app.get('/fights/')
+    @app.get('/fights/<slug>/')
+    @app.get('/model/')
+    @app.get('/status/')
+    def public_page(slug=None):
+        context = catalog().page(request.path)
+        if context is None:
+            abort(404)
+        return render_template('detail.html', **context)
+
+    @app.get('/robots.txt')
+    def robots():
+        return Response('User-agent: *\nAllow: /\nDisallow: /api/\nSitemap: ' + ORIGIN + '/sitemap.xml\n', mimetype='text/plain')
+
+    @app.get('/sitemap.xml')
+    def sitemap():
+        from xml.sax.saxutils import escape
+        urls = ''.join('<url><loc>' + escape(ORIGIN + path) + '</loc></url>' for path in ['/'] + catalog().paths())
+        return Response('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + urls + '</urlset>', mimetype='application/xml')
 
     @app.get('/api/dashboard')
     def dashboard():
@@ -36,6 +68,14 @@ def create_app(data_dir=None, bootstrap=True, auto_updates=None):
     @app.get('/api/update')
     def update():
         return jsonify(revision=service.update_revision())
+
+    @app.get('/api/health')
+    def api_health():
+        d = service.dashboard()
+        return jsonify(revision=d['revision'], last_sync=d['status']['last_sync'],
+                       last_error=d['status']['last_error'], automatic=service.auto_updates,
+                       upcoming_bouts=len(d['upcoming']), verified_bouts=d['total_fights'],
+                       model_version=d['model']['version'] if d['model'] else None)
 
     @app.post('/api/matchup')
     def matchup():

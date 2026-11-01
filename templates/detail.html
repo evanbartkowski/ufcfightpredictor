@@ -1,0 +1,64 @@
+{% from '_public.html' import forecast, evidence, model_details %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title }} | MMA Cipher</title>
+  <meta name="description" content="{{ description }}">
+  <link rel="canonical" href="{{ origin }}{{ path }}">
+  <meta property="og:title" content="{{ title }} | MMA Cipher"><meta property="og:description" content="{{ description }}"><meta property="og:url" content="{{ origin }}{{ path }}">
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='cipher-mark.svg') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css', v='19') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='content.css', v='1') }}">
+  {% if structured %}<script type="application/ld+json">{{ structured|tojson }}</script>{% endif %}
+</head>
+<body>
+<header class="topbar"><div class="topbar-inner"><a class="brand" href="/" aria-label="MMA Cipher home"><img src="{{ url_for('static', filename='cipher-mark.svg') }}" class="brand-logo" alt=""><span class="brand-wordmark">MMA CIPHER<span>FIGHT INTELLIGENCE</span></span></a><a class="public-link" href="/">Live dashboard →</a></div></header>
+<main class="directory-page">
+  <nav class="public-nav" aria-label="Site pages"><a href="/">Dashboard</a><a href="/events/">Events</a><a href="/fighters/">Fighters</a><a href="/fights/">Forecasts</a><a href="/model/">Model methods</a><a href="/status/">Data status</a></nav>
+  <p class="eyebrow">MMA CIPHER · VERIFIED RECORDS &amp; PUBLISHED ESTIMATES</p>
+  <h1>{{ title }}</h1><p class="lead">{{ description }}</p>
+  {% if kind == 'fighter' %}
+    <section class="public-section">
+      <h2>Career snapshot and recorded UFC performance</h2>
+      <dl class="public-facts"><div><dt>Career record{% if profile.source %} · {{ profile.source }}{% endif %}</dt><dd>{{ profile.record or 'Unavailable' }}</dd></div><div><dt>UFC data record</dt><dd>{{ wins }}–{{ losses }}{% if other %} · {{ other }} draw / NC{% endif %}</dd></div><div><dt>Latest replay Elo</dt><dd>{{ '%.1f'|format(current_elo) if current_elo is not none else 'No decided bouts recorded' }}</dd></div><div><dt>Recent decided bouts</dt><dd>{{ recent_wins }} wins in {{ recent|length }} bouts</dd></div></dl>
+      <p class="muted">UFC counts describe this dataset, with coverage beginning {{ coverage_start or 'unavailable' }}. Career records are separate profile snapshots; last profile fetch: {{ profile.fetched_at or 'no live timestamp (bundled or unavailable)' }}. Draws and no contests do not change Elo.</p>
+    </section>
+    <section class="public-section"><h2>Upcoming fights</h2>{% if upcoming %}<div class="fight-grid">{% for f in upcoming %}{{ forecast(f) }}{% endfor %}</div>{% else %}<p>No announced upcoming UFC matchup appears in the latest source pull.</p>{% endif %}</section>
+    <section class="public-section"><h2>Elo progression</h2>
+      {% if elo_chart %}<p>Latest {{ [elo_points|length, 40]|min }} decided UFC bouts. Ratings follow the same replay and finish-dependent update rule used by the model.</p>
+      <svg class="elo-chart" viewBox="0 0 760 215" role="img" aria-label="{{ profile.name }} Elo progression from {{ elo_chart.start }} through {{ elo_chart.end }}"><title>{{ profile.name }} Elo progression; exact values are in the bout table below.</title><path d="M52 25V175H710" fill="none" stroke="#5b6a80"/><text x="8" y="36" fill="#c0cddd">{{ elo_chart.high }}</text><text x="8" y="173" fill="#c0cddd">{{ elo_chart.low }}</text><polyline points="{{ elo_chart.polyline }}" fill="none" stroke="#6ce9f3" stroke-width="3" stroke-linejoin="round"/><text x="52" y="205" fill="#c0cddd">{{ elo_chart.start }}</text><text x="710" y="205" text-anchor="end" fill="#c0cddd">{{ elo_chart.end }}</text></svg>
+      {% else %}<p>No decided UFC history is recorded for an Elo progression.</p>{% endif %}
+    </section>
+    <section class="public-section"><h2>Striking and grappling profile{% if opponent %} vs. next opponent{% endif %}</h2>
+      <div class="table-scroll"><table><thead><tr><th>Statistic</th><th>{{ profile.name }}</th>{% if opponent %}<th><a href="{{ fighter_path(opponent.name) }}">{{ opponent.name }}</a></th>{% endif %}</tr></thead><tbody>
+      {% for key, label in [('SLpM','Significant strikes landed / minute'),('SApM','Significant strikes absorbed / minute'),('sig_str_acc','Striking accuracy'),('str_def','Striking defense'),('td_avg','Takedowns / 15 minutes'),('td_acc','Takedown accuracy'),('td_def','Takedown defense'),('sub_avg','Submission attempts / 15 minutes'),('height','Height'),('reach','Reach'),('stance','Stance')] %}<tr><th scope="row">{{ label }}</th><td>{{ profile.get(key) or 'Unavailable' }}</td>{% if opponent %}<td>{{ opponent.get(key) or 'Unavailable' }}</td>{% endif %}</tr>{% endfor %}
+      </tbody></table></div><p class="muted">Profile averages are source snapshots, distinct from historical model inputs.{% if opponent %} Opponent profile fetched {{ opponent.fetched_at or 'at an unreported date' }}.{% endif %}</p>
+    </section>
+    <section class="public-section"><h2>UFC opponent history</h2><div class="table-scroll"><table><thead><tr><th>Date</th><th>Opponent</th><th>Result</th><th>Method</th><th>Elo after bout</th><th>Event / forecast</th></tr></thead><tbody>{% for row in history %}<tr><td><time datetime="{{ row.date }}">{{ row.date }}</time></td><td><a href="{{ row.opponent_path }}">{{ row.opponent }}</a></td><td>{{ row.result }}</td><td>{{ row.method or 'Unavailable' }}</td><td>{{ '%.1f'|format(row.elo) if row.elo is not none else 'Unchanged / unavailable' }}</td><td><a href="{{ row.detail_path }}">{{ row.event or 'Recorded UFC event' }}</a></td></tr>{% else %}<tr><td colspan="6">No verified UFC bouts appear in the current dataset.</td></tr>{% endfor %}</tbody></table></div></section>
+  {% elif kind == 'fight' %}
+    <section class="public-section"><p><a href="{{ fight.event_path }}">{{ fight.event }} · {{ fight.date }}</a></p><p><a href="{{ fight.red_path }}">{{ fight.red }} profile</a> · <a href="{{ fight.blue_path }}">{{ fight.blue }} profile</a></p>
+    {% if fight.removed %}<div class="evidence-note">This issued matchup is absent from the current announced card. The forecast is retained as an archive.</div>{% endif %}
+    <h2>Issued prediction</h2><p class="published-pick">{{ fight.pick }} · {{ pct(fight.confidence) }}</p><p>Model {{ fight.model_version }} · issued {{ fight.issued_at or 'at an unreported time' }}.</p>
+    {% if fight.winner in ('red','blue') %}<p>Verified winner: <strong>{{ fight[fight.winner] }}</strong> · {{ fight.method or 'method unavailable' }}. The settled forecast uses the original issued pick.</p>{% elif fight.winner %}<p>Draw / no contest. This forecast is not scored as a win or loss.</p>{% endif %}
+    <h2>Evidence and uncertainty</h2>{{ evidence(fight) }}</section>
+  {% elif kind == 'event' %}
+    <section class="public-section"><h2>Fight card and available results</h2><div class="table-scroll"><table><thead><tr><th>Matchup</th><th>Division</th><th>Forecast / result</th></tr></thead><tbody>{% for f in event.fights %}<tr><td><a href="{{ f.red_path }}">{{ f.red }}</a> vs. <a href="{{ f.blue_path }}">{{ f.blue }}</a></td><td>{{ f.weight_class or 'Unreported' }}</td><td>{% if f.path in forecast_paths %}<a href="{{ f.path }}">{{ f.pick }} · {{ pct(f.confidence) }}</a>{% elif f.winner in ('red','blue') %}Winner: {{ f[f.winner] }} · {{ f.method }}{% elif f.winner %}Draw / NC{% else %}Prediction pending{% endif %}</td></tr>{% endfor %}</tbody></table></div></section>
+  {% elif kind == 'fighters' %}
+    <section class="public-section"><h2>{{ fighters|length }} fighter profiles</h2><ul class="directory-links">{% for p in fighters %}<li><a href="{{ fighter_path(p.name) }}">{{ p.name }}</a></li>{% endfor %}</ul></section>
+  {% elif kind == 'events' %}
+    <section class="public-section"><h2>Event archive and upcoming cards</h2><ul class="directory-links event-directory">{% for e in events %}<li><time datetime="{{ e.date }}">{{ e.date }}</time> · <a href="{{ e.path }}">{{ e.name }}</a> · {{ e.fights|length }} bouts</li>{% endfor %}</ul></section>
+  {% elif kind == 'fights' %}
+    <section class="public-section"><h2>{{ forecasts|length }} published matchups</h2><ul class="directory-links event-directory">{% for f in forecasts %}<li>{{ f.date }} · <a href="{{ f.path }}">{{ f.red }} vs. {{ f.blue }}</a></li>{% endfor %}</ul></section>
+  {% elif kind == 'model' %}
+    <section class="public-section">{{ model_details(model) }}</section>
+  {% elif kind == 'status' %}
+    <section class="public-section"><h2>Production data state</h2><dl class="public-facts"><div><dt>Last successful fight-data sync</dt><dd>{{ dashboard.status.last_sync or 'No successful sync recorded' }}</dd></div><div><dt>Odds checked</dt><dd>{{ dashboard.odds_status.checked_at or 'No successful check recorded' }}</dd></div><div><dt>Upcoming bouts</dt><dd>{{ dashboard.upcoming|length }}</dd></div><div><dt>Verified bout records</dt><dd>{{ dashboard.total_fights }}</dd></div></dl>
+      {% if dashboard.status.last_error %}<div class="evidence-note">Fight-data refresh error: {{ dashboard.status.last_error.message }} · {{ dashboard.status.last_error.at }}</div>{% endif %}
+      {% if dashboard.odds_status.error %}<div class="evidence-note">Odds error: {{ dashboard.odds_status.error }}</div>{% endif %}
+      {% if dashboard.publication %}<p>Published {{ dashboard.published_at }}. Hosting: {{ dashboard.publication.hosting }}.</p><p>Code revision: <a href="https://github.com/evanbartkowski/ufcfightpredictor/commit/{{ dashboard.publication.code_revision }}">{{ dashboard.publication.code_revision }}</a>.</p>{% if dashboard.publication.job_url %}<p><a href="{{ dashboard.publication.job_url }}">Publication job and logs</a></p>{% endif %}<p>Public saved-state SHA-256: <code class="long-id">{{ dashboard.publication.state_sha256 }}</code></p>{% endif %}
+      <p>The scheduled updater restores the last published state, preserves original issued forecasts, refreshes due sources, and publishes a complete Hosting version. Browser polls only check for a changed revision.</p><p><a href="/api/health">Machine-readable production health</a> · <a href="/api/update">Current publication revision</a></p>
+    </section>
+  {% endif %}
+  <footer class="public-footer"><p>Fight data last successfully synchronized {{ last_sync or 'at an unreported time' }}. <a href="/status/">Source freshness and build status</a>.</p><p>UFCStats supplies verified records and profile snapshots. ESPN supplies announced schedule and available odds. Probabilities are estimates and have not been separately calibrated.</p></footer>
+</main></body></html>

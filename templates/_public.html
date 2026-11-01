@@ -1,0 +1,47 @@
+{% macro forecast(f) -%}
+<article class="fight-card published-card" data-fight-id="{{ f.id }}">
+  <div class="fight-top"><span>{{ f.weight_class or 'UFC bout' }}</span><time datetime="{{ f.date }}">{{ f.date }}</time></div>
+  <h3><a href="{{ f.red_path }}">{{ f.red }}</a> <span class="muted">vs.</span> <a href="{{ f.blue_path }}">{{ f.blue }}</a></h3>
+  {% if f.pick %}<p class="published-pick">Model pick: <strong>{{ f.pick }}</strong> · {{ '%.1f'|format(f.confidence * 100) }}%</p>
+  <p class="muted">Estimate · not separately calibrated{% if f.issued_at %} · Issued {{ f.issued_at[:10] }}{% endif %}</p>
+  {% else %}<p>Forecast pending. The announced matchup is shown.</p>{% endif %}
+  <a class="public-link" href="{{ f.path }}">Forecast evidence and matchup details →</a>
+</article>
+{%- endmacro %}
+
+{% macro evidence(f) -%}
+{% set exp = f.explanation or {} %}
+{% if exp.method == 'one_input_at_a_time_sensitivity' %}
+  <p class="lead">{{ exp.summary }}</p>
+  <h3>Three strongest supporting input sensitivities</h3>
+  {% if exp.advantages %}<ol class="evidence-list">{% for factor in exp.advantages[:3] %}
+    <li><strong>{{ factor.title }}</strong><p>{{ factor.detail }}</p></li>
+  {% endfor %}</ol>{% else %}<p>No material supporting input differences were identified.</p>{% endif %}
+  <div class="evidence-note"><strong>Major uncertainty</strong><p>{{ exp.major_uncertainty }}</p></div>
+  <p>History supporting this forecast: {{ exp.support.red_bouts }} decided UFC bouts for {{ f.red }}; {{ exp.support.blue_bouts }} for {{ f.blue }}. Training data: {{ exp.support.training_bouts or 'unreported' }} decided bouts through {{ exp.support.through or 'unreported' }}.</p>
+  <p class="muted">{{ exp.basis_note }}</p>
+{% else %}
+  <p>This original forecast predates full-ensemble sensitivity reporting. Its probability and issued pick are retained; a new explanation is not substituted after the event.</p>
+  <p>Recorded history at issue: {{ (f.red_history or {}).get('wins', 0) + (f.red_history or {}).get('losses', 0) }} decided bouts for {{ f.red }}; {{ (f.blue_history or {}).get('wins', 0) + (f.blue_history or {}).get('losses', 0) }} for {{ f.blue }}.</p>
+{% endif %}
+<p class="muted">Probabilities have not been separately calibrated. Model sensitivities are not causal effects or guarantees of an outcome.</p>
+{%- endmacro %}
+
+{% macro model_details(m) -%}
+{% if m %}
+<p class="lead">{{ m.description }}</p>
+<div class="evidence-note"><strong>Probability calibration: no separate transform</strong><p>{{ m.calibration_note }}</p></div>
+<dl class="public-facts"><div><dt>Model version</dt><dd>{{ m.version }}</dd></div><div><dt>Actual inputs</dt><dd>{{ m.feature_count }}</dd></div><div><dt>Results through</dt><dd>{{ m.through }}</dd></div><div><dt>Training rows</dt><dd>{{ m.metrics.training_fights }}</dd></div></dl>
+<h3>Measured chronological holdout</h3>
+<p>{{ m.metrics.test_fights }} decided bouts, {{ m.metrics.test_start }} through {{ m.metrics.test_end }}. These are retrospective held-out measurements, separate from the live issued-pick record.</p>
+<div class="table-scroll"><table><thead><tr><th scope="col">Accuracy</th><th scope="col">Brier score</th><th scope="col">Log loss</th><th scope="col">Elo baseline accuracy</th></tr></thead><tbody><tr><td>{{ '%.1f'|format(m.metrics.accuracy * 100) }}%</td><td>{{ '%.4f'|format(m.metrics.brier) }}</td><td>{{ '%.4f'|format(m.metrics.log_loss) }}</td><td>{{ '%.1f'|format(m.metrics.elo_accuracy * 100) }}%</td></tr></tbody></table></div>
+<h3>Serving estimators and blend weights</h3>
+<ul>{% for name in m.estimator_names %}<li>{{ name }}{% if name in (m.weights or {}) %} · {{ '%.2f'|format(m.weights[name] * 100) }}%{% endif %}</li>{% endfor %}</ul>
+<p>{{ m.weight_selection }}</p>
+<h3>Observed probability reliability</h3>
+<p>These bins measure forecast reliability on the holdout. They do not calibrate the serving probabilities; small bins have limited support.</p>
+<div class="table-scroll"><table><thead><tr><th>Probability bin</th><th>Mean confidence</th><th>Observed pick accuracy</th><th>Bouts</th></tr></thead><tbody>{% for bin in m.metrics.calibration or [] %}{% if bin.count %}<tr><td>{{ bin.range }}</td><td>{{ '%.1f'|format(bin.expected * 100) }}%</td><td>{{ '%.1f'|format(bin.observed * 100) }}%</td><td>{{ bin.count }}</td></tr>{% endif %}{% endfor %}</tbody></table></div>
+<h3>{{ m.feature_count }} model inputs</h3><ol class="feature-list">{% for name in m.feature_names %}<li>{{ name }}</li>{% endfor %}</ol>
+<h3>Data and evaluation limits</h3><p>{{ m.limitations }}</p><p>Replay builds fighter histories before each event day, and a chronological holdout measures later outcomes. Missing measurements are imputed. Agreement between estimators is not a calibrated uncertainty interval.</p>
+{% else %}<p>The serving model is unavailable. No model architecture or measured accuracy is asserted.</p>{% endif %}
+{%- endmacro %}

@@ -10,3 +10,10 @@ test-results/
 *.code-workspace
 static/api/sync-state.json.gz
 gha-creds-*.json
+/static/fighters/
+/static/events/
+/static/fights/
+/static/model/
+/static/status/
+/static/sitemap.xml
+/static/robots.txt

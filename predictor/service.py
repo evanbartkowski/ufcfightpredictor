@@ -9,7 +9,9 @@ from datetime import datetime, timezone, timedelta
 
 import joblib
 
-from .model import SCHEMA, predict, train
+from .model import IMPLEMENTATION_HASH, SCHEMA, predict, train
+from .model_metadata import describe_model
+from .links import event_path, fight_path, fighter_path
 from .odds import ESPNOdds, display_odds, forecast_open, match_market
 from .source import UFCStats
 from .store import identity, now
@@ -46,7 +48,7 @@ class Service:
         if self.model_path.exists():
             try:
                 self.bundle = joblib.load(self.model_path)
-                if self.bundle.get('schema') != SCHEMA:
+                if self.bundle.get('schema') != SCHEMA or self.bundle.get('implementation_hash') != IMPLEMENTATION_HASH:
                     self.bundle = None
             except Exception:
                 log.exception('Cached model could not be read; rebuilding')
@@ -295,6 +297,8 @@ class Service:
                 continue
             p = latest.get(f['id'], saved.get(f['id']))
             market = match_market(f, markets)
+            if market and market.get('state') == 'post':
+                continue
             if p:
                 # Metadata comes from the newest card, prediction inputs from the
                 # last eligible pre-event snapshot. No rewriting after the start.
@@ -311,6 +315,9 @@ class Service:
                 results.append(dict(p, actual_winner=winner, correct=p['pick']==winner if winner else None,
                                     method=f.get('method')))
         scored = [r for r in results if r['correct'] is not None]
+        for fight in upcoming + results:
+            fight.update(path=fight_path(fight), event_path=event_path(fight),
+                         red_path=fighter_path(fight['red']), blue_path=fighter_path(fight['blue']))
         bundle = self.bundle
         model_info = None
         if bundle:
@@ -323,7 +330,7 @@ class Service:
                 'through': bundle.get('through'),
                 'metrics': metrics,
                 'weights': bundle.get('weights'),
-                'candidate_models': list(bundle.get('models', {}).keys()) if bundle.get('models') else ['Extra Trees', 'Random Forest', 'XGBoost', 'LightGBM', 'HistGradientBoosting', 'Logistic Regression'],
+                'candidate_models': list(bundle.get('models', {}).keys()) or [bundle.get('name', 'Serving estimator')],
                 'candidate_metrics': metrics.get('candidate_metrics'),
                 'calibration': metrics.get('calibration'),
                 'confidence_distribution': metrics.get('confidence_distribution'),
@@ -331,6 +338,8 @@ class Service:
                 'weight_class_stats': metrics.get('weight_class_stats'),
                 'feature_importances': metrics.get('feature_importances')
             }
+            model_info.update(describe_model(bundle))
+            model_info['implementation_hash'] = bundle.get('implementation_hash')
 
         # Index recent verified bouts per fighter for the searchable database & profile views
         fights_by_fighter = defaultdict(list)
@@ -349,12 +358,17 @@ class Service:
         fighter_rows = []
         for f in sorted(self.store.rows('fighters'), key=lambda item: item['name']):
             f_copy = dict(f)
+            f_copy['path'] = fighter_path(f['name'])
             bouts = fights_by_fighter.get(identity(f['name']), [])
             f_copy['recent_bouts'] = bouts[:6]
             f_copy['total_recorded_bouts'] = len(bouts)
             fighter_rows.append(f_copy)
 
         dynamic_interval = self.get_dynamic_sync_interval()
+        profile_names = {identity(f['name']): f['name'] for f in fighter_rows}
+        for fight in upcoming + results:
+            for corner in ('red', 'blue'):
+                fight[corner + '_path'] = fighter_path(profile_names.get(identity(fight[corner]), fight[corner]))
         return dict(revision=self.update_revision(), upcoming=sorted(upcoming, key=lambda f:f['date']), results=sorted(results, key=lambda f:f['date'], reverse=True),
                     fighters=fighter_rows,
                     images=self.fighter_images,
