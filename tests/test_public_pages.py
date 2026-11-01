@@ -9,12 +9,12 @@ import pytest
 from app import create_app
 from predictor.catalog import Catalog
 from predictor.links import event_path, fight_path, fighter_path
-from predictor.model import FEATURES, SCHEMA, fresh, predict
+from predictor.model import FEATURES, IMPLEMENTATION_HASH, SCHEMA, fresh, predict
 from predictor.model_metadata import describe_model
 from predictor.publication import update_publication
 from predictor.rendering import export_pages
 from predictor.store import bout_id, identity
-from scripts.verify_publication import verify
+from scripts.verify_publication import verify, verify_live
 
 
 class Estimator:
@@ -35,7 +35,8 @@ def serving_bundle():
                 weights={'Tree estimator': .9, 'MMA Cipher Logistic Regression': .1},
                 states={identity('Alice'): dict(fresh(), elo=1700, wins=10, reach=190),
                         identity('Beth'): dict(fresh(), elo=1500, wins=5, reach=175)},
-                schema=SCHEMA, version='test-version', name='Test ensemble', through='2020-02-01',
+                schema=SCHEMA, implementation_hash=IMPLEMENTATION_HASH,
+                version='test-version', name='Test ensemble', through='2020-02-01',
                 metrics=dict(training_fights=15, test_fights=3, test_start='2020-01-01', test_end='2020-02-01',
                              accuracy=.6, brier=.24, log_loss=.66, elo_accuracy=.5, calibration=[]))
 
@@ -165,7 +166,25 @@ def test_exported_pages_and_state_verify_together(public_app, tmp_path, monkeypa
     assert verified['feature_count'] == len(FEATURES)
     state = json.loads(gzip.decompress(read('/api/sync-state.json.gz')))
     assert len(state['tables']['predictions']) == 1
+    # Hosting can briefly return an older health object immediately after release.
+    # Retry the complete audit, then require agreement rather than accepting it.
+    probes = []
+    def propagating_read(path):
+        data = read(path)
+        if path == '/api/health':
+            health = json.loads(data)
+            probes.append(path)
+            if len(probes) == 1:
+                health['publication']['code_revision'] = 'previous-release'
+                return json.dumps(health).encode()
+        return data
+    pauses = []
+    assert verify_live(propagating_read, expected_commit=verified['code_revision'],
+                       attempts=2, pause=pauses.append) == verified
+    assert len(probes) == 2 and pauses == [10]
     # Tampered or mixed publications must fail verification before deployment.
     (root / 'api/update.json').write_text('{"revision":"wrong-version"}')
     with pytest.raises(AssertionError, match='revisions differ'):
         verify(read)
+    with pytest.raises(AssertionError, match='revisions differ'):
+        verify_live(read, attempts=2, pause=pauses.append)

@@ -6,6 +6,7 @@ import json
 import os
 from pathlib import Path
 import sys
+import time
 from urllib.parse import urlparse
 import xml.etree.ElementTree as ET
 
@@ -50,7 +51,10 @@ def verify(read, expected_commit=None):
             assert abs(min(.995, max(.005, weighted)) - fight['red_probability']) < 1e-7, 'Published probability differs from the declared ensemble weights'
     if expected_commit:
         assert health['publication']['code_revision'] == expected_commit, 'Published code commit differs from the release'
-        assert model['implementation_hash'] == hashlib.sha256((ROOT / 'predictor/model.py').read_bytes()).hexdigest(), 'Published model implementation differs from the release source'
+        source = (ROOT / 'predictor/model.py').read_bytes()
+        # Git may check out CRLF on Windows and LF on the Linux publisher.
+        source_hashes = {hashlib.sha256(value).hexdigest() for value in (source, source.replace(b'\r\n', b'\n'))}
+        assert model['implementation_hash'] in source_hashes, 'Published model implementation differs from the release source'
     if os.environ.get('GITHUB_RUN_ID'):
         assert health['publication']['job_url'].endswith('/' + os.environ['GITHUB_RUN_ID']), 'Publication did not come from this background job'
     html = BeautifulSoup(read('/'), 'html.parser')
@@ -79,13 +83,28 @@ def verify(read, expected_commit=None):
                 checks='API revisions, persisted state, model metadata, rendered homepage, canonical links, detail pages, sitemap, robots')
 
 
+def verify_live(read, expected_commit=None, attempts=7, interval=10, pause=time.sleep):
+    """Allow CDN release propagation, while requiring a fully consistent release."""
+    for attempt in range(attempts):
+        try:
+            return verify(read, expected_commit=expected_commit)
+        except (AssertionError, requests.RequestException):
+            if attempt + 1 == attempts:
+                raise
+            print(f'Publication has not converged; retrying in {interval}s ({attempt + 1}/{attempts})',
+                  file=sys.stderr, flush=True)
+            pause(interval)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--url', help='Verify a published origin instead of local export files')
     args = parser.parse_args()
     def read(path):
         if args.url:
-            response = requests.get(args.url.rstrip('/') + path, params={'verify': os.environ.get('GITHUB_RUN_ID', 'audit')}, timeout=(15, 60))
+            response = requests.get(args.url.rstrip('/') + path,
+                                    params={'verify': os.environ.get('GITHUB_RUN_ID', 'audit'), 'probe': time.time_ns()},
+                                    timeout=(15, 60))
             response.raise_for_status()
             return response.content
         target = ROOT / 'static' / path.lstrip('/')
@@ -94,7 +113,8 @@ def main():
         if path.endswith('/'):
             target /= 'index.html'
         return target.read_bytes()
-    result = verify(read, expected_commit=os.environ.get('GITHUB_SHA'))
+    check = verify_live if args.url else verify
+    result = check(read, expected_commit=os.environ.get('GITHUB_SHA'))
     print(json.dumps(result, indent=2))
     return 0
 
