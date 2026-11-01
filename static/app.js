@@ -585,9 +585,14 @@ function getFighterData(name) {
   if (!name || !data?.fighters) return null;
   const key = v => v.normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
   const k = key(name);
-  const indexed = data.fighters.find(f => key(f.name) === k);
-  for (const fight of data.upcoming || []) for (const corner of ['red','blue']) if (key(fight[corner]) === k && fight.fighter_stats?.[corner]) return {...indexed,...fight.fighter_stats[corner]};
-  return data.fighters.find(f => key(f.name) === k) || null;
+  let best = data.fighters.find(f => key(f.name) === k) || null;
+  for (const fight of data.upcoming || []) for (const corner of ['red','blue']) {
+    const observed = fight.fighter_stats?.[corner];
+    if (key(fight[corner]) !== k || !observed) continue;
+    const newer = !best || (Date.parse(observed.fetched_at)||0) > (Date.parse(best.fetched_at)||0);
+    best = newer ? {...best,...observed} : {...observed,...best};
+  }
+  return best;
 }
 
 function getFighterCoreMetrics(f) {

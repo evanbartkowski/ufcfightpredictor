@@ -40,6 +40,14 @@ with sync_playwright() as p:
     page.locator('#matchup-output .pick').wait_for()
     assert page.locator('#matchup-output .profile').count()==2
     assert page.evaluate("getFighterData('Conor McGregor').SLpM !== undefined")
+    assert page.evaluate("""() => {
+      const indexed={name:'Fresh Profile',fetched_at:'2026-11-01T12:00:00Z',SLpM:'6.0'};
+      data.fighters.push(indexed);
+      data.upcoming.push({red:'Fresh Profile',blue:'Other',fighter_stats:{red:{name:'Fresh Profile',fetched_at:'2026-10-01T12:00:00Z',SLpM:'3.0'}}});
+      const value=getFighterData('Fresh Profile').SLpM;
+      data.fighters.pop();data.upcoming.pop();
+      return value==='6.0';
+    }""")
     page.set_viewport_size({'width':390,'height':844})
     assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
     assert page.locator('img:visible').evaluate_all('(imgs) => imgs.every(img => img.complete && img.naturalWidth > 0)')
