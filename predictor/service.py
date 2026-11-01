@@ -1,4 +1,6 @@
 import logging
+import hashlib
+import json
 import os
 from pathlib import Path
 import threading
@@ -353,7 +355,7 @@ class Service:
             fighter_rows.append(f_copy)
 
         dynamic_interval = self.get_dynamic_sync_interval()
-        return dict(upcoming=sorted(upcoming, key=lambda f:f['date']), results=sorted(results, key=lambda f:f['date'], reverse=True),
+        return dict(revision=self.update_revision(), upcoming=sorted(upcoming, key=lambda f:f['date']), results=sorted(results, key=lambda f:f['date'], reverse=True),
                     fighters=fighter_rows,
                     images=self.fighter_images,
                     model=model_info,
@@ -365,6 +367,13 @@ class Service:
                     profile_errors=self.store.meta('profile_errors', []),
                     live_accuracy=sum(r['correct'] for r in scored)/len(scored) if scored else None,
                     scored_predictions=len(scored), total_fights=len(fights))
+
+    def update_revision(self):
+        state = dict(status=self.status, odds_status=self.odds_status,
+                     model=self.bundle.get('version') if self.bundle else None,
+                     meta={key: self.store.meta(key) for key in
+                           ('last_sync', 'sync_error', 'odds_checked_at', 'odds_error', 'profile_errors')})
+        return hashlib.sha256(json.dumps(state, sort_keys=True).encode()).hexdigest()[:24]
 
     def matchup(self, red, blue):
         fighters = {identity(f['name']): f for f in self.store.rows('fighters')}

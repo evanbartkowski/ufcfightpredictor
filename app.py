@@ -33,6 +33,10 @@ def create_app(data_dir=None, bootstrap=True, auto_updates=None):
     def dashboard():
         return jsonify(service.dashboard())
 
+    @app.get('/api/update')
+    def update():
+        return jsonify(revision=service.update_revision())
+
     @app.post('/api/matchup')
     def matchup():
         data = request.get_json(silent=True) or {}

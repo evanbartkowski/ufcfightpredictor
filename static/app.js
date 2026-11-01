@@ -1980,6 +1980,19 @@ async function load(force = false) {
   lastNetworkAttempt = Date.now();
   try {
     const bust = Date.now();
+    if (hasInitialNetworkSynced && data && !force) {
+      const update = await fetch(`/api/update?_t=${bust}`, {cache: 'no-store', signal: AbortSignal.timeout(10000)});
+      if (update.ok) {
+        const latest = await update.json();
+        if (latest.revision && latest.revision === data.revision) {
+          lastPollFailed = false;
+          render();
+          return;
+        }
+      } else if (update.status !== 404) {
+        throw Error('Update check is unavailable');
+      }
+    }
     const r = await fetch(`/api/dashboard?_t=${bust}`, { cache: 'no-store', signal: AbortSignal.timeout(20000) });
     if (!r.ok) throw Error('Dashboard is unavailable');
     const freshData = await r.json();

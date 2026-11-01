@@ -140,7 +140,7 @@ Evaluation uses **strict walk-forward chronological backtesting** across three e
 - **Ensemble Consensus Pill:** Displays individual model probabilities and weights in an expandable drawer.
 - **Method of Victory Breakdown:** Visual progress indicators for Decision, KO/TKO, and Submission probabilities.
 - **Pre-Fight Tale of the Tape:** Clear comparison of age, height, reach, and stance.
-- **Background Updates:** The browser checks for updates every minute and retries connection failures after 30 seconds. Saved data paints immediately while a fresh response loads. Past events are removed from Upcoming even when offline.
+- **Background Updates:** The browser checks a tiny revision file every minute and downloads the full dashboard only when it changes. Connection failures retry after 30 seconds. Saved data paints immediately while a fresh response loads. Past events are removed from Upcoming even when offline.
 - **Undercard:** Prelims start collapsed and open only when clicked. Each event remembers its own expanded sections during page updates.
 - **Artwork:** Custom shaded SVG illustrations replace emoji icons throughout the fight cards, value indicators, filters, and comparison controls.
 - **Mobile Responsive:** Fluid layout on iOS, Android, tablets, and desktop.

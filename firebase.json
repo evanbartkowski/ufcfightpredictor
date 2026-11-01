@@ -8,6 +8,10 @@
     ],
     "rewrites": [
       {
+        "source": "/api/update",
+        "destination": "/api/update.json"
+      },
+      {
         "source": "/api/dashboard",
         "destination": "/api/dashboard.json"
       }

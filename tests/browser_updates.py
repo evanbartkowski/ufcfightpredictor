@@ -20,9 +20,16 @@ with sync_playwright() as p:
         if fail[0]:
             route.abort()
         else:
-            response = dict(payload, total_fights=payload['total_fights'] + len(calls))
+            response = dict(payload, total_fights=payload['total_fights'] + len(calls), revision=str(len(calls)))
             route.fulfill(json=response)
+    def update(route):
+        if fail[0]:
+            calls.append(1)
+            route.abort()
+        else:
+            route.fulfill(json={'revision': str(len(calls) + 1)})
     page.route('**/api/dashboard?*', dashboard)
+    page.route('**/api/update?*', update)
     page.clock.install()
     page.goto('http://127.0.0.1:8000', wait_until='networkidle')
     page.wait_for_function("() => document.getElementById('fight-count').textContent !== '—'")
@@ -62,6 +69,14 @@ with sync_playwright() as p:
     page.wait_for_function(f"() => document.getElementById('fight-count').textContent === '{payload['total_fights'] + failed_calls + 1:,}'")
     assert len(calls) == failed_calls + 1
     assert page.locator('.notice.warning').count() == 0
+
+    # An unchanged tiny revision check must not download the full dashboard.
+    before = len(calls)
+    page.unroute('**/api/update?*', update)
+    page.route('**/api/update?*', lambda route: route.fulfill(json={'revision': str(before)}))
+    page.clock.fast_forward(65000)
+    page.wait_for_function('() => !loading')
+    assert len(calls) == before
 
     assert page.locator('.art-icon').first.evaluate('(svg) => svg.getBBox().width > 0')
     assert not page.evaluate(r'/[\u{1F300}-\u{1FAFF}]/u.test(document.body.innerText)')

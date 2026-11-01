@@ -69,6 +69,7 @@ def test_failed_upstream_is_published_with_old_timestamp_and_retry_status(tmp_pa
     assert dashboard['status']['last_error']['message'] == 'upstream unavailable'
     assert dashboard['refresh']['delivery'] == 'scheduled'
     assert dashboard['refresh']['browser_seconds'] == 60
+    assert json.loads((output / 'update.json').read_text())['revision'] == dashboard['revision']
     restored = Store(tmp_path / 'restored')
     restore_state(restored, (output / 'sync-state.json.gz').read_bytes())
     assert restored.meta('last_sync') == old

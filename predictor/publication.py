@@ -84,9 +84,11 @@ def update_publication(service, directory, force=False):
             service.store.set_meta('sync_error', dict(message=str(exc), at=now()))
     dashboard = service.dashboard()
     dashboard['published_at'] = now()
+    dashboard['revision'] = dashboard['published_at']
     dashboard['refresh'].update(automatic=True, delivery='scheduled', retry_seconds=900)
     dashboard['status'].update(running=False, phase='Scheduled updates active')
     directory = Path(directory)
     atomic_write(directory / 'dashboard.json', json.dumps(dashboard, separators=(',', ':')).encode())
     atomic_write(directory / 'sync-state.json.gz', export_state(service.store))
+    atomic_write(directory / 'update.json', json.dumps(dict(revision=dashboard['revision'])).encode())
     return failures
