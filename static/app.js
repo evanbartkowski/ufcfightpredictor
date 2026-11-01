@@ -876,7 +876,7 @@ function card(f, withProfiles=false, isMainEvent=false, mainCardInfo=null) {
         ` : (isMainEvent ? `<span class="main-event-badge">${art('crown')} MAIN EVENT</span>` : '')}
         <span class="weight-class-tag">${esc(f.weight_class || 'CUSTOM MATCHUP')}</span>
       </div>
-      <span>${f.locked?'FORECAST LOCKED':'MMA CIPHER PROBABILITY'}</span>
+      ${f.locked?'<span class="forecast-lock-label">FORECAST LOCKED</span>':''}
     </div>
     <a class="public-link forecast-detail-link" href="${esc(f.path || '/fights/')}">Full forecast and evidence</a>
     ${edge?`<div class="model-edge"><strong>${art('star')} MODEL EDGE</strong><span>${esc(f.pick)} &middot; ${pct(edge.probability)} model chance &middot; ${line(edge.price)} at ${esc(edge.name)}</span><small>+${(edge.edge*100).toFixed(1)} points vs. ${pct(edge.implied)} break-even probability. Model estimate, not a guaranteed return.</small></div>`:''}

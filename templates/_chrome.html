@@ -1,6 +1,7 @@
 {% macro icon(name) -%}<svg class="art-icon" viewBox="0 0 48 48" aria-hidden="true"><use href="{{ url_for('static', filename='icon-art.svg') }}#{{ name }}"></use></svg>{%- endmacro %}
 
 {% macro site_header(active='dashboard', next_event=none) -%}
+{% include '_arena.html' %}
 <a class="skip-link" href="#main-content">Skip to content</a>
 <header class="topbar site-topbar"><div class="topbar-inner">
   <a class="brand" href="/" aria-label="MMA Cipher home"><img src="{{ url_for('static', filename='cipher-mark.svg') }}" class="brand-logo" alt=""><span class="brand-wordmark">MMA CIPHER<span>FIGHT INTELLIGENCE</span></span></a>

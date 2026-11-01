@@ -11,6 +11,7 @@
   <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='cipher-mark.svg') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css', v='22') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='content.css', v='3') }}">
+  {% include '_visual_head.html' %}
   <script src="{{ url_for('static', filename='content.js', v='2') }}" defer></script>
   {% if structured %}<script type="application/ld+json">{{ structured|tojson }}</script>{% endif %}
 </head>

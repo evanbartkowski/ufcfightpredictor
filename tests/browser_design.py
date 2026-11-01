@@ -13,7 +13,7 @@ def check_width(page, label):
       viewport:innerWidth, content:document.documentElement.scrollWidth,
       elements:[...document.querySelectorAll('body *')].filter(e => {
         const rect=e.getBoundingClientRect();
-        return rect.width>0 && rect.right>innerWidth+1 && !e.closest('.tabs,.event-shelf-track,.site-navigation,.table-scroll');
+        return rect.width>0 && rect.right>innerWidth+1 && !e.closest('.tabs,.event-shelf-track,.site-navigation,.table-scroll,.arena-backdrop,.hero-range-markers');
       }).slice(0,12).map(e=>({tag:e.tagName,class:String(e.className),right:e.getBoundingClientRect().right}))
     })''')
     assert diagnostics['content'] <= diagnostics['viewport'], (label,diagnostics)
@@ -25,6 +25,20 @@ with sync_playwright() as p:
     page.on('pageerror', lambda error: errors.append(str(error)))
     page.goto(BASE + '/', wait_until='networkidle')
     page.wait_for_selector('#cards .fighter-img')
+    page.evaluate('document.fonts.ready')
+    assert 'MMA CIPHER PROBABILITY' not in page.locator('#cards').inner_text()
+    assert page.evaluate('document.fonts.check(\'700 32px "Barlow Condensed"\') && document.fonts.check(\'400 14px "Manrope"\') && document.fonts.check(\'400 12px "IBM Plex Mono"\')')
+    assert 'Barlow Condensed' in page.locator('.hero h1').evaluate('(e)=>getComputedStyle(e).fontFamily')
+    assert 'Manrope' in page.locator('body').evaluate('(e)=>getComputedStyle(e).fontFamily')
+    assert page.locator('.arena-backdrop').evaluate('(e)=>getComputedStyle(e).pointerEvents') == 'none'
+    page.wait_for_function('() => Number(document.querySelector("[data-arena-canvas]").dataset.frames)>2')
+    assert page.locator('[data-arena-canvas]').evaluate('(e)=>e.getContext("2d").getImageData(0,0,e.width,e.height).data.some((v,i)=>i%4===3&&v>0)')
+    page.emulate_media(reduced_motion='reduce')
+    page.wait_for_function('() => document.querySelector("[data-arena-canvas]").dataset.motion==="static"')
+    still = page.locator('[data-arena-canvas]').get_attribute('data-frames')
+    page.wait_for_timeout(180)
+    assert page.locator('[data-arena-canvas]').get_attribute('data-frames') == still
+    page.emulate_media(reduced_motion='no-preference')
     assert page.locator('header .site-navigation a').count() == 2
     assert page.locator('.library-shortcut:visible').count() == 0
     assert page.locator('a[href="/status/"]').count() == 0
@@ -120,4 +134,4 @@ with sync_playwright() as p:
     assert not errors, errors
     browser.close()
 
-print('Design checks passed: database-only archive links, cross-directory search, Model Watch without card banners, roster/event/forecast controls, portraits, and desktop/mobile/tablet layouts.')
+print('Design checks passed: self-hosted typography, animated octagon and reduced motion, removed probability label, archive search/navigation, main-card record, portraits, and desktop/mobile/tablet layouts.')

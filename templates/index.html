@@ -16,24 +16,19 @@
   <title>MMA Cipher — AI Fight Intelligence & UFC Predictions</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css', v='22') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='content.css', v='3') }}">
+  {% include '_visual_head.html' %}
   <script src="{{ url_for('static', filename='content.js', v='2') }}" defer></script>
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js" defer></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js" defer></script>
   <script src="{{ url_for('static', filename='firebase.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='app.js', v='23') }}" defer></script>
+  <script src="{{ url_for('static', filename='app.js', v='24') }}" defer></script>
 </head>
 <body>
   {{ site_header('dashboard', upcoming_events[0] if upcoming_events else none) }}
   <main id="main-content">
     <section class="hero">
-      <div class="octagon-scene" aria-hidden="true">
-        <div class="octagon-plane plane-one"></div>
-        <div class="octagon-plane plane-two"></div>
-        <div class="octagon-plane plane-three"></div>
-        <div class="octagon-plane plane-four"></div>
-        <div class="octagon-wireframe"></div>
-      </div>
+      <div class="hero-range-markers" aria-hidden="true"><i></i><i></i><i></i></div>
       <div class="hero-copy">
         <div class="eyebrow">MMA CIPHER · ADVANCED MULTI-MODEL AI</div>
         <h1>MMA CIPHER<br><span>PREDICTIONS.</span></h1>

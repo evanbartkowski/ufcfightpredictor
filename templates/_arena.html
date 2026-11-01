@@ -1,0 +1,14 @@
+<div class="arena-backdrop" aria-hidden="true">
+  <div class="arena-coordinate-grid"></div>
+  <svg class="arena-blueprint" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" focusable="false">
+    <defs><pattern id="cage-weave" width="34" height="48" patternUnits="userSpaceOnUse"><path d="M17 0 34 24 17 48 0 24Z" fill="none" stroke="#4a7485" stroke-width=".6"/></pattern><linearGradient id="arena-edge"><stop stop-color="#30dce8" stop-opacity=".45"/><stop offset="1" stop-color="#17353c" stop-opacity="0"/></linearGradient><radialGradient id="weave-fade"><stop stop-color="white" stop-opacity=".4"/><stop offset="1" stop-color="white" stop-opacity="0"/></radialGradient><mask id="weave-mask"><ellipse cx="160" cy="625" rx="450" ry="500" fill="url(#weave-fade)"/></mask></defs>
+    <path d="M-120 60H270L540 330V670L270 940H-120" fill="url(#cage-weave)" mask="url(#weave-mask)"/>
+    <g fill="none" stroke="#305163" stroke-width="1" opacity=".27"><path d="m-130 455 250-105 260 105 105 250-105 250-260 105-250-105-105-250Z"/><path d="m-105 470 225-94 235 94 94 235-94 225-235 94-225-94-94-225Z"/><path d="M120 350v674M-224 705h673" stroke-dasharray="3 9"/><circle cx="120" cy="705" r="115" stroke-dasharray="2 12"/></g>
+    <g class="arena-path-static" fill="none" stroke="url(#arena-edge)" stroke-width="1"><path d="M0 180H250l90 90h300l80-80h210M1180 1000V820l110-110V370l160-160h150"/><path d="M0 188H244l90 90h312M1188 1000V825l110-110V374l157-157" opacity=".3"/></g>
+    <g class="arena-trace-flow" fill="none" stroke="#45bdcb" stroke-width="1.5" stroke-dasharray="8 240" opacity=".35"><path d="M0 180H250l90 90h300l80-80h210"/><path d="M1180 1000V820l110-110V370l160-160h150"/></g>
+    <g fill="none" stroke="#3d6073" opacity=".45"><path d="M42 105v-20h20m1496 20V85h-20M42 895v20h20m1496-20v20h-20"/><path d="M18 490h12m-6-6v12m1554 0h12m-6-6v12"/></g>
+  </svg>
+  <canvas class="arena-canvas" data-arena-canvas></canvas>
+  <div class="arena-floor-glow"></div>
+  <span class="arena-side-mark">MMA CIPHER / FIGHT INTELLIGENCE</span>
+</div>
