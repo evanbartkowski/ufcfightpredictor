@@ -61,7 +61,10 @@ def update_state(catalog, previous, at):
 
 
 def robots_text():
-    return 'User-agent: *\nAllow: /\nDisallow: /api/\nSitemap: '+ORIGIN+'/sitemap.xml\n'
+    # Crawlers need these JSON resources to render the homepage successfully.
+    # API responses carry X-Robots-Tag: noindex; bulk state remains blocked.
+    return ('User-agent: *\nAllow: /api/overview\nAllow: /api/update\nAllow: /api/dashboard\n'
+            'Allow: /api/fighter-images.json\nDisallow: /api/\nAllow: /\nSitemap: '+ORIGIN+'/sitemap.xml\n')
 
 
 def sitemap_bytes(catalog, state):

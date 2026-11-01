@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import pytest
 from predictor.catalog import Catalog
 from predictor.discovery import update_state
+from predictor.discovery import robots_text
 from predictor.links import fighter_path
 from scripts.submit_indexnow import changed_paths, submit
 from test_public_pages import public_app
@@ -46,6 +47,16 @@ def test_html_record_index_links_to_profiles_and_preserves_utility_noindex(publi
 
 def test_indexnow_submits_changes_and_deletions_only():
     assert changed_paths({'/':{'hash':'new'},'/same/':{'hash':'same'}},{'/':'old','/same/':'same','/removed/':'gone'})==['/','/removed/']
+
+
+def test_crawlers_can_render_public_pages_without_crawling_bulk_state():
+    from urllib.robotparser import RobotFileParser
+    parser=RobotFileParser();parser.parse(robots_text().splitlines())
+    for bot in ('Googlebot','bingbot'):
+        assert parser.can_fetch(bot,'https://mma-oracle.web.app/api/overview?_t=123')
+        assert parser.can_fetch(bot,'https://mma-oracle.web.app/arena.js')
+        assert parser.can_fetch(bot,'https://mma-oracle.web.app/fighters/alice/')
+        assert not parser.can_fetch(bot,'https://mma-oracle.web.app/api/sync-state.json.gz')
 
 
 def test_failed_indexnow_request_does_not_advance_submission_state(tmp_path):
