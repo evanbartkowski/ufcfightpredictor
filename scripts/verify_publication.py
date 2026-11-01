@@ -27,6 +27,10 @@ def verify(read, expected_commit=None):
     assert hashlib.sha256(state_bytes).hexdigest() == health['publication']['state_sha256'], 'Saved-state digest differs'
     assert state['meta']['last_sync'] == dashboard['status']['last_sync'] == health['last_sync'], 'Source timestamps differ'
     assert len(dashboard['upcoming']) == health['upcoming_bouts'], 'Upcoming counts differ'
+    assert dashboard.get('record_scope') == 'main_card' and all(r.get('card_section') == 'main' for r in dashboard['results']), 'Prediction record includes a non-main-card bout'
+    scored = [r for r in dashboard['results'] if r.get('correct') is not None]
+    assert len(scored) == dashboard['scored_predictions'], 'Main-card record denominator differs'
+    assert dashboard['live_accuracy'] == (sum(r['correct'] for r in scored)/len(scored) if scored else None), 'Main-card record accuracy differs'
     assert all(len(state['tables'][table]) == count for table, count in health['publication']['persisted_counts'].items()), 'Persisted table counts differ'
     assert model['version'] == dashboard['model']['version'] == health['model_version'], 'Serving model versions differ'
     assert model['feature_count'] == len(model['feature_names']), 'Feature metadata is inconsistent'

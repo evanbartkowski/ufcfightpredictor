@@ -58,7 +58,7 @@ def test_identity_and_rematches():
 def test_prediction_immutable_and_settlement(tmp_path, bundle):
     store = Store(tmp_path)
     service = Service(store); service.bundle = bundle
-    p = dict(fight('2023-01-01'), **predict(bundle,'Alice','Beth','2023-01-01'), issued_at='2022-12-30T00:00:00+00:00')
+    p = dict(fight('2023-01-01'), **predict(bundle,'Alice','Beth','2023-01-01'), issued_at='2022-12-30T00:00:00+00:00', card_section='main')
     store.save_prediction(p)
     store.save_prediction(dict(p,pick='Changed',red_probability=.01))
     assert store.rows('predictions') == [p]

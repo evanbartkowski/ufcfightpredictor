@@ -21,7 +21,7 @@ TABLES = ('fights', 'fighters', 'predictions', 'latest_predictions', 'prediction
 META = ('upcoming', 'markets', 'last_sync', 'sync_error', 'profile_errors',
         'odds_feed_failed', 'odds_checked_at', 'odds_last_sync', 'odds_error',
         'training_pending', 'source_parser_version', 'seeded', 'seeded_schema')
-META += ('pre_fight_markets', 'fighter_images')
+META += ('pre_fight_markets', 'fighter_images', 'card_sections', 'card_section_checks')
 
 
 def atomic_write(path, content):

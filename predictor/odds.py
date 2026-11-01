@@ -139,6 +139,12 @@ class ESPNOdds:
     def schedule(self):
         today = datetime.now(timezone.utc)
         dates = (today-timedelta(days=1)).strftime('%Y%m%d')+'-'+(today+timedelta(days=120)).strftime('%Y%m%d')
+        return self._schedule(dates)
+
+    def historical_schedule(self, day):
+        return self._schedule(datetime.fromisoformat(day).strftime('%Y%m%d'))
+
+    def _schedule(self, dates):
         with UPSTREAM.request():
             r = self.session.get(SCOREBOARD, params={'dates':dates, 'limit':100}, timeout=(10,25))
         r.raise_for_status()

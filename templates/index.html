@@ -21,7 +21,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js" defer></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js" defer></script>
   <script src="{{ url_for('static', filename='firebase.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='app.js', v='22') }}" defer></script>
+  <script src="{{ url_for('static', filename='app.js', v='23') }}" defer></script>
 </head>
 <body>
   {{ site_header('dashboard', upcoming_events[0] if upcoming_events else none) }}
@@ -51,7 +51,7 @@
     <section class="metrics" aria-label="Model overview">
       <div><span class="metric-label">HISTORICAL TEST ACCURACY</span><strong id="accuracy">{{ pct(model.metrics.accuracy) if model else 'Unavailable' }}</strong><small id="test-count">{{ model.metrics.test_fights if model else 0 }} chronological holdout bouts</small></div>
       <div><span class="metric-label">RECORDED FIGHTS</span><strong id="fight-count">{{ '{:,}'.format(dashboard.total_fights) }}</strong><small>Confirmed outcomes</small></div>
-      <div><span class="metric-label">LIVE PREDICTION RECORD</span><strong id="live-accuracy">{{ pct(dashboard.live_accuracy) }}</strong><small id="live-count">{{ dashboard.scored_predictions }} settled forecasts</small></div>
+      <div><span class="metric-label">MAIN CARD PREDICTION RECORD</span><strong id="live-accuracy">{{ pct(dashboard.live_accuracy) }}</strong><small id="live-count">{{ dashboard.scored_predictions }} settled main-card picks</small></div>
       <div><span class="metric-label">LAST SUCCESSFUL SYNC</span><strong class="date-metric" id="last-sync">{{ (dashboard.status.last_sync[:16]|replace('T', ' ')) + ' UTC' if dashboard.status.last_sync else 'Unreported' }}</strong><small id="sync-state">Fight data every 6h · page checks every minute</small></div>
     </section>
     <nav class="tabs" aria-label="Dashboard sections">
@@ -235,7 +235,8 @@
       <div class="section-heading">
         <div>
           <div class="eyebrow">ACCOUNTABILITY &amp; VERIFIED TRACK RECORD</div>
-          <h2>The prediction record</h2>
+          <h2>Main-card prediction record</h2>
+          <p class="muted">Only original main-card picks are graded. Prelims and bouts without verified card placement are excluded; draws and no contests are unscored.</p>
         </div>
       </div>
       <div id="results-list"></div>

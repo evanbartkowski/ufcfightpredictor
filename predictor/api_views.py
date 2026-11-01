@@ -6,7 +6,7 @@ from .links import fighter_path
 
 PAGE_SIZE = 48
 FIGHT_KEYS = ('id','date','event','red','blue','pick','confidence','red_probability','blue_probability',
-              'actual_winner','correct','method','path','event_path','model_version','issued_at')
+              'actual_winner','correct','method','path','event_path','model_version','issued_at','card_section','section_source')
 INDEX_KEYS = ('name','path','record','weight_class')
 
 

@@ -210,6 +210,11 @@ class Store:
         with self.connect() as db:
             return [json.loads(r[0]) for r in db.execute(f'SELECT payload FROM {table}')]
 
+    def settled_predictions(self):
+        with self.connect() as db:
+            return [(json.loads(p),json.loads(f)) for p,f in db.execute(
+                'SELECT p.payload,f.payload FROM predictions p JOIN fights f ON f.id=p.id')]
+
     def save_fight(self, fight):
         with self.connect() as db:
             db.execute('INSERT OR REPLACE INTO fights VALUES (?,?,?)', (fight['id'], fight['date'], json.dumps(fight)))

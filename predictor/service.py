@@ -28,6 +28,7 @@ class Service:
         self.lock = threading.Lock()
         self.odds_lock = threading.Lock()
         self.profile_lock = threading.Lock()
+        self.record_lock = threading.Lock()
         self.profile_attempts = {}
         self.auto_updates = False
         self.background_lock = threading.Lock()
@@ -160,6 +161,7 @@ class Service:
         self.store.set_meta('last_sync', now())
         self.store.set_meta('source_parser_version', 2)
         self.store.set_meta('sync_error', None)
+        self.sync_record_sections()
         self.status.update(phase='Up to date', error=None)
 
     def refresh_predictions(self, upcoming):
@@ -192,6 +194,8 @@ class Service:
                 fighter_stats=observed,
                 start_at=market.get('start_at') if market else None
             )
+            if market and market.get('card_section'):
+                prediction.update(card_section=market['card_section'], section_source=market.get('section_source'))
             if forecast_open(fight, market):
                 predictions.append(prediction)
         self.store.publish_predictions(predictions)
@@ -232,6 +236,50 @@ class Service:
         if not failures:
             metadata['odds_last_sync'] = now()
         self.store.set_meta_many(metadata)
+        self.sync_record_sections(schedule)
+
+    def sync_record_sections(self, schedule=None):
+        """Archive card placement separately from immutable issued forecasts."""
+        with self.record_lock:
+            self._sync_record_sections(schedule)
+
+    def _sync_record_sections(self, schedule=None):
+        archive = self.store.meta('card_sections', {})
+        checked = self.store.meta('card_section_checks', {})
+        settled = self.store.settled_predictions()
+        targets = {p['id']:p for p in self.store.rows('predictions')}
+        targets.update({f['id']:f for f in self.store.meta('upcoming', [])})
+        schedule = schedule if schedule is not None else self.store.meta('markets', [])
+
+        def remember(bouts, candidates):
+            for fight in candidates:
+                market = match_market(fight, bouts)
+                if not market or market.get('card_section') not in ('main','prelims','early'):
+                    continue
+                entry = dict(card_section=market['card_section'], source='ESPN',
+                    section_source=market.get('section_source'), event_id=market['event_id'],
+                    bout_id=market['id'], final=market.get('state')=='post')
+                previous = archive.get(fight['id'], {})
+                # A later schedule response must not downgrade settled evidence.
+                if not previous.get('final') or entry['final']:
+                    archive[fight['id']] = entry
+
+        remember(schedule, targets.values())
+        at = datetime.now(timezone.utc)
+        days = {p['date'] for p,_ in settled if not archive.get(p['id'], {}).get('final')}
+        if hasattr(self.odds_source, 'historical_schedule'):
+            for day in sorted(days):
+                last_check = checked.get(day)
+                if last_check and (at-datetime.fromisoformat(last_check)).total_seconds() < 86400:
+                    continue
+                try:
+                    bouts = self.odds_source.historical_schedule(day)
+                    remember(bouts, (p for p in targets.values() if p['date']==day))
+                    checked[day] = now()
+                except Exception as exc:
+                    log.warning('Card placement unavailable for %s: %s', day, exc)
+        if archive != self.store.meta('card_sections', {}) or checked != self.store.meta('card_section_checks', {}):
+            self.store.set_meta_many(dict(card_sections=archive,card_section_checks=checked))
 
     def start_odds_sync(self):
         if not self.odds_lock.acquire(blocking=False):
@@ -369,9 +417,14 @@ class Service:
         for p in saved.values():
             f = fights.get(p['id'])
             if f:
+                placement = meta('card_sections', {}).get(p['id'], {})
+                section = f.get('card_section') or placement.get('card_section') or p.get('card_section') or (p.get('odds') or {}).get('card_section')
+                if section != 'main':
+                    continue
                 winner = f.get(f['winner']) if f['winner'] in ('red', 'blue') else None
                 results.append(dict(p, actual_winner=winner, correct=p['pick']==winner if winner else None,
-                                    method=f.get('method')))
+                                    method=f.get('method'), card_section='main',
+                                    section_source=placement.get('section_source') or f.get('section_source') or p.get('section_source')))
         scored = [r for r in results if r['correct'] is not None]
         for fight in upcoming + results:
             fight.update(path=fight_path(fight), event_path=event_path(fight),
@@ -438,7 +491,7 @@ class Service:
                                      last_sync=meta('odds_last_sync'), error=meta('odds_error')),
                     profile_errors=meta('profile_errors', []),
                     live_accuracy=sum(r['correct'] for r in scored)/len(scored) if scored else None,
-                    scored_predictions=len(scored), total_fights=len(fights))
+                    scored_predictions=len(scored), record_scope='main_card', total_fights=len(fights))
 
     def update_revision(self, snapshot=None):
         keys = ('last_sync','sync_error','odds_checked_at','odds_error','profile_errors')

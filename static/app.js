@@ -1182,7 +1182,7 @@ function render() {
   $('test-count').textContent = m ? `${m.metrics.test_fights.toLocaleString()} fights · ${day(m.metrics.test_start)}–${day(m.metrics.test_end)}` : 'Model pending';
   $('fight-count').textContent = data.total_fights.toLocaleString();
   $('live-accuracy').textContent = pct(data.live_accuracy);
-  $('live-count').textContent = data.scored_predictions ? `${data.scored_predictions} settled forecasts` : 'Awaiting settled forecasts';
+  $('live-count').textContent = data.scored_predictions ? `${data.scored_predictions} settled main-card picks` : 'Awaiting settled main-card picks';
   $('last-sync').textContent = data.status.last_sync ? stamp(data.status.last_sync) : 'Not yet';
   $('sync-state').textContent = data.status.running ? data.status.phase : 'Fight data every 6h · page checks every minute';
   const stale = !Number.isFinite(Date.parse(data.status.last_sync)) || Date.now() - Date.parse(data.status.last_sync) > ((data.refresh?.stats_seconds || 21600) + 900) * 1000;
@@ -1242,7 +1242,7 @@ function render() {
   attachCardListeners();
 
   $('fighter-list').innerHTML = data.fighters.map(f => `<option value="${esc(f.name)}"></option>`).join('');
-  $('results-list').innerHTML = data.results.length ? data.results.map(r => `<article class="result"><div><h3>${esc(r.red)} vs. ${esc(r.blue)}</h3><p>${esc(day(r.date))} · Predicted ${esc(r.pick)} (${pct(r.confidence)}) · ${r.actual_winner ? 'Winner: ' + esc(r.actual_winner) : 'Draw / no contest — unscored'}</p></div><span class="badge ${r.correct===false?'miss':''}">${r.correct===null?'UNSCORED':r.correct?'CORRECT':'MISSED'}</span></article>`).join('') : empty('A record earned in real fights', 'Once a saved forecast settles, the original pick and the actual result appear here. Historical test scores are tracked separately.');
+  $('results-list').innerHTML = data.results.length ? data.results.map(r => `<article class="result"><div><h3>${esc(r.red)} vs. ${esc(r.blue)}</h3><p>${esc(day(r.date))} · Main card · Predicted ${esc(r.pick)} (${pct(r.confidence)}) · ${r.actual_winner ? 'Winner: ' + esc(r.actual_winner) : 'Draw / no contest — unscored'}</p></div><span class="badge ${r.correct===false?'miss':''}">${r.correct===null?'UNSCORED':r.correct?'CORRECT':'MISSED'}</span></article>`).join('') : empty('The main-card record starts here', 'Settled original picks appear once main-card placement is verified. Prelims are excluded. Historical model test scores are tracked separately.');
   
   if (m) {
     const weights = m.weights || {};

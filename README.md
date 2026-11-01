@@ -26,6 +26,8 @@ Each eligible upcoming prediction reports its three strongest supporting input s
 
 Original issued forecasts remain immutable. Latest forecasts may update before the event starts. Event-start locks prevent later model changes or explanations from rewriting a settled prediction. Older frozen snapshots retain their original estimates and explicitly disclose when full-ensemble explanations were not recorded.
 
+The live prediction record grades original **main-card picks only**. Prelims, early prelims, and bouts without verified card placement are excluded. Main-card draws and no contests appear as unscored and do not affect accuracy. Card placement is archived from matched ESPN broadcast blocks, with historical lookups for older issued picks; this metadata survives fresh updater runs without editing the original forecasts. Historical model holdout metrics still describe the full chronological evaluation sample.
+
 ## Personal picks
 
 Picks are stored only in the current browser using `mma_cipher_user_picks`. Selecting a fighter records a personal choice; selecting it again clears it. There is no shared voting backend, synthetic starting vote count, or claimed community consensus. Existing personal selections are preserved.
