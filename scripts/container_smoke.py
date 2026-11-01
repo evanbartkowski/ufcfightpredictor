@@ -20,7 +20,7 @@ def main():
         try:
             status,health=request('/health')
             if status==200:break
-        except (URLError,TimeoutError):
+        except (URLError,TimeoutError,ConnectionError):
             time.sleep(1)
     else:raise AssertionError('Container liveness did not become available')
     status,ready=request('/ready')
