@@ -8,3 +8,5 @@ ufcstats_sample.html
 test-results/
 .firebase/
 *.code-workspace
+static/api/sync-state.json.gz
+gha-creds-*.json

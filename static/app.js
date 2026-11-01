@@ -5,6 +5,8 @@ const pct = v => v == null ? '—' : `${(v*100).toFixed(1)}%`;
 const day = v => v ? new Date(v.length === 10 ? `${v}T12:00:00` : v).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}) : 'Not yet';
 const stamp = v => v ? new Date(v).toLocaleString(undefined,{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'}) : 'Not yet';
 const line = v => v == null ? '\u2014' : v > 0 ? `+${v}` : String(v);
+const assetURL = name => new URL(name, document.querySelector('script[src*="app.js"]').src).href;
+const art = name => `<svg class="art-icon art-${name}" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><use href="${assetURL('icon-art.svg')}#${name}"></use></svg>`;
 
 let data = null;
 let activeMatchup = null;
@@ -220,38 +222,43 @@ function calculateProfitability(f) {
 
   // Value tier and user-facing rating
   let tier = 'neutral';
-  let ratingLabel = '⚖️ FAIR MARKET VALUE';
+  let ratingLabel = 'FAIR MARKET VALUE';
+  let ratingArt = 'scales';
   let badgeText = 'MODERATE';
   let summary = '';
   let meterPct = 50;
 
   if (ev >= 15.0) {
     tier = 'exceptional';
-    ratingLabel = '🔥 EXCEPTIONAL PROFIT VALUE';
+    ratingLabel = 'EXCEPTIONAL PROFIT VALUE';
+    ratingArt = 'flame';
     badgeText = 'VERY HIGH';
     meterPct = Math.min(98, Math.max(75, 70 + ev));
     summary = `MMA Cipher projects a massive mathematical edge (+${edgeDiff.toFixed(1)}% vs sportsbook break-even). Strong value proposition with outsized profit potential.`;
   } else if (ev >= 6.0) {
     tier = 'positive';
-    ratingLabel = '🌟 STRONG PROFIT VALUE';
+    ratingLabel = 'STRONG PROFIT VALUE';
+    ratingArt = 'star';
     badgeText = 'HIGH';
     meterPct = Math.min(85, Math.max(62, 55 + ev * 2.2));
     summary = `The AI win probability (${(pickProb * 100).toFixed(1)}%) substantially exceeds sportsbook break-even (${(impliedProb * 100).toFixed(1)}%), producing a favorable +${ev.toFixed(1)}% expected return.`;
   } else if (ev >= 0.0) {
     tier = 'moderate';
-    ratingLabel = '⚡ POSITIVE VALUE';
+    ratingLabel = 'POSITIVE VALUE';
+    ratingArt = 'bolt';
     badgeText = 'FAVORABLE';
     meterPct = Math.min(65, Math.max(52, 50 + ev * 2.5));
     summary = `Favorable pricing: the payout pays out higher than model-projected outcome probability. Positive expected value (+${ev.toFixed(1)}%).`;
   } else if (ev >= -6.0) {
     tier = 'neutral';
-    ratingLabel = '⚖️ FAIR MARKET ODDS';
+    ratingLabel = 'FAIR MARKET ODDS';
     badgeText = 'NEUTRAL';
     meterPct = Math.max(35, Math.min(49, 50 + ev * 2.0));
     summary = `Market moneylines closely match AI win confidence. Expected return is neutral once sportsbook house juice is accounted for.`;
   } else {
     tier = 'negative';
-    ratingLabel = '⚠️ LOW PROFIT VALUE';
+    ratingLabel = 'LOW PROFIT VALUE';
+    ratingArt = 'warning';
     badgeText = 'UNFAVORABLE';
     meterPct = Math.max(12, Math.min(32, 35 + ev));
     summary = `The current sportsbook line is expensive relative to AI confidence. Unfavorable risk-to-reward ratio (-${Math.abs(ev).toFixed(1)}% EV).`;
@@ -270,6 +277,7 @@ function calculateProfitability(f) {
     edgeDiff,
     tier,
     ratingLabel,
+    ratingArt,
     badgeText,
     meterPct,
     summary
@@ -304,7 +312,7 @@ function renderProfitPredictor(f) {
           <span class="profit-tag-pill"><span class="pulse-dot"></span> MONEY-MAKER PREDICTOR</span>
           <h4>Chances of Making Money &middot; ${esc(p.pick)}</h4>
         </div>
-        <span class="profit-badge tier-${p.tier}">${p.ratingLabel}</span>
+        <span class="profit-badge tier-${p.tier}">${art(p.ratingArt)}${p.ratingLabel}</span>
       </div>
 
       <div class="profit-metrics-grid">
@@ -510,7 +518,7 @@ function renderExplanation(f) {
   return `
     <details class="prediction-explanation">
       <summary>
-        <span>⚡ WHY THE AI CHOSE THIS FIGHTER</span>
+        <span>${art('bolt')} WHY THE AI CHOSE THIS FIGHTER</span>
         <span class="cipher-pill">${esc(exp.pick)} ADVANTAGE</span>
       </summary>
       <div class="explanation-body">
@@ -623,7 +631,7 @@ async function initFighterImages() {
     return;
   }
   try {
-    const res = await fetch('/static/fighter_images.json');
+    const res = await fetch(assetURL('fighter_images.json'));
     if (res.ok) {
       fighterImagesMap = await res.json();
     }
@@ -877,7 +885,7 @@ function quickOddsBar(f) {
     profitSnippet = `
       <div class="quick-profit-bar tier-${p.tier}">
         <div class="qpb-left">
-          <span class="qpb-icon">💰</span>
+          <span class="qpb-icon">${art('coins')}</span>
           <span>Chances of profiting: <strong class="${isPos ? 'qpb-green' : 'qpb-neg'}">${isPos ? '+' : ''}${p.ev.toFixed(1)}% EV</strong></span>
         </div>
         <div class="qpb-right">
@@ -939,15 +947,15 @@ function card(f, withProfiles=false, isMainEvent=false, mainCardInfo=null) {
     <div class="fight-top">
       <div class="fight-top-tag-wrap">
         ${mainCardInfo ? `
-          <span class="fight-order-badge ${mainCardInfo.isMain ? 'is-main-order' : mainCardInfo.isCoMain ? 'is-comain-order' : 'is-card-order'}">${esc(mainCardInfo.orderLabel)}</span>
-          ${mainCardInfo.predictedTime ? `<span class="predicted-time-badge" title="Estimated fighter walkout time">🕒 ${esc(mainCardInfo.predictedTime)}</span>` : ''}
-        ` : (isMainEvent ? '<span class="main-event-badge">👑 MAIN EVENT</span>' : '')}
+          <span class="fight-order-badge ${mainCardInfo.isMain ? 'is-main-order' : mainCardInfo.isCoMain ? 'is-comain-order' : 'is-card-order'}">${art(mainCardInfo.isMain ? 'crown' : mainCardInfo.isCoMain ? 'swords' : 'glove')}${esc(mainCardInfo.orderLabel)}</span>
+          ${mainCardInfo.predictedTime ? `<span class="predicted-time-badge" title="Estimated fighter walkout time">${art('clock')} ${esc(mainCardInfo.predictedTime)}</span>` : ''}
+        ` : (isMainEvent ? `<span class="main-event-badge">${art('crown')} MAIN EVENT</span>` : '')}
         <span class="weight-class-tag">${esc(f.weight_class || 'CUSTOM MATCHUP')}</span>
       </div>
       <span>${f.locked?'FORECAST LOCKED':'MMA CIPHER PROBABILITY'}</span>
     </div>
     ${renderUpsetBanner(f)}
-    ${edge?`<div class="model-edge"><strong>★ MODEL EDGE</strong><span>${esc(f.pick)} &middot; ${pct(edge.probability)} model chance &middot; ${line(edge.price)} at ${esc(edge.name)}</span><small>+${(edge.edge*100).toFixed(1)} points vs. ${pct(edge.implied)} break-even probability. Model estimate, not a guaranteed return.</small></div>`:''}
+    ${edge?`<div class="model-edge"><strong>${art('star')} MODEL EDGE</strong><span>${esc(f.pick)} &middot; ${pct(edge.probability)} model chance &middot; ${line(edge.price)} at ${esc(edge.name)}</span><small>+${(edge.edge*100).toFixed(1)} points vs. ${pct(edge.implied)} break-even probability. Model estimate, not a guaranteed return.</small></div>`:''}
     ${countdown(f)}
     <div class="fighters-row">
       <div class="fighter-cell red-cell">
@@ -958,7 +966,7 @@ function card(f, withProfiles=false, isMainEvent=false, mainCardInfo=null) {
           <div class="corner">FIRST FIGHTER</div>
           <div class="fighter-name">
             ${esc(f.red)}
-            <button class="fav-btn ${favs.has(f.red)?'is-fav':''}" data-fav-name="${esc(f.red)}" aria-label="Favorite ${esc(f.red)}" title="Favorite ${esc(f.red)}">★</button>
+            <button class="fav-btn ${favs.has(f.red)?'is-fav':''}" data-fav-name="${esc(f.red)}" aria-label="Favorite ${esc(f.red)}" title="Favorite ${esc(f.red)}">${art('star')}</button>
           </div>
         </div>
       </div>
@@ -971,7 +979,7 @@ function card(f, withProfiles=false, isMainEvent=false, mainCardInfo=null) {
           <div class="corner blue">SECOND FIGHTER</div>
           <div class="fighter-name">
             ${esc(f.blue)}
-            <button class="fav-btn ${favs.has(f.blue)?'is-fav':''}" data-fav-name="${esc(f.blue)}" aria-label="Favorite ${esc(f.blue)}" title="Favorite ${esc(f.blue)}">★</button>
+            <button class="fav-btn ${favs.has(f.blue)?'is-fav':''}" data-fav-name="${esc(f.blue)}" aria-label="Favorite ${esc(f.blue)}" title="Favorite ${esc(f.blue)}">${art('star')}</button>
           </div>
         </div>
       </div>
@@ -1007,7 +1015,7 @@ function card(f, withProfiles=false, isMainEvent=false, mainCardInfo=null) {
       <div class="card-footer-actions">
         <button class="share-card-btn" data-share-id="${esc(f.id)}"><span>⎘</span> Share Prediction</button>
       </div>
-      ${withProfiles?`<details class="stats-comparison-details" ${openComparisonFightIds.has(f.id)?'open':''}><summary>Compare current fighter stats</summary>${renderPerformanceSnapshot(f.red, f.blue)}<div class="comparison">${profile(f.red)}${profile(f.blue)}</div></details>`:''}
+      ${withProfiles?`<details class="stats-comparison-details" ${openComparisonFightIds.has(f.id)?'open':''}><summary>${art('chart')}Compare current fighter stats</summary>${renderPerformanceSnapshot(f.red, f.blue)}<div class="comparison">${profile(f.red)}${profile(f.blue)}</div></details>`:''}
     </div>
   </article>`;
 }
@@ -1050,11 +1058,11 @@ function getMainCardBoutMeta(f, i, totalMainBouts, mainStartAt) {
 
   let orderLabel = '';
   if (isMain) {
-    orderLabel = `👑 MAIN EVENT · BOUT ${boutNumber} OF ${totalMainBouts}`;
+    orderLabel = `MAIN EVENT · BOUT ${boutNumber} OF ${totalMainBouts}`;
   } else if (isCoMain) {
-    orderLabel = `⚔️ CO-MAIN EVENT · BOUT ${boutNumber} OF ${totalMainBouts}`;
+    orderLabel = `CO-MAIN EVENT · BOUT ${boutNumber} OF ${totalMainBouts}`;
   } else {
-    orderLabel = `🥊 MAIN CARD · BOUT ${boutNumber} OF ${totalMainBouts}`;
+    orderLabel = `MAIN CARD · BOUT ${boutNumber} OF ${totalMainBouts}`;
   }
 
   // Calculate predicted walkout / fight time
@@ -1102,7 +1110,7 @@ function cardSections(fights) {
     if (currentCardFilter === 'upset') {
       return empty('No Upset Radar alerts on this card', 'MMA Cipher has not detected any heavy underdog style clashes or market pricing edges for this selection.');
     } else if (currentCardFilter === 'favorites') {
-      return empty('No starred fighters on this card', 'Star fighters with the ★ button next to their name or in the Fighter Database to track them here.');
+      return empty('No starred fighters on this card', 'Use the star button next to a fighter’s name or in the Fighter Database to track them here.');
     }
   }
 
@@ -1126,14 +1134,13 @@ function cardSections(fights) {
       </section>`;
     }
 
-    const isFilterActive = (currentCardFilter !== 'all');
-    const wasOpen = openUndercardSections.has(label);
-    const isOpen = isFilterActive || wasOpen;
+    const sectionId = `${fights[0].date}|${fights[0].event}|${key}`;
+    const isOpen = openUndercardSections.has(sectionId);
 
-    return `<details class="undercard-dropdown card-section" aria-label="${label}" ${isOpen ? 'open' : ''}>
+    return `<details class="undercard-dropdown card-section" data-section-id="${esc(sectionId)}" aria-label="${label}" ${isOpen ? 'open' : ''}>
       <summary class="undercard-summary">
         <div class="undercard-summary-info">
-          <span class="undercard-pill-tag">⚡ UNDERCARD</span>
+          <span class="undercard-pill-tag">${art('glove')} UNDERCARD</span>
           <div class="undercard-heading-group">
             <h4 class="undercard-title">${label}</h4>
             <span class="undercard-bouts-badge">${group.length} ${group.length===1?'bout':'bouts'}</span>
@@ -1222,10 +1229,10 @@ function attachCardListeners() {
   // Track open undercard dropdown menus
   document.querySelectorAll('details.undercard-dropdown').forEach(d => {
     d.ontoggle = () => {
-      const label = d.getAttribute('aria-label');
-      if (label) {
-        if (d.open) openUndercardSections.add(label);
-        else openUndercardSections.delete(label);
+      const sectionId = d.dataset.sectionId;
+      if (sectionId && d.isConnected) {
+        if (d.open) openUndercardSections.add(sectionId);
+        else openUndercardSections.delete(sectionId);
       }
     };
   });
@@ -1260,18 +1267,16 @@ function render() {
   $('fight-count').textContent = data.total_fights.toLocaleString();
   $('live-accuracy').textContent = pct(data.live_accuracy);
   $('live-count').textContent = data.scored_predictions ? `${data.scored_predictions} settled forecasts` : 'Awaiting settled forecasts';
-  $('last-sync').textContent = data.status.last_sync ? new Date(data.status.last_sync).toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit',second:'2-digit'}) : 'Not yet';
-  const pullInterval = getDynamicPullInterval(data?.upcoming);
-  const isFightCadence = pullInterval <= 6 * 3600 * 1000;
-  $('sync-state').textContent = data.status.running ? data.status.phase : (isFightCadence ? 'Fight day: updating every 6h' : 'Updating weekly with fresh predictions');
-  const stale = !data.status.last_sync || Date.now() - Date.parse(data.status.last_sync) > (data.refresh.stats_seconds * 2000);
+  $('last-sync').textContent = data.status.last_sync ? stamp(data.status.last_sync) : 'Not yet';
+  $('sync-state').textContent = data.status.running ? data.status.phase : 'Fight data every 6h · page checks every minute';
+  const stale = !Number.isFinite(Date.parse(data.status.last_sync)) || Date.now() - Date.parse(data.status.last_sync) > ((data.refresh?.stats_seconds || 21600) + 900) * 1000;
   const lastFailure = data.status.last_error;
   const error = data.status.error || (lastFailure && (!data.status.last_sync || Date.parse(lastFailure.at) > Date.parse(data.status.last_sync)) ? lastFailure.message : null);
   const profileWarning = data.profile_errors?.length ? ` ${data.profile_errors.length} fighter profiles could not be refreshed and are labeled as cached.` : '';
   $('odds-sync').textContent = data.odds_status.error ? 'Odds delayed / retrying automatically' : data.odds_status.running ? 'Refreshing odds...' : data.odds_status.checked_at ? `Odds checked ${stamp(data.odds_status.checked_at)}` : 'Waiting for sportsbook odds';
   $('odds-sync').classList.toggle('warning', Boolean(data.odds_status.error));
   $('notice').classList.toggle('warning', Boolean(!data.status.running && (error || stale)));
-  $('notice').textContent = data.status.running ? 'Refreshing fight data in the background. Saved data remains available.' : error ? 'Fight data is delayed. Showing saved data; retrying automatically.' : stale ? 'Showing saved data. A fresh update is pending.' : `Fight data up to date / ${stamp(data.status.last_sync)}`;
+  $('notice').textContent = data.status.running ? 'Refreshing fight data in the background. Saved data remains available.' : error ? `Fight data refresh failed. Retrying automatically. Last successful pull: ${stamp(data.status.last_sync)}.` : stale ? `Fight data is delayed. Automatic updates will retry. Last successful pull: ${stamp(data.status.last_sync)}.` : `Fight data up to date / ${stamp(data.status.last_sync)}`;
   $('notice').textContent += profileWarning;
   updateNextEvent();
   $('card-count').textContent = data.upcoming.length;
@@ -1597,7 +1602,7 @@ function renderFighterDatabase() {
             <div class="db-card-record">${esc(f.record || 'UFC Veteran')} · ${esc(f.weight_class || 'UFC Division')}</div>
           </div>
         </div>
-        <button class="fav-btn ${favs.has(f.name)?'is-fav':''}" data-fav-name="${esc(f.name)}" aria-label="Favorite ${esc(f.name)}">★</button>
+        <button class="fav-btn ${favs.has(f.name)?'is-fav':''}" data-fav-name="${esc(f.name)}" aria-label="Favorite ${esc(f.name)}">${art('star')}</button>
       </div>
 
       <div class="db-physical-row">
@@ -1889,30 +1894,24 @@ $('download-card-btn')?.addEventListener('click', () => {
 // ==========================================
 // Cache & Fetch Synchronization
 // ==========================================
-const PULL_INTERVAL_DEFAULT_MS = 24 * 60 * 60 * 1000;
-const PULL_INTERVAL_FIGHT_DAY_MS = 6 * 60 * 60 * 1000;
+const PULL_INTERVAL_DEFAULT_MS = 60 * 1000;
 const CACHE_KEY = 'mma_cipher_dashboard';
 const CACHE_TIME_KEY = 'mma_cipher_last_pull';
 const LEGACY_CACHE_KEY = 'mma_oracle_dashboard';
 const LEGACY_CACHE_TIME_KEY = 'mma_oracle_last_pull';
 
-function getDynamicPullInterval(upcomingList) {
-  if (!upcomingList || !upcomingList.length) return PULL_INTERVAL_DEFAULT_MS;
-  const now = Date.now();
-  const today = new Date().toISOString().slice(0, 10);
-  const next = upcomingList.find(f => {
-    const state = f.odds?.state;
-    const start = Date.parse(f.odds?.start_at || f.start_at);
-    return state !== 'post' && (Number.isFinite(start) ? start > now - 4 * 3600 * 1000 : f.date >= today);
-  });
-  if (!next) return PULL_INTERVAL_DEFAULT_MS;
-  const isFightDay = next.date === today;
-  const startMs = Date.parse(next.odds?.start_at || next.start_at);
-  const hoursToStart = Number.isFinite(startMs) ? (startMs - now) / 3600000 : 999;
-  if (isFightDay || (hoursToStart > 0 && hoursToStart <= 6)) {
-    return PULL_INTERVAL_FIGHT_DAY_MS;
-  }
+function getDynamicPullInterval() {
+  if (data?.status?.running) return 10000;
+  if (lastPollFailed) return 30000;
   return PULL_INTERVAL_DEFAULT_MS;
+}
+
+function currentDashboard(payload) {
+  if (!payload || !Array.isArray(payload.upcoming) || !Array.isArray(payload.fighters) || !Array.isArray(payload.results) || !payload.status) {
+    throw Error('Unrecognized dashboard response');
+  }
+  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  return {...payload, upcoming: payload.upcoming.filter(f => f.date >= yesterday && f.odds?.state !== 'post')};
 }
 
 function getCachedPredictions() {
@@ -1942,14 +1941,14 @@ function saveCachedPredictions(d) {
 }
 
 function shouldPull() {
-  const cached = getCachedPredictions();
-  if (!cached) return true;
-  const interval = getDynamicPullInterval(cached.data?.upcoming);
-  return (Date.now() - cached.timestamp >= interval);
+  const interval = getDynamicPullInterval();
+  return !lastNetworkAttempt || Date.now() - lastNetworkAttempt >= interval;
 }
 
 let loading = false;
 let hasInitialNetworkSynced = false;
+let lastNetworkAttempt = 0;
+let lastPollFailed = false;
 
 async function load(force = false) {
   if (loading) return;
@@ -1958,16 +1957,18 @@ async function load(force = false) {
 
   // 1. Instant paint from cache so user experiences zero wait time
   if (!data && cached) {
-    data = cached.data;
-    if (data?.images) fighterImagesMap = data.images;
-    initFighterImages().then(() => {});
-    render();
+    try { data = currentDashboard(cached.data); } catch (_) {}
+    if (data) {
+      if (data?.images) fighterImagesMap = data.images;
+      initFighterImages().then(() => {});
+      render();
+    }
   }
 
   // 2. Determine if network fetch is needed:
   // Forced, or initial page load/reload, or cache has reached dynamic expiration
   const pullInterval = getDynamicPullInterval(data?.upcoming || cached?.data?.upcoming);
-  const isCacheExpired = !cached || (now - cached.timestamp >= pullInterval);
+  const isCacheExpired = !lastNetworkAttempt || now - lastNetworkAttempt >= pullInterval;
   const shouldFetchNetwork = force || !hasInitialNetworkSynced || isCacheExpired;
 
   if (!shouldFetchNetwork) {
@@ -1976,12 +1977,14 @@ async function load(force = false) {
   }
 
   loading = true;
+  lastNetworkAttempt = Date.now();
   try {
     const bust = Date.now();
     const r = await fetch(`/api/dashboard?_t=${bust}`, { cache: 'no-store', signal: AbortSignal.timeout(20000) });
     if (!r.ok) throw Error('Dashboard is unavailable');
     const freshData = await r.json();
-    data = freshData;
+    data = currentDashboard(freshData);
+    lastPollFailed = false;
     hasInitialNetworkSynced = true;
     if (data?.images) fighterImagesMap = data.images;
     else await initFighterImages();
@@ -1989,12 +1992,15 @@ async function load(force = false) {
     render();
     if (activeMatchup && !$('matchup').hidden) await refreshMatchup();
   } catch (e) {
+    lastPollFailed = true;
     hasInitialNetworkSynced = true;
     if (!data && cached) {
-      data = cached.data;
-      if (data?.images) fighterImagesMap = data.images;
-      await initFighterImages();
-      render();
+      try { data = currentDashboard(cached.data); } catch (_) {}
+      if (data) {
+        if (data?.images) fighterImagesMap = data.images;
+        await initFighterImages();
+        render();
+      }
     }
     $('notice').classList.add('warning');
     $('notice').textContent = 'Connection interrupted. Showing saved MMA Cipher data; retrying automatically.';
@@ -2021,7 +2027,7 @@ async function refreshMatchup() {
   const divisionMismatch = (redP?.weight_class && blueP?.weight_class && redP.weight_class !== blueP.weight_class);
 
   $('matchup-output').innerHTML = `
-    ${divisionMismatch ? `<div class="division-mismatch-banner">⚠ Cross-division matchup: ${esc(redP.weight_class)} vs. ${esc(blueP.weight_class)}</div>` : ''}
+    ${divisionMismatch ? `<div class="division-mismatch-banner">${art('warning')} Cross-division matchup: ${esc(redP.weight_class)} vs. ${esc(blueP.weight_class)}</div>` : ''}
     ${card(f)}
     ${renderPerformanceSnapshot(f.red, f.blue)}
     <div class="comparison">${profile(f.red)}${profile(f.blue)}</div>
@@ -2049,11 +2055,11 @@ document.addEventListener('visibilitychange', () => {
   if (!document.hidden && shouldPull()) load();
 });
 window.addEventListener('online', () => {
-  if (shouldPull()) load();
+  load(true);
 });
 
 load();
 setInterval(() => {
-  if (shouldPull()) load();
-}, 60000);
+  if (!document.hidden && shouldPull()) load();
+}, 10000);
 setInterval(updateCountdowns, 1000);

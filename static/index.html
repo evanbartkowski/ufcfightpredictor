@@ -9,12 +9,12 @@
   <meta name="theme-color" content="#06070a">
   <meta name="description" content="MMA Cipher — Next-generation UFC fight forecasting, multi-model AI ensemble consensus, pre-bout statistical telemetry, and verified performance tracking.">
   <title>MMA Cipher — AI Fight Intelligence & UFC Predictions</title>
-  <link rel="stylesheet" href="/style.css?v=17">
+  <link rel="stylesheet" href="/style.css?v=18">
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js" defer></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js" defer></script>
   <script src="/firebase.js" defer></script>
-  <script src="/app.js?v=17" defer></script>
+  <script src="/app.js?v=18" defer></script>
 </head>
 <body>
   <header class="topbar">
@@ -27,7 +27,7 @@
         <span class="next-event-icon" aria-hidden="true">&#8599;</span>
         <span>
           <span class="next-event-label" id="next-event-label">EXPLORE</span>
-          <strong id="next-event-date">Upcoming Bouts</strong>
+          <strong id="next-event-date">Fight cards</strong>
         </span>
       </a>
     </div>
@@ -73,12 +73,13 @@
       <div class="section-heading">
         <div>
           <div class="eyebrow">NEXT IN THE OCTAGON</div>
+          <h2>The fight card</h2>
         </div>
         <div class="upcoming-controls">
           <div class="filter-pills" role="toolbar" aria-label="Card filters">
             <button class="filter-pill active" data-filter="all">All Bouts</button>
-            <button class="filter-pill pill-upset" data-filter="upset">⚡ Upset Radar <span class="pill-badge" id="upset-pill-count">0</span></button>
-            <button class="filter-pill pill-fav" data-filter="favorites">★ Favorites <span class="pill-badge" id="fav-pill-count">0</span></button>
+            <button class="filter-pill pill-upset" data-filter="upset"><svg class="art-icon" viewBox="0 0 48 48" aria-hidden="true"><use href="/icon-art.svg#bolt"></use></svg> Upset Radar <span class="pill-badge" id="upset-pill-count">0</span></button>
+            <button class="filter-pill pill-fav" data-filter="favorites"><svg class="art-icon" viewBox="0 0 48 48" aria-hidden="true"><use href="/icon-art.svg#star"></use></svg> Favorites <span class="pill-badge" id="fav-pill-count">0</span></button>
           </div>
           <select id="event-filter" aria-label="Choose an event">
             <option value="">Loading events…</option>
@@ -282,10 +283,10 @@
         <div class="bottom-item bottom-creations">
           <span class="projects-kicker">OTHER GAMES:</span>
           <a class="gui-pill" href="https://starlight-fishing.web.app" target="_blank" rel="noopener noreferrer" title="Play StarLight Fishing">
-            <span class="pill-star" aria-hidden="true">★</span>StarLight Fishing <span class="arrow-glyph" aria-hidden="true">&#8599;</span>
+            <svg class="art-icon" viewBox="0 0 48 48" aria-hidden="true"><use href="/icon-art.svg#star"></use></svg>StarLight Fishing <span class="arrow-glyph" aria-hidden="true">&#8599;</span>
           </a>
           <a class="gui-pill" href="https://jinxkiss.web.app" target="_blank" rel="noopener noreferrer" title="Play Jinx Kiss">
-            <span class="pill-heart" aria-hidden="true">♥</span>Jinx Kiss <span class="arrow-glyph" aria-hidden="true">&#8599;</span>
+            <svg class="art-icon" viewBox="0 0 48 48" aria-hidden="true"><use href="/icon-art.svg#heart"></use></svg>Jinx Kiss <span class="arrow-glyph" aria-hidden="true">&#8599;</span>
           </a>
         </div>
       </div>

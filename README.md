@@ -16,7 +16,7 @@ MMA Cipher is a production-grade MMA fight intelligence platform combining chron
 Stop-Process -Id (Get-NetTCPConnection -LocalPort 8000).OwningProcess -Force
 ```
 
-Open **http://localhost:8000**. The server serves the responsive desktop/mobile UI, refreshes UFCStats every 6 hours, updates DraftKings odds via ESPN every 15 minutes, and syncs client forecasts on a 6-hour interval with local storage caching.
+Open **http://localhost:8000**. The server serves the responsive desktop/mobile UI, refreshes UFCStats every 6 hours, and updates sportsbook odds via ESPN every 15 minutes. Open pages check for new dashboard data every minute, with saved data available during connection failures.
 
 ---
 
@@ -140,7 +140,9 @@ Evaluation uses **strict walk-forward chronological backtesting** across three e
 - **Ensemble Consensus Pill:** Displays individual model probabilities and weights in an expandable drawer.
 - **Method of Victory Breakdown:** Visual progress indicators for Decision, KO/TKO, and Submission probabilities.
 - **Pre-Fight Tale of the Tape:** Clear comparison of age, height, reach, and stance.
-- **Local Storage Cache:** Client pulls predictions strictly every 6 hours (`PULL_INTERVAL_MS = 21600000`), caching responses in `localStorage` across reloads and tab visits.
+- **Background Updates:** The browser checks for updates every minute and retries connection failures after 30 seconds. Saved data paints immediately while a fresh response loads. Past events are removed from Upcoming even when offline.
+- **Undercard:** Prelims start collapsed and open only when clicked. Each event remembers its own expanded sections during page updates.
+- **Artwork:** Custom shaded SVG illustrations replace emoji icons throughout the fight cards, value indicators, filters, and comparison controls.
 - **Mobile Responsive:** Fluid layout on iOS, Android, tablets, and desktop.
 
 ---
@@ -155,9 +157,26 @@ MMA Cipher maintains seamless integration with Firebase:
 
 ---
 
+### Unattended Hosting updates
+
+Firebase Hosting serves published files and cannot run the Python scheduler. `.github/workflows/refresh-site.yml` runs every 15 minutes (GitHub may delay scheduled runs), refreshes odds, and pulls UFCStats whenever its last successful update is at least 6 hours old. It also runs on pushes to `main` and on manual dispatch.
+
+The workflow authenticates with Google Workload Identity Federation, restricted to this repository ID and `main`, using a dedicated Firebase Hosting publisher. No long-lived service-account key or personal Firebase token is stored in GitHub. Billing is not enabled by this setup.
+
+Each deployment publishes `api/dashboard.json` together with `api/sync-state.json.gz`, containing public fight records, profiles, and original/latest prediction revisions. The next run restores that state from the existing website; a failed restore stops deployment. Model binaries use the runner cache and are rebuilt if missing or out of date. Upstream outages retain the last successful timestamps and show a delayed status. The runtime state file stays out of Git. The updater keeps 24 recent automated snapshots to bound Hosting storage; manual releases and currently served content are protected.
+
+For a local one-time update and export:
+
+```powershell
+.\.venv\Scripts\python scripts/refresh_site.py --force
+firebase deploy --only hosting --project mma-oracle
+```
+
+The static index is rendered from `templates/index.html` by the export script, so Flask and Hosting use the same markup. Hypothetical Matchup Lab requests still require the Python server; static Hosting supplies the published fight forecasts.
+
 ## 8. Verification & Test Suite
 
-Run the full automated test suite (all 28 unit and pipeline tests, plus browser tests):
+Run the automated suite and browser checks:
 
 ```powershell
 .\.venv\Scripts\python -m pytest

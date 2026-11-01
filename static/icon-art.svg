@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff3b0"/><stop offset=".43" stop-color="#fbc75e"/><stop offset="1" stop-color="#ab651c"/></linearGradient>
+    <linearGradient id="ice" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e0fbff"/><stop offset=".45" stop-color="#69deed"/><stop offset="1" stop-color="#247aab"/></linearGradient>
+    <linearGradient id="steel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f3f6ff"/><stop offset=".48" stop-color="#b4c4df"/><stop offset="1" stop-color="#4e617f"/></linearGradient>
+    <linearGradient id="leather" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ff879b"/><stop offset=".4" stop-color="#e8365a"/><stop offset="1" stop-color="#7d173a"/></linearGradient>
+    <linearGradient id="fire" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#ffe9a3"/><stop offset=".5" stop-color="#ffa54b"/><stop offset="1" stop-color="#d32c54"/></linearGradient>
+    <linearGradient id="violet" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#edd9ff"/><stop offset=".5" stop-color="#a78bfa"/><stop offset="1" stop-color="#6847b8"/></linearGradient>
+  </defs>
+  <symbol id="crown" viewBox="0 0 48 48">
+    <path d="m5 14 10 7 9-13 9 13 10-7-5 22H10Z" fill="url(#gold)" stroke="#f5d48b" stroke-width="1.4" stroke-linejoin="round"/>
+    <path d="m10 18 6 9 8-12 8 12 6-9-3 13H13Z" fill="#704515" opacity=".38"/>
+    <path d="M11 35h26v6H11z" fill="url(#gold)" stroke="#f8df9c"/><path d="M14 38h20" stroke="#7d4c1e"/>
+    <path d="m24 25 3 4-3 4-3-4z" fill="#3cabc5" stroke="#c6f8ff"/><circle cx="5" cy="12" r="2.5" fill="#fff1bb"/><circle cx="24" cy="6" r="2.5" fill="#fff1bb"/><circle cx="43" cy="12" r="2.5" fill="#fff1bb"/>
+  </symbol>
+  <symbol id="glove" viewBox="0 0 48 48">
+    <path d="M12 30c-5-4-6-9-4-15 1-4 5-7 9-7h12c7 0 11 5 11 12v8l-8 9H17Z" fill="url(#leather)" stroke="#ffacb9" stroke-width="1.3"/>
+    <path d="M14 19v-6m7 5v-6m7 6v-6" stroke="#862446" stroke-width="2" stroke-linecap="round"/><path d="M11 14c3-4 7-4 17-3" stroke="#ffc5cb" stroke-width="2" stroke-linecap="round" opacity=".8"/>
+    <path d="M12 28c-1-5 1-8 4-8 4 0 5 5 7 7l8 2" fill="none" stroke="#792340" stroke-width="2"/>
+    <path d="m15 33 20 1-1 10H16Z" fill="#202c44" stroke="#8999b5"/><path d="m18 36 13 1v4H18Z" fill="url(#steel)"/><path d="m22 38 5 1" stroke="#304359"/>
+  </symbol>
+  <symbol id="swords" viewBox="0 0 48 48">
+    <path d="m7 5 10 4 22 25-5 5L9 17Z" fill="url(#steel)" stroke="#cfe2f4"/><path d="m8 7 27 29" stroke="#f8fbff"/>
+    <path d="m29 34 10-8 3 3-11 9Z" fill="url(#gold)"/><path d="m36 37 5 6 3-3-6-6Z" fill="#6f4d3d" stroke="#dcb474"/>
+    <path d="m41 5-10 4L9 34l5 5 25-22Z" fill="url(#ice)" stroke="#c3f6ff"/><path d="M40 7 13 36" stroke="#fff"/>
+    <path d="m19 34-10-8-3 3 11 9Z" fill="url(#gold)"/><path d="m12 37-5 6-3-3 6-6Z" fill="#6f4d3d" stroke="#dcb474"/>
+  </symbol>
+  <symbol id="clock" viewBox="0 0 48 48">
+    <circle cx="24" cy="25" r="19" fill="#15283d" stroke="url(#steel)" stroke-width="3"/><circle cx="24" cy="25" r="14.5" fill="#102232" stroke="#3d7f96"/>
+    <path d="M24 13v3m12 9h-3M24 37v-3M12 25h3" stroke="#91c4d9" stroke-width="2"/>
+    <path d="M24 17v8l7 4" fill="none" stroke="url(#ice)" stroke-width="3" stroke-linecap="round"/><circle cx="24" cy="25" r="2.5" fill="#e2fbff"/>
+    <path d="M20 3h8M24 3v3" stroke="url(#gold)" stroke-width="3" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="coins" viewBox="0 0 48 48">
+    <path d="M4 29v10c0 4 20 4 20 0V29" fill="#a66825" stroke="#f1cc7c"/><ellipse cx="14" cy="29" rx="10" ry="4" fill="url(#gold)" stroke="#ffe8a0"/><path d="M5 34c4 3 14 3 18 0m-18 4c4 3 14 3 18 0" fill="none" stroke="#e4a54b"/>
+    <circle cx="31" cy="23" r="17" fill="url(#gold)" stroke="#ffe6a1" stroke-width="1.5"/><circle cx="31" cy="23" r="13" fill="#b57a2c" stroke="#ffe4a0"/><circle cx="31" cy="23" r="11" fill="url(#gold)"/>
+    <path d="M35 17h-6a3 3 0 0 0 0 6h4a3 3 0 0 1 0 6h-7m5-15v18" fill="none" stroke="#815019" stroke-width="2.5" stroke-linecap="round"/><path d="M20 14c3-4 8-5 12-4" fill="none" stroke="#fff4c6" stroke-width="2" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="bolt" viewBox="0 0 48 48">
+    <path d="M27 3 8 27h14l-3 18 22-27H27l4-15Z" fill="url(#ice)" stroke="#b9f8ff" stroke-width="1.5" stroke-linejoin="round"/><path d="m26 7-13 17h13l-4 15 14-18H24Z" fill="#e3fbff" opacity=".45"/>
+  </symbol>
+  <symbol id="star" viewBox="0 0 48 48">
+    <path d="m24 4 6 13 14 2-10 10 2 15-12-7-12 7 2-15L4 19l14-2Z" fill="url(#gold)" stroke="#ffe5a1" stroke-width="1.2" stroke-linejoin="round"/><path d="m24 8 0 17-17-5 14-1Zm0 17 10 15-3-12 10-7Zm0 0-10 15 2-11Z" fill="#fff4c8" opacity=".42"/>
+  </symbol>
+  <symbol id="flame" viewBox="0 0 48 48">
+    <path d="M25 3c4 11 15 14 15 25 0 10-7 17-17 17S7 38 8 29c0-7 6-12 8-18 1 7 3 8 5 8 4-4 4-9 4-16Z" fill="url(#fire)" stroke="#ffcc91" stroke-width="1.2"/>
+    <path d="M25 23c2 6 8 8 7 13-1 5-4 7-9 7-6 0-8-4-7-8 1-3 5-6 5-10 1 4 3 6 4 6Z" fill="#ffe7a0"/><path d="M24 34c4 4 4 8 0 8s-4-4 0-8" fill="#fff8dd"/>
+  </symbol>
+  <symbol id="scales" viewBox="0 0 48 48">
+    <path d="M24 8v31m-8 4h16M10 15h28" stroke="url(#steel)" stroke-width="3" stroke-linecap="round"/><circle cx="24" cy="10" r="4" fill="url(#gold)" stroke="#ffdf9a"/>
+    <path d="m10 15-7 15h14Zm28 0-7 15h14Z" fill="none" stroke="#bad7e7" stroke-width="1.4" stroke-linejoin="round"/>
+    <path d="M2 30h16c-1 10-15 10-16 0m28 0h16c-1 10-15 10-16 0" fill="url(#gold)" stroke="#ffe0a3"/>
+    <path d="M19 39h10l4 5H15Z" fill="url(#steel)"/>
+  </symbol>
+  <symbol id="warning" viewBox="0 0 48 48">
+    <path d="m21 6-18 32a4 4 0 0 0 3 6h36a4 4 0 0 0 3-6L27 6a3.5 3.5 0 0 0-6 0Z" fill="url(#gold)" stroke="#ffe8ae" stroke-width="1.5"/><path d="m24 12 15 27H9Z" fill="#392e20" opacity=".88"/><path d="M24 21v9" stroke="#ffe6a0" stroke-width="3.5" stroke-linecap="round"/><circle cx="24" cy="35" r="2" fill="#ffe6a0"/>
+  </symbol>
+  <symbol id="chart" viewBox="0 0 48 48">
+    <rect x="4" y="4" width="40" height="40" rx="8" fill="#142236" stroke="#6390ac"/><path d="M11 15h26M11 24h26M11 33h26" stroke="#2c415b"/>
+    <path d="M12 35V25h5v10Z" fill="url(#violet)"/><path d="M22 35V19h5v16Z" fill="url(#ice)"/><path d="M32 35V11h5v24Z" fill="url(#gold)"/><path d="m10 22 9-8 7 2 12-9" fill="none" stroke="#e1faff" stroke-width="1.5" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="heart" viewBox="0 0 48 48">
+    <path d="M24 43 7 27C-7 13 12-1 24 13 36-1 55 13 41 27Z" fill="url(#leather)" stroke="#ffb0c0" stroke-width="1.5"/><path d="M9 18c0-6 7-9 11-5" fill="none" stroke="#ffd1d7" stroke-width="2.5" stroke-linecap="round"/>
+  </symbol>
+</svg>

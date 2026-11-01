@@ -18,7 +18,7 @@ with sync_playwright() as p:
     live = dashboard.json()
     assert live['refresh']['odds_seconds'] in (900, 10800)
     assert live['refresh']['stats_seconds'] in (21600, 86400, 604800)
-    assert live['refresh']['browser_seconds'] in (21600, 86400, 604800)
+    assert live['refresh']['browser_seconds'] == 60
     if live['upcoming'] and live['upcoming'][0]['odds'].get('available'):
         expected = live['upcoming'][0]['odds']['books'][0]
         prices = page.locator('.fight-card').first.locator('.odds-prices strong')

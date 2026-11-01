@@ -930,10 +930,22 @@ h2 {
 .stats-comparison-details summary::-webkit-details-marker {
   display: none;
 }
+.art-icon {
+  display: inline-block;
+  width: 1.45em;
+  height: 1.45em;
+  flex: 0 0 auto;
+  vertical-align: -0.33em;
+  margin-right: 0.3em;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.32));
+}
+.qpb-icon .art-icon { width: 28px; height: 28px; margin-right: 0; }
+.fav-btn .art-icon { width: 19px; height: 19px; margin: 0; opacity: 0.45; filter: grayscale(1); }
+.fav-btn.is-fav .art-icon, .fav-btn:hover .art-icon { opacity: 1; filter: none; }
+.stats-comparison-details summary .art-icon { width: 23px; height: 23px; }
+.fight-order-badge, .predicted-time-badge, .profit-badge, .undercard-pill-tag { align-items: center; }
 .stats-comparison-details summary::before {
-  content: '📊';
-  font-size: 13px;
-  filter: drop-shadow(0 0 6px rgba(0, 240, 255, 0.5));
+  content: none;
 }
 .stats-comparison-details summary::after {
   content: '▾';
