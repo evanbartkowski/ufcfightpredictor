@@ -90,6 +90,10 @@ def create_app(data_dir=None, bootstrap=True, auto_updates=None):
     def fighter_images():
         return jsonify(service.fighter_images)
 
+    @app.get('/api/search-index.json')
+    def search_index():
+        return jsonify(catalog().search_index())
+
     @app.get('/api/overview')
     def api_overview():
         data = service.dashboard()

@@ -25,7 +25,11 @@ with sync_playwright() as p:
     page.on('pageerror', lambda error: errors.append(str(error)))
     page.goto(BASE + '/', wait_until='networkidle')
     page.wait_for_selector('#cards .fighter-img')
-    assert page.locator('header .site-navigation a').count() == 6
+    assert page.locator('header .site-navigation a').count() == 2
+    assert page.locator('.library-shortcut:visible').count() == 0
+    assert page.locator('a[href="/status/"]').count() == 0
+    assert page.get_by_role('button',name='Model Watch',exact=False).is_visible()
+    assert page.locator('.upset-radar-banner,.is-upset-card').count() == 0
     assert page.locator('.public-nav, .published-events').count() == 0
     assert page.locator('.event-shelf .event-tile').count() > 0
     assert page.locator('.event-shelf').bounding_box()['y'] < page.locator('#cards').bounding_box()['y']
@@ -50,12 +54,23 @@ with sync_playwright() as p:
     page.locator('.event-shelf').scroll_into_view_if_needed()
     page.screenshot(path=str(OUT / 'design-home-schedule-mobile.png'))
 
-    for route, active in [('/events/', 'Events'),('/fighters/', 'Fighters'),('/fights/', 'Forecasts'),('/model/', 'Model'),('/status/', 'Status'),(event_path,'Events'),(fighter_path,'Fighters'),(fight_path,'Forecasts')]:
+    page.get_by_role('button',name='Fighter database',exact=False).click()
+    assert page.locator('.library-shortcut:visible').count() == 4
+    page.locator('#archive-query').fill('Waldo')
+    page.wait_for_selector('.archive-result')
+    page.locator('[data-archive-kind="forecasts"]').click()
+    page.wait_for_function("() => document.querySelectorAll('.archive-result').length > 0 && [...document.querySelectorAll('.archive-result small')].every(e=>e.textContent==='ISSUED FORECAST')")
+    page.screenshot(path=str(OUT / 'design-library-search-mobile.png'))
+    page.reload(wait_until='networkidle')
+    assert page.locator('#fighters').is_visible()
+
+    for route in ['/events/','/fighters/','/fights/','/model/','/status/',event_path,fighter_path,fight_path]:
         page.set_viewport_size({'width':1440,'height':1050})
         response = page.goto(BASE + route, wait_until='networkidle')
         assert response.status == 200, route
         assert page.locator('h1').count() == 1, route
-        assert page.locator('header [aria-current="page"]').inner_text() == active, route
+        assert page.locator('header [aria-current="page"]').inner_text() == 'Fighter database', route
+        assert page.locator('header a[href="/status/"]').count() == 0
         assert page.locator('.page-hero').is_visible()
         page.screenshot(path=str(OUT / ('design-' + route.strip('/').replace('/','-') + '-desktop.png')))
         for width in (390, 320, 768):
@@ -81,12 +96,19 @@ with sync_playwright() as p:
     assert page.locator('.page-hero .portrait-initials').is_visible()
 
     page.goto(BASE + '/events/',wait_until='networkidle')
-    page.get_by_role('searchbox',name='Search event archive').fill('2026-10-17')
+    page.get_by_role('searchbox',name='Search event cards').fill('UFC 334')
+    assert page.locator('#upcoming-directory > div:visible').count() > 0
+    page.get_by_role('searchbox',name='Search event cards').fill('2026-10-17')
     assert page.locator('#event-archive > div:visible').count() > 0
     assert all('2026' in text for text in page.locator('#event-archive > div:visible').all_inner_texts())
-    page.get_by_role('searchbox',name='Search event archive').fill('no-matching-ufc-event')
+    page.get_by_role('searchbox',name='Search event cards').fill('no-matching-ufc-event')
     assert page.locator('[data-empty-for="event-archive"]').is_visible()
+    page.goto(BASE + '/fights/',wait_until='networkidle')
+    page.get_by_role('searchbox',name='Search issued forecasts').fill('Waldo')
+    assert page.locator('#forecast-directory > div:visible').count() > 0
+    page.locator('[data-record-filter="settled"]').click()
+    assert page.locator('#forecast-directory > div:visible').evaluate_all('(items)=>items.every(e=>e.dataset.recordState==="settled")')
     assert not errors, errors
     browser.close()
 
-print('Design checks passed: shared navigation, schedule placement, real fighter portraits and fallback, search/pagination, and all public/detail pages at desktop, mobile, and tablet widths.')
+print('Design checks passed: database-only archive links, cross-directory search, Model Watch without card banners, roster/event/forecast controls, portraits, and desktop/mobile/tablet layouts.')

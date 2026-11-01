@@ -87,6 +87,20 @@ def test_sparse_history_is_reported_as_major_uncertainty():
     assert p['consensus']['uncertainty'] == 'Elevated'
 
 
+def test_archive_search_index_covers_every_collection_and_fighters_beyond_page_one(public_app):
+    service = public_app.extensions['predictor']
+    for index in range(55):
+        service.store.save_fighter(dict(name=f'Roster fighter {index:02d}'))
+    payload = public_app.test_client().get('/api/search-index.json').json
+    items = payload['items']
+    assert {item['kind'] for item in items} == {'fighters','events','forecasts','model'}
+    assert any(item['title'] == 'Roster fighter 54' for item in items)
+    assert any(item['kind'] == 'events' and 'Alice' in item['terms'] and 'Beth' in item['terms'] for item in items)
+    paths = [item['path'] for item in items]
+    assert len(paths) == len(set(paths))
+    assert any(item['kind'] == 'forecasts' and item['title'] == 'Alice vs. Beth' for item in items)
+
+
 def test_raw_homepage_contains_real_data_and_crawlable_forecast(public_app):
     response = public_app.test_client().get('/')
     assert response.status_code == 200

@@ -1,0 +1,15 @@
+{% from '_chrome.html' import icon with context %}
+<section class="records-library" aria-label="Fight archive">
+  <div class="library-heading"><div><p class="eyebrow">THE MMA CIPHER ARCHIVE</p><h3>Find the fighter. Follow the fight.</h3><p>Search profiles, event cards, and every published forecast in one place.</p></div><span class="library-heading-art" aria-hidden="true">{{ icon('swords') }}</span></div>
+  <div class="library-shortcuts">
+    {% for href, symbol, label, description in [('/events/','glove','Event cards','Upcoming lineups & past results'),('/fighters/','crown','Fighter profiles','Records, form & opponent history'),('/fights/','swords','Issued forecasts','Published picks & supporting evidence'),('/model/','chart','Model methods & limits','Inputs, performance & uncertainty')] %}
+    <a class="library-shortcut" href="{{ href }}">{{ icon(symbol) }}<span><strong>{{ label }}</strong><small>{{ description }}</small></span><span class="tile-arrow" aria-hidden="true">↗</span></a>
+    {% endfor %}
+  </div>
+  <div class="archive-finder" data-archive-finder>
+    <label class="archive-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><span class="sr-only">Search all fight records</span><input type="search" id="archive-query" placeholder="Search a fighter, matchup, event, or date…" autocomplete="off"><kbd>/</kbd></label>
+    <div class="archive-filters" role="group" aria-label="Search record types">{% for key, label in [('all','All records'),('fighters','Fighters'),('events','Event cards'),('forecasts','Forecasts')] %}<button type="button" data-archive-kind="{{ key }}" aria-pressed="{{ 'true' if loop.first else 'false' }}" class="{{ 'active' if loop.first else '' }}">{{ label }}</button>{% endfor %}</div>
+    <p class="archive-search-status" id="archive-search-status" role="status">Try a fighter’s name, “UFC 334”, or an event date.</p>
+    <div id="archive-search-results" class="archive-search-results"></div><button type="button" class="archive-more" id="archive-more" hidden>Show more matches ↓</button>
+  </div>
+</section>

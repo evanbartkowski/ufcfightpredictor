@@ -32,6 +32,8 @@ def verify(read, expected_commit=None):
     assert model['feature_count'] == len(model['feature_names']), 'Feature metadata is inconsistent'
     overview = json.loads(read('/api/overview'))
     portraits = json.loads(read('/api/fighter-images.json'))
+    search = json.loads(read('/api/search-index.json'))
+    assert {item['kind'] for item in search['items']} == {'fighters','events','forecasts','model'}, 'Search index is missing a collection'
     assert portraits == dashboard.get('images', {}), 'Published portrait index differs from the dashboard'
     assert all(url.startswith('https://a.espncdn.com/i/headshots/mma/players/full/') for url in portraits.values()), 'Portrait source is not an MMA athlete'
     assert overview['revision'] == dashboard['revision'] and overview['api_mode'] == 'static', 'Overview is not from this static publication'

@@ -105,6 +105,7 @@ SQLite retains WAL. Short request scopes reuse one connection and close it at te
 | Purpose | Python service | Static Hosting |
 | --- | --- | --- |
 | Compact initial data | `/api/overview` | `/api/overview` |
+| Archive finder | `/api/search-index.json` | `/api/search-index.json` |
 | Fighter search and pages | `/api/fighters?q=Silva&page=1&per_page=48` | Name index in overview, then `/api/fighters/page/1.json` |
 | Fighter lookup/history | `/api/fighters/MaxHolloway` and `/api/fighters/MaxHolloway/history` | Published profile JSON and indexable fighter pages |
 | Forecast pages | `/api/predictions?kind=upcoming&page=1&per_page=48` | `/api/predictions/upcoming/page/1.json` |
@@ -112,6 +113,8 @@ SQLite retains WAL. Short request scopes reuse one connection and close it at te
 | Holdout bout attribution | `/api/analytics?kind=holdout&page=1` | `/api/analytics/holdout/page/1.json` |
 
 Page sizes are bounded at 100. Static Hosting does not execute query-based Flask APIs: its browser searches the small name index and fetches deterministic page files. The compatibility dashboard remains available, but new browser loads do not download its full fighter histories. Legacy browser cache data migrates once; only a smaller current-format payload is retained.
+
+Fighter database contains the event, profile, forecast, and model collections. Its archive finder loads the cross-collection search index on demand. Event search covers upcoming and archived cards, including lineup names; forecast search supports event/date/model queries and status filters. The Model Watch control filters upcoming matchups without adding alert banners to fight cards.
 
 `/api/matchup` validates name types and lengths, applies per-IP and process-wide limits, and bounds concurrent inference. It uses the socket address rather than trusting arbitrary forwarded-IP headers. Profile refreshes are deduplicated; all source sessions share a bounded request budget. A multi-process or multi-host deployment should use a shared rate-limit service instead of treating these process-local limits as a distributed quota.
 

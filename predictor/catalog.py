@@ -75,6 +75,27 @@ class Catalog:
         # sharing the same normalized identity. All links use the profile name.
         return fighter_path(self.profiles.get(identity(name), {}).get('name', name))
 
+    def search_index(self):
+        if hasattr(self, '_search_index'):
+            return self._search_index
+        images = self.dashboard.get('images', {})
+        items = [dict(kind='fighters', title=p['name'], path=path,
+                      detail=p.get('record') or 'UFC record, opponents, and Elo history',
+                      image=images.get(identity(p['name'])), terms=p.get('weight_class') or '')
+                 for path,p in self.fighters.items()]
+        for event in self.event_list:
+            names = ' '.join(f[corner] for f in event['fights'] for corner in ('red','blue'))
+            items.append(dict(kind='events',title=event['name'],path=event['path'],
+                detail=f"{date_label(event['date'])} · {len(event['fights'])} bouts", terms=event['date']+' '+names))
+        for path,f in self.forecasts.items():
+            items.append(dict(kind='forecasts',title=f"{f['red']} vs. {f['blue']}",path=path,
+                detail=f"{date_label(f['date'])} · {f.get('event') or 'UFC matchup'}",
+                terms=f"{f['date']} {f.get('pick') or ''} {f.get('model_version') or ''}"))
+        items.append(dict(kind='model',title='Model methods and limits',path='/model/',
+            detail='Serving models, inputs, measured performance, and probability reliability',terms='algorithm calibration features accuracy methodology'))
+        self._search_index = dict(revision=self.dashboard.get('revision'),items=items)
+        return self._search_index
+
     def common(self):
         if hasattr(self, '_common'):
             return dict(self._common)
@@ -142,8 +163,11 @@ class Catalog:
         data['path'] = path
         if path == '/fighters/':
             data.update(kind='fighters', title='UFC fighter records and profiles', description='Browse career snapshots, recorded UFC bouts, Elo histories, and upcoming fights.')
+            scheduled = {identity(f[c]) for f in self.dashboard['upcoming'] for c in ('red','blue')}
             data['directory_items'] = [dict(name=p['name'], path=self.fighter_url(p['name']),
-                image=data['portrait'](p['name']), record=p.get('record'), weight_class=p.get('weight_class')) for p in data['fighters']]
+                image=data['portrait'](p['name']), record=p.get('record'), weight_class=p.get('weight_class'),
+                upcoming=identity(p['name']) in scheduled, bouts=len(self.bouts[identity(p['name'])])) for p in data['fighters']]
+            data['directory_items'].sort(key=lambda p:(not p['upcoming'],not p['image'],-p['bouts'],p['name']))
         elif path == '/events/':
             data.update(kind='events', title='UFC events and fight cards', description='Upcoming cards and verified historical UFC results, linked to fighter profiles and published forecasts.')
         elif path == '/fights/':

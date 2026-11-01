@@ -2,6 +2,7 @@
 {% macro forecast(f) -%}
 <article class="fight-card published-card" data-fight-id="{{ f.id }}">
   <div class="fight-top"><span>{{ f.weight_class or 'UFC bout' }}</span><time datetime="{{ f.date }}">{{ date_label(f.date) }}</time></div>
+  {% if kind == 'fights' %}<div class="forecast-collection-label"><span class="forecast-state-tag">{{ 'SETTLED' if f.winner else 'ARCHIVED LINEUP' if f.removed else 'SCHEDULED' }}</span><span>{{ f.event }}</span></div>{% endif %}
   <div class="published-matchup"><a class="published-fighter red-corner" href="{{ f.red_path }}">{{ portrait_image(f.red) }}<strong>{{ f.red }}</strong></a><span class="published-vs">VS</span><a class="published-fighter blue-corner" href="{{ f.blue_path }}">{{ portrait_image(f.blue) }}<strong>{{ f.blue }}</strong></a></div>
   {% if f.pick %}<div class="published-pick"><span><small>MODEL PICK</small><strong>{{ f.pick }}</strong></span><strong class="published-confidence">{{ '%.1f'|format(f.confidence * 100) }}<small>%</small></strong></div>
   <p class="forecast-caption">Estimate · not separately calibrated{% if f.issued_at %}<span>Issued {{ date_label(f.issued_at) }}</span>{% endif %}</p>

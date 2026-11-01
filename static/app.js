@@ -24,10 +24,17 @@ const analyticsRequests = new Map();
 // Navigation & Tab Switching
 // ==========================================
 function showTab(name) {
+  if (!document.getElementById(name)?.classList.contains('panel')) return;
   document.querySelectorAll('.panel').forEach(p => p.hidden = p.id !== name);
   document.querySelectorAll('.tab').forEach(b => {
     b.classList.toggle('active', b.dataset.tab === name);
     b.setAttribute('aria-pressed', String(b.dataset.tab === name));
+  });
+  history.replaceState(null,'',`#${name}`);
+  document.querySelectorAll('header .site-navigation a').forEach(link => {
+    const selected = link.getAttribute('href') === (name === 'fighters' ? '/#fighters' : '/');
+    link.classList.toggle('is-current', selected);
+    if (selected) link.setAttribute('aria-current','page'); else link.removeAttribute('aria-current');
   });
   if (name === 'analytics') {
     ensureAnalytics().then(renderAnalytics).catch(() => { $('accuracy-chart-container').textContent = 'Historical analytics are temporarily unavailable. Please retry.'; });
@@ -36,9 +43,14 @@ function showTab(name) {
   }
 }
 document.querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => showTab(b.dataset.tab)));
+document.querySelectorAll('a[href="/#fighters"]').forEach(link => link.addEventListener('click', event => {
+  event.preventDefault(); showTab('fighters');
+}));
+window.addEventListener('hashchange', () => showTab(location.hash.slice(1)));
+if (location.hash === '#fighters') showTab('fighters');
 $('event-filter')?.addEventListener('change', () => render());
 
-// Card Filter Pills (All Bouts, Upset Radar, Favorites)
+// Card Filter Pills (All Bouts, Model Watch, Favorites)
 document.querySelectorAll('.filter-pill').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
@@ -508,21 +520,6 @@ function renderExplanation(f) {
   `;
 }
 
-function renderUpsetBanner(f) {
-  if (!f.upset_radar?.is_candidate && !modelEdge(f)) return '';
-  const signals = f.upset_radar?.signals || [];
-  const edge = modelEdge(f);
-  return `
-    <div class="upset-radar-banner">
-      <div class="upset-radar-tag">
-        <span class="radar-pulse-dot"></span>
-        <span>UPSET RADAR</span>
-      </div>
-      <small>${esc(signals[0] || (edge ? `+${(edge.edge*100).toFixed(0)}% edge over market odds` : 'Underdog projected to contend'))}</small>
-    </div>
-  `;
-}
-
 function renderUserPickButtons(f) {
   if (f.prediction_pending || !f.id) return '';
   const userPick = getUserPicks()[f.id];
@@ -867,11 +864,10 @@ function toggleCardDrawer(fightId) {
 function card(f, withProfiles=false, isMainEvent=false, mainCardInfo=null) {
   const pending = f.prediction_pending;
   const edge = modelEdge(f);
-  const isUpset = Boolean(f.upset_radar?.is_candidate || edge);
   const favs = getFavorites();
   const isExpanded = expandedFightIds.has(f.id);
 
-  return `<article class="fight-card${isMainEvent ? ' is-main-event' : ''}${isWomensFight(f)?' womens-fight':''}${edge?' has-model-edge':''}${isUpset?' is-upset-card':''}" data-fight-id="${esc(f.id || 'custom')}">
+  return `<article class="fight-card${isMainEvent ? ' is-main-event' : ''}${isWomensFight(f)?' womens-fight':''}${edge?' has-model-edge':''}" data-fight-id="${esc(f.id || 'custom')}">
     <div class="fight-top">
       <div class="fight-top-tag-wrap">
         ${mainCardInfo ? `
@@ -883,7 +879,6 @@ function card(f, withProfiles=false, isMainEvent=false, mainCardInfo=null) {
       <span>${f.locked?'FORECAST LOCKED':'MMA CIPHER PROBABILITY'}</span>
     </div>
     <a class="public-link forecast-detail-link" href="${esc(f.path || '/fights/')}">Full forecast and evidence</a>
-    ${renderUpsetBanner(f)}
     ${edge?`<div class="model-edge"><strong>${art('star')} MODEL EDGE</strong><span>${esc(f.pick)} &middot; ${pct(edge.probability)} model chance &middot; ${line(edge.price)} at ${esc(edge.name)}</span><small>+${(edge.edge*100).toFixed(1)} points vs. ${pct(edge.implied)} break-even probability. Model estimate, not a guaranteed return.</small></div>`:''}
     ${countdown(f)}
     <div class="fighters-row">
@@ -1037,7 +1032,7 @@ function cardSections(fights) {
 
   if (!filtered.length) {
     if (currentCardFilter === 'upset') {
-      return empty('No Upset Radar alerts on this card', 'MMA Cipher has not detected any heavy underdog style clashes or market pricing edges for this selection.');
+      return empty('No Model Watch matchups on this card', 'This filter highlights model disagreement or available market comparisons. Select All Bouts to see the complete card.');
     } else if (currentCardFilter === 'favorites') {
       return empty('No starred fighters on this card', 'Use the star button next to a fighter’s name or in the Fighter Database to track them here.');
     }
@@ -1276,7 +1271,6 @@ function render() {
           <h3>Probability reliability and data limits</h3>
           <p>${esc(m.calibration_note)}</p><p>${esc(m.limitations)}</p>
           <p>Chronological holdout: ${esc(m.metrics.test_start)} through ${esc(m.metrics.test_end)}. Corner symmetry enforces p(A, B) = 1 - p(B, A).</p>
-          <p><a class="public-link" href="/model/">All ${esc(m.feature_count)} inputs, serving models, and measured reliability bins</a></p>
         </div>
       </div>
     `;

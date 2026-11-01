@@ -1,5 +1,6 @@
 """Render the same public content for Flask requests and Firebase publications."""
 from pathlib import Path
+import json
 from urllib.parse import urlencode
 import xml.etree.ElementTree as ET
 
@@ -20,6 +21,7 @@ def static_url(endpoint, filename, **query):
 def export_pages(service, directory=None, dashboard=None):
     directory = Path(directory or ROOT / 'static')
     catalog = Catalog(service, dashboard)
+    atomic_write(directory / 'api/search-index.json', json.dumps(catalog.search_index(),separators=(',',':')).encode())
     env = Environment(loader=FileSystemLoader(ROOT / 'templates'), autoescape=select_autoescape(['html']),
                       trim_blocks=True, lstrip_blocks=True)
     def html_bytes(html):

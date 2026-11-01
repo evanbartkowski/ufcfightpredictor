@@ -14,14 +14,14 @@
   <meta property="og:description" content="Published UFC forecasts, model evidence, fighter records, and source freshness.">
   <meta name="description" content="MMA Cipher — Next-generation UFC fight forecasting, multi-model AI ensemble consensus, pre-bout statistical telemetry, and verified performance tracking.">
   <title>MMA Cipher — AI Fight Intelligence & UFC Predictions</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css', v='21') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='content.css', v='2') }}">
-  <script src="{{ url_for('static', filename='content.js', v='1') }}" defer></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css', v='22') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='content.css', v='3') }}">
+  <script src="{{ url_for('static', filename='content.js', v='2') }}" defer></script>
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js" defer></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js" defer></script>
   <script src="{{ url_for('static', filename='firebase.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='app.js', v='21') }}" defer></script>
+  <script src="{{ url_for('static', filename='app.js', v='22') }}" defer></script>
 </head>
 <body>
   {{ site_header('dashboard', upcoming_events[0] if upcoming_events else none) }}
@@ -63,7 +63,7 @@
       <button class="tab" data-tab="model" aria-pressed="false">Inside the Algorithm</button>
     </nav>
     <section id="upcoming" class="panel">
-      <section class="event-shelf" aria-label="Upcoming event schedule"{% if not upcoming_events %} hidden{% endif %}><div class="shelf-heading"><span class="eyebrow">ON THE CALENDAR</span><a href="/events/">All events <span aria-hidden="true">↗</span></a></div><div class="event-shelf-track">{% for event in upcoming_events %}{{ event_tile(event, compact=true) }}{% endfor %}</div></section>
+      <section class="event-shelf" aria-label="Upcoming event schedule"{% if not upcoming_events %} hidden{% endif %}><div class="shelf-heading"><span class="eyebrow">ON THE CALENDAR</span><span class="schedule-hint">Swipe or select a card</span></div><div class="event-shelf-track">{% for event in upcoming_events %}{{ event_tile(event, compact=true) }}{% endfor %}</div></section>
       <div class="section-heading">
         <div>
           <div class="eyebrow">NEXT IN THE OCTAGON</div>
@@ -72,7 +72,7 @@
         <div class="upcoming-controls">
           <div class="filter-pills" role="toolbar" aria-label="Card filters">
             <button class="filter-pill active" data-filter="all">All Bouts</button>
-            <button class="filter-pill pill-upset" data-filter="upset"><svg class="art-icon" viewBox="0 0 48 48" aria-hidden="true"><use href="{{ url_for('static', filename='icon-art.svg') }}#bolt"></use></svg> Upset Radar <span class="pill-badge" id="upset-pill-count">0</span></button>
+            <button class="filter-pill pill-upset" data-filter="upset"><svg class="art-icon" viewBox="0 0 48 48" aria-hidden="true"><use href="{{ url_for('static', filename='icon-art.svg') }}#bolt"></use></svg> Model Watch <span class="pill-badge" id="upset-pill-count">0</span></button>
             <button class="filter-pill pill-fav" data-filter="favorites"><svg class="art-icon" viewBox="0 0 48 48" aria-hidden="true"><use href="{{ url_for('static', filename='icon-art.svg') }}#star"></use></svg> Favorites <span class="pill-badge" id="fav-pill-count">0</span></button>
           </div>
           <select id="event-filter" aria-label="Choose an event">
@@ -112,6 +112,7 @@
       </div>
     </section>
     <section id="fighters" class="panel" hidden>
+      {% include '_library.html' %}
       <div class="section-heading">
         <div>
           <div class="eyebrow">OFFICIAL UFC ROSTER &amp; CAREER INTELLIGENCE</div>
