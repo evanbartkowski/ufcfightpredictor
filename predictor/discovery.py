@@ -48,7 +48,8 @@ def update_state(catalog, previous, at):
     # Primary templates and metadata can change meaningful page content even
     # when the fight data did not. CSS-only changes do not reset these dates.
     names = ('index.html','detail.html','_public.html','_directories.html','_seo.html','_discovery_pages.html')
-    layout = hashlib.sha256(b''.join((TEMPLATES/name).read_bytes() for name in names if (TEMPLATES/name).exists()) + Path(__file__).read_bytes()).hexdigest()
+    source = b''.join((TEMPLATES/name).read_bytes() for name in names if (TEMPLATES/name).exists()) + Path(__file__).read_bytes()
+    layout = hashlib.sha256(source.replace(b'\r\n',b'\n')).hexdigest()
     old = previous.get('pages',{})
     pages = {}
     for path in ['/'] + catalog.paths():
