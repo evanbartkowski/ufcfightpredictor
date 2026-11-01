@@ -1100,6 +1100,7 @@ function updateNextEvent() {
     return state !== 'post' && state !== 'in' && (Number.isFinite(start) ? start > now : f.date >= today);
   });
   link.dataset.event = next ? `${next.date}|${next.event}` : '';
+  link.href = next?.event_path || '/events/';
   $('next-event-label').textContent = next ? 'NEXT EVENT' : 'EXPLORE';
   $('next-event-date').textContent = next ? new Date(`${next.date}T12:00:00`).toLocaleDateString(undefined,{month:'short',day:'numeric'}) : 'Upcoming Bouts';
   link.title = next ? `${next.event} - View predictions` : 'Browse upcoming bouts';
@@ -1215,6 +1216,24 @@ function render() {
     (groups[key] ||= []).push(f);
     return groups;
   }, Object.create(null));
+  const schedule = document.querySelector('.event-shelf-track');
+  if (schedule) {
+    const events = Object.values(groups).sort((a,b) => a[0].date.localeCompare(b[0].date));
+    schedule.closest('.event-shelf').hidden = !events.length;
+    const markup = events.map(fights => {
+      const f = fights[0];
+      const [brand, ...name] = f.event.split(': ');
+      const month = new Date(`${f.date}T12:00:00`).toLocaleDateString(undefined,{month:'short'}).toUpperCase();
+      return `<a class="event-tile event-tile-compact" href="${esc(f.event_path || '/events/')}">
+        <time class="event-date-block" datetime="${esc(f.date)}"><span>${esc(month)}</span><strong>${Number(f.date.slice(8,10))}</strong><small>${esc(f.date.slice(0,4))}</small></time>
+        <span class="event-tile-copy"><span class="tile-kicker">${esc(name.length ? brand : 'UFC EVENT')}</span><strong>${esc(name.length ? name.join(': ') : f.event)}</strong><span class="tile-meta">${fights.length} bouts <span aria-hidden="true">·</span> Upcoming card</span></span><span class="tile-arrow" aria-hidden="true">↗</span></a>`;
+    }).join('');
+    if (schedule.innerHTML !== markup) {
+      const scroll = schedule.scrollLeft;
+      schedule.innerHTML = markup;
+      schedule.scrollLeft = scroll;
+    }
+  }
   let selection = $('event-filter').value;
   if (selection !== 'all' && !groups[selection]) selection = Object.keys(groups)[0] || 'all';
   $('event-filter').innerHTML = '<option value="all">All upcoming events</option>' + Object.entries(groups).map(([key, fs]) => `<option value="${esc(key)}">${esc(fs[0].event)}</option>`).join('');

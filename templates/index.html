@@ -63,7 +63,7 @@
       <button class="tab" data-tab="model" aria-pressed="false">Inside the Algorithm</button>
     </nav>
     <section id="upcoming" class="panel">
-      {% if upcoming_events %}<section class="event-shelf" aria-label="Upcoming event schedule"><div class="shelf-heading"><span class="eyebrow">ON THE CALENDAR</span><a href="/events/">All events <span aria-hidden="true">↗</span></a></div><div class="event-shelf-track">{% for event in upcoming_events %}{{ event_tile(event, compact=true) }}{% endfor %}</div></section>{% endif %}
+      <section class="event-shelf" aria-label="Upcoming event schedule"{% if not upcoming_events %} hidden{% endif %}><div class="shelf-heading"><span class="eyebrow">ON THE CALENDAR</span><a href="/events/">All events <span aria-hidden="true">↗</span></a></div><div class="event-shelf-track">{% for event in upcoming_events %}{{ event_tile(event, compact=true) }}{% endfor %}</div></section>
       <div class="section-heading">
         <div>
           <div class="eyebrow">NEXT IN THE OCTAGON</div>

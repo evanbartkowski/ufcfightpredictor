@@ -78,6 +78,18 @@ with sync_playwright() as p:
     page.wait_for_function('() => !loading')
     assert len(calls) == before
 
+    # The schedule strip and header must follow a changed live lineup, too.
+    assert page.evaluate('''() => {
+      const original=data.upcoming;
+      const event=original[0].event;
+      data.upcoming=original.map(f=>f.event===event?{...f,event:'UFC: Revised fight night',event_path:'/events/revised-card/'}:f);
+      render();
+      const updated=document.querySelector('.event-shelf-track').textContent.includes('Revised fight night')
+        && document.getElementById('next-event-link').getAttribute('href')==='/events/revised-card/';
+      data.upcoming=original;render();
+      return updated;
+    }''')
+
     assert page.locator('.art-icon').first.evaluate('(svg) => svg.getBBox().width > 0')
     assert not page.evaluate(r'/[\u{1F300}-\u{1FAFF}]/u.test(document.body.innerText)')
     page.screenshot(path=str(ROOT / 'test-results' / 'updates-desktop.png'))
