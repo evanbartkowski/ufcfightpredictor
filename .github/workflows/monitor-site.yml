@@ -1,7 +1,7 @@
 name: Monitor production freshness
 on:
   schedule:
-    - cron: '16 * * * *'
+    - cron: '16 */3 * * *'
   workflow_dispatch:
 permissions:
   contents: read
@@ -11,4 +11,4 @@ jobs:
     timeout-minutes: 3
     steps:
       - uses: actions/checkout@v4
-      - run: python3 scripts/monitor_production.py
+      - run: python3 scripts/monitor_production.py --url https://mma-oracle.web.app --max-heartbeat 43200 --max-sync 86400 --max-odds 43200

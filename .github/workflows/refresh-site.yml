@@ -2,7 +2,7 @@ name: Refresh fight data and website
 
 on:
   schedule:
-    - cron: '8,23,38,53 * * * *'
+    - cron: '24 * * * *'
   workflow_dispatch:
   push:
     branches: [main]
@@ -18,7 +18,7 @@ permissions:
 
 jobs:
   clean-container:
-    if: github.event_name != 'schedule'
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
