@@ -39,7 +39,7 @@ with sync_playwright() as p:
     page.wait_for_timeout(180)
     assert page.locator('[data-arena-canvas]').get_attribute('data-frames') == still
     page.emulate_media(reduced_motion='no-preference')
-    assert page.locator('header .site-navigation a').count() == 2
+    assert page.locator('header .site-navigation a').count() == 0
     assert page.locator('.library-shortcut:visible').count() == 0
     assert page.locator('a[href="/status/"]').count() == 0
     assert page.get_by_role('button',name='Model Watch',exact=False).is_visible()
@@ -92,7 +92,7 @@ with sync_playwright() as p:
         response = page.goto(BASE + route, wait_until='networkidle')
         assert response.status == 200, route
         assert page.locator('h1').count() == 1, route
-        assert page.locator('header [aria-current="page"]').inner_text() == 'Fighter database', route
+        assert page.locator('header .brand').is_visible(), route
         assert page.locator('header a[href="/status/"]').count() == 0
         assert page.locator('.page-hero').is_visible()
         page.screenshot(path=str(OUT / ('design-' + route.strip('/').replace('/','-') + '-desktop.png')))

@@ -5,11 +5,6 @@
 <a class="skip-link" href="#main-content">Skip to content</a>
 <header class="topbar site-topbar"><div class="topbar-inner">
   <a class="brand" href="/" aria-label="MMA Cipher home"><img src="{{ url_for('static', filename='cipher-mark.svg') }}" class="brand-logo" alt=""><span class="brand-wordmark">MMA CIPHER<span>FIGHT INTELLIGENCE</span></span></a>
-  <nav class="site-navigation" aria-label="Main navigation">
-    {% for key, href, label in [('dashboard','/','Dashboard'),('library','/#fighters','Fighter database')] %}
-    <a href="{{ href }}"{% if (active == 'dashboard' and key == 'dashboard') or (active != 'dashboard' and key == 'library') %} class="is-current" aria-current="page"{% endif %}>{{ label }}</a>
-    {% endfor %}
-  </nav>
   {% if next_event %}<a class="next-event-link" id="next-event-link" href="{{ next_event.path }}"><span class="next-event-icon" aria-hidden="true">↗</span><span><span class="next-event-label" id="next-event-label">NEXT EVENT</span><strong id="next-event-date">{{ date_label(next_event.date) }}</strong></span></a>
   {% else %}<a class="header-dashboard-link" href="/">Live dashboard <span aria-hidden="true">↗</span></a>{% endif %}
 </div></header>
