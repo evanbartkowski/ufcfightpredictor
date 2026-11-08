@@ -74,3 +74,28 @@ def test_failed_indexnow_request_does_not_advance_submission_state(tmp_path):
     state=tmp_path/'state.json';state.write_text('{"/":"old"}')
     with pytest.raises(RuntimeError,match='429'):submit('https://mma-oracle.web.app',state,Session())
     assert json.loads(state.read_text())=={'/':'old'}
+
+
+def test_event_page_has_complete_google_structured_data(public_app):
+    import json
+    service = public_app.extensions['predictor']
+    catalog = Catalog(service)
+    event_path = next(iter(catalog.events.keys()))
+    html = BeautifulSoup(public_app.test_client().get(event_path).data, 'html.parser')
+    graph = json.loads(html.select_one('script[type="application/ld+json"]').string)['@graph']
+    event = next(item for item in graph if item['@type'] == 'SportsEvent')
+    assert event['name']
+    assert event['startDate']
+    assert event['endDate']
+    assert event['description']
+    assert event['eventStatus'] == 'https://schema.org/EventScheduled'
+    assert event['eventAttendanceMode'] == 'https://schema.org/OfflineEventAttendanceMode'
+    assert event['location']['@type'] == 'Place'
+    assert event['location']['address']['@type'] == 'PostalAddress'
+    assert event['organizer']['@type'] == 'Organization'
+    assert isinstance(event['performer'], list) and len(event['performer']) > 0
+    assert event['performer'][0]['@type'] == 'Person'
+    assert event['offers']['@type'] == 'Offer'
+    assert event['offers']['availability'] == 'https://schema.org/InStock'
+    assert event['offers']['price'] == '0'
+

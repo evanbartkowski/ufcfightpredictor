@@ -74,7 +74,7 @@
         {% if upcoming_events %}{% set event = upcoming_events[0] %}
         <div class="event-heading"><h3><a class="public-link" href="{{ event.path }}">{{ event.name }}</a></h3><time datetime="{{ event.date }}">{{ event.date }}</time></div>
         {% for section, label in [('main','Main card'),('prelims','Undercard / Prelims'),('early','Early prelims'),('unassigned','Card placement pending')] %}
-          {% set group = [] %}{% for f in event.fights %}{% if (f.odds.card_section or 'unassigned') == section %}{% set _ = group.append(f) %}{% endif %}{% endfor %}
+          {% set group = [] %}{% for f in event.fights %}{% if (((f.odds and f.odds.card_section) if f.odds is defined else None) or f.card_section or 'unassigned') == section %}{% set _ = group.append(f) %}{% endif %}{% endfor %}
           {% if group %}{% if section == 'main' %}<section class="card-section" aria-label="{{ label }}"><h4>{{ label }}</h4><div class="fight-grid">{% for f in group %}{{ forecast(f) }}{% endfor %}</div></section>
           {% else %}<details class="undercard-dropdown card-section" aria-label="{{ label }}"><summary class="undercard-summary"><span>{{ label }} · {{ group|length }} bouts</span><span>Click to show undercard</span></summary><div class="undercard-content fight-grid">{% for f in group %}{{ forecast(f) }}{% endfor %}</div></details>{% endif %}{% endif %}
         {% endfor %}

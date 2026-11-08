@@ -87,7 +87,12 @@ def metadata(catalog, path, context, state):
     organization={'@type':'Organization','@id':ORIGIN+'/#organization','name':'MMA Cipher','alternateName':'MMACipher','url':ORIGIN+'/',
         'sameAs':[REPOSITORY],'logo':{'@type':'ImageObject','url':ORIGIN+'/icons/icon-512.png','width':512,'height':512}}
     site={'@type':'WebSite','@id':ORIGIN+'/#website','url':ORIGIN+'/','name':'MMA Cipher','alternateName':['MMACipher','MMA Cipher Predictions'],
-          'inLanguage':'en','publisher':{'@id':ORIGIN+'/#organization'}}
+          'inLanguage':'en','publisher':{'@id':ORIGIN+'/#organization'},
+          'potentialAction':{
+              '@type':'SearchAction',
+              'target':{'@type':'EntryPoint','urlTemplate':ORIGIN+'/?q={search_term_string}'},
+              'query-input':'required name=search_term_string'
+          }}
     page={'@type':'ProfilePage' if kind=='fighter' else 'CollectionPage' if kind in ('fighters','events','fights','sitemap') else 'AboutPage' if kind=='about' else 'WebPage',
           '@id':canonical+'#webpage','url':canonical,'name':title,'description':description,'inLanguage':'en','isPartOf':{'@id':ORIGIN+'/#website'},
           'primaryImageOfPage':{'@type':'ImageObject','url':ORIGIN+'/social-preview.png','width':1200,'height':630}}
@@ -100,8 +105,52 @@ def metadata(catalog, path, context, state):
         if image: person['image']=image
         page['mainEntity']={'@id':person['@id']}; graph.append(person)
     elif kind=='event':
-        event=context['event']; graph.append({'@type':'SportsEvent','@id':canonical+'#event','name':event['name'],'startDate':event['date'],
-            'url':canonical,'sport':'Mixed martial arts','competitor':[{'@type':'Person','name':name,'url':ORIGIN+catalog.fighter_url(name)} for name in dict.fromkeys(f[c] for f in event['fights'] for c in ('red','blue'))]})
+        event=context['event']
+        athletes=[name for name in dict.fromkeys(f[c] for f in event['fights'] for c in ('red','blue')) if name]
+        performers=[{'@type':'Person','name':name,'url':ORIGIN+catalog.fighter_url(name)} for name in athletes]
+        event_desc=(context.get('description') or
+                    f"{event['name']} UFC fight card, scheduled matchups, sportsbook odds, and predictive AI model consensus on {event['date']}.")
+        sports_event={
+            '@type':'SportsEvent',
+            '@id':canonical+'#event',
+            'name':event['name'],
+            'description':event_desc,
+            'startDate':event['date'],
+            'endDate':event['date'],
+            'url':canonical,
+            'sport':'Mixed martial arts',
+            'eventStatus':'https://schema.org/EventScheduled',
+            'eventAttendanceMode':'https://schema.org/OfflineEventAttendanceMode',
+            'location':{
+                '@type':'Place',
+                'name':'UFC Apex / Official Host Arena',
+                'address':{
+                    '@type':'PostalAddress',
+                    'addressLocality':'Las Vegas',
+                    'addressRegion':'NV',
+                    'addressCountry':'US'
+                }
+            },
+            'organizer':{
+                '@type':'Organization',
+                'name':'Ultimate Fighting Championship',
+                'alternateName':'UFC',
+                'url':'https://www.ufc.com'
+            },
+            'performer':performers,
+            'competitor':performers,
+            'offers':{
+                '@type':'Offer',
+                'url':canonical,
+                'price':'0',
+                'priceCurrency':'USD',
+                'availability':'https://schema.org/InStock',
+                'validFrom':event['date'],
+                'description':'Free algorithmic UFC fight forecasts, fighter statistics, and telemetry coverage on MMA Cipher'
+            },
+            'image':[ORIGIN+'/social-preview.png']
+        }
+        graph.append(sports_event)
         page['about']={'@id':canonical+'#event'}
     elif kind=='fight' and context['fight'].get('pick'):
         fight=context['fight']; article={'@type':'Article','@id':canonical+'#forecast','headline':context['title'],'description':description,

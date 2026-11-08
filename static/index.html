@@ -5,46 +5,70 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <link rel="icon" type="image/svg+xml" href="/cipher-mark.svg">
-  <meta name="theme-color" content="#06070a">
-  <link rel="canonical" href="https://mma-oracle.web.app/">
-  <meta property="og:title" content="MMA Cipher — UFC predictions and fighter records">
-  <meta property="og:description" content="Published UFC forecasts, model evidence, fighter records, and source freshness.">
-  <meta name="description" content="MMA Cipher — Next-generation UFC fight forecasting, multi-model AI ensemble consensus, pre-bout statistical telemetry, and verified performance tracking.">
-  <title>MMA Cipher — AI Fight Intelligence & UFC Predictions</title>
-  <link rel="stylesheet" href="/style.css?v=20">
-  <link rel="stylesheet" href="/content.css?v=1">
+<title>MMA Cipher (MMACipher) | UFC Predictions &amp; Fighter Stats</title>
+<meta name="description" content="MMA Cipher (MMACipher): UFC fight predictions, fighter stats, upcoming event cards, and a transparent main-card prediction record with model evidence.">
+<meta name="keywords" content="UFC predictions, MMA predictions, UFC picks, UFC fight cards, UFC betting odds, fighter records, fight simulator, MMA analytics, MMACipher">
+<meta name="author" content="Evan Bartkowski">
+<meta name="publisher" content="MMA Cipher">
+<meta name="application-name" content="MMA Cipher">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="theme-color" content="#030507">
+<link rel="canonical" href="https://mma-oracle.web.app/">
+<link rel="icon" type="image/svg+xml" href="/cipher-mark.svg">
+<link rel="icon" type="image/png" sizes="96x96" href="/icons/icon-96.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="MMA Cipher">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="MMA Cipher (MMACipher) | UFC Predictions &amp; Fighter Stats">
+<meta property="og:description" content="MMA Cipher (MMACipher): UFC fight predictions, fighter stats, upcoming event cards, and a transparent main-card prediction record with model evidence.">
+<meta property="og:url" content="https://mma-oracle.web.app/">
+<meta property="og:image" content="https://mma-oracle.web.app/social-preview.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta property="og:image:type" content="image/png"><meta property="og:image:alt" content="MMA Cipher — UFC predictions, fighter records, and model evidence">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="MMA Cipher (MMACipher) | UFC Predictions &amp; Fighter Stats">
+<meta name="twitter:description" content="MMA Cipher (MMACipher): UFC fight predictions, fighter stats, upcoming event cards, and a transparent main-card prediction record with model evidence."><meta name="twitter:image" content="https://mma-oracle.web.app/social-preview.png">
+<meta name="twitter:image:alt" content="MMA Cipher — UFC predictions, fighter records, and model evidence">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@id": "https://mma-oracle.web.app/#organization", "@type": "Organization", "alternateName": "MMACipher", "logo": {"@type": "ImageObject", "height": 512, "url": "https://mma-oracle.web.app/icons/icon-512.png", "width": 512}, "name": "MMA Cipher", "sameAs": ["https://github.com/evanbartkowski/ufcfightpredictor"], "url": "https://mma-oracle.web.app/"}, {"@id": "https://mma-oracle.web.app/#website", "@type": "WebSite", "alternateName": ["MMACipher", "MMA Cipher Predictions"], "inLanguage": "en", "name": "MMA Cipher", "potentialAction": {"@type": "SearchAction", "query-input": "required name=search_term_string", "target": {"@type": "EntryPoint", "urlTemplate": "https://mma-oracle.web.app/?q={search_term_string}"}}, "publisher": {"@id": "https://mma-oracle.web.app/#organization"}, "url": "https://mma-oracle.web.app/"}, {"@id": "https://mma-oracle.web.app/#webpage", "@type": "WebPage", "dateModified": "2026-11-08T00:32:54.086212+00:00", "description": "MMA Cipher (MMACipher): UFC fight predictions, fighter stats, upcoming event cards, and a transparent main-card prediction record with model evidence.", "inLanguage": "en", "isPartOf": {"@id": "https://mma-oracle.web.app/#website"}, "name": "MMA Cipher (MMACipher) | UFC Predictions \u0026 Fighter Stats", "primaryImageOfPage": {"@type": "ImageObject", "height": 630, "url": "https://mma-oracle.web.app/social-preview.png", "width": 1200}, "url": "https://mma-oracle.web.app/"}]}</script>  <link rel="stylesheet" href="/style.css?v=22">
+  <link rel="stylesheet" href="/content.css?v=4">
+<link rel="preload" href="/fonts/barlow-condensed-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/fonts.css?v=1">
+<link rel="stylesheet" href="/arena.css?v=1">
+<script src="/arena.js?v=1" defer></script>  <script src="/content.js?v=2" defer></script>
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js" defer></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js" defer></script>
   <script src="/firebase.js" defer></script>
-  <script src="/app.js?v=20" defer></script>
+  <script src="/app.js?v=24" defer></script>
 </head>
 <body>
-  <header class="topbar">
-    <div class="topbar-inner">
-      <a class="brand" href="/" aria-label="MMA Cipher home">
-        <img src="/cipher-mark.svg" class="brand-logo" alt="MMA Cipher All-Seeing Eye Logo">
-        <span class="brand-wordmark">MMA CIPHER<span>INTELLIGENCE</span></span>
-      </a>
-      <a class="next-event-link" id="next-event-link" href="#upcoming">
-        <span class="next-event-icon" aria-hidden="true">&#8599;</span>
-        <span>
-          <span class="next-event-label" id="next-event-label">NEXT EVENT</span>
-          <strong id="next-event-date">2026-11-07</strong>
-        </span>
-      </a>
-    </div>
-  </header>
-  <main>
+  <div class="arena-backdrop" aria-hidden="true">
+  <div class="arena-coordinate-grid"></div>
+  <svg class="arena-blueprint" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" focusable="false">
+    <defs><pattern id="cage-weave" width="34" height="48" patternUnits="userSpaceOnUse"><path d="M17 0 34 24 17 48 0 24Z" fill="none" stroke="#4a7485" stroke-width=".6"/></pattern><linearGradient id="arena-edge"><stop stop-color="#30dce8" stop-opacity=".45"/><stop offset="1" stop-color="#17353c" stop-opacity="0"/></linearGradient><radialGradient id="weave-fade"><stop stop-color="white" stop-opacity=".4"/><stop offset="1" stop-color="white" stop-opacity="0"/></radialGradient><mask id="weave-mask"><ellipse cx="160" cy="625" rx="450" ry="500" fill="url(#weave-fade)"/></mask></defs>
+    <path d="M-120 60H270L540 330V670L270 940H-120" fill="url(#cage-weave)" mask="url(#weave-mask)"/>
+    <g fill="none" stroke="#305163" stroke-width="1" opacity=".27"><path d="m-130 455 250-105 260 105 105 250-105 250-260 105-250-105-105-250Z"/><path d="m-105 470 225-94 235 94 94 235-94 225-235 94-225-94-94-225Z"/><path d="M120 350v674M-224 705h673" stroke-dasharray="3 9"/><circle cx="120" cy="705" r="115" stroke-dasharray="2 12"/></g>
+    <g class="arena-path-static" fill="none" stroke="url(#arena-edge)" stroke-width="1"><path d="M0 180H250l90 90h300l80-80h210M1180 1000V820l110-110V370l160-160h150"/><path d="M0 188H244l90 90h312M1188 1000V825l110-110V374l157-157" opacity=".3"/></g>
+    <g class="arena-trace-flow" fill="none" stroke="#45bdcb" stroke-width="1.5" stroke-dasharray="8 240" opacity=".35"><path d="M0 180H250l90 90h300l80-80h210"/><path d="M1180 1000V820l110-110V370l160-160h150"/></g>
+    <g fill="none" stroke="#3d6073" opacity=".45"><path d="M42 105v-20h20m1496 20V85h-20M42 895v20h20m1496-20v20h-20"/><path d="M18 490h12m-6-6v12m1554 0h12m-6-6v12"/></g>
+  </svg>
+  <canvas class="arena-canvas" data-arena-canvas></canvas>
+  <div class="arena-floor-glow"></div>
+  <span class="arena-side-mark">MMA CIPHER / FIGHT INTELLIGENCE</span>
+</div><a class="skip-link" href="#main-content">Skip to content</a>
+<header class="topbar site-topbar"><div class="topbar-inner">
+  <a class="brand" href="/" aria-label="MMA Cipher home"><img src="/cipher-mark.svg" class="brand-logo" alt=""><span class="brand-wordmark">MMA CIPHER<span>FIGHT INTELLIGENCE</span></span></a>
+  <nav class="site-navigation" aria-label="Main navigation">
+    <a href="/" class="is-current" aria-current="page">Dashboard</a>
+    <a href="/#fighters">Fighter database</a>
+  </nav>
+<a class="next-event-link" id="next-event-link" href="/events/2026-11-07-ufc-fight-night-cortes-acosta-vs-walker/"><span class="next-event-icon" aria-hidden="true">↗</span><span><span class="next-event-label" id="next-event-label">NEXT EVENT</span><strong id="next-event-date">Nov 07, 2026</strong></span></a>
+</div></header>
+  <main id="main-content">
     <section class="hero">
-      <div class="octagon-scene" aria-hidden="true">
-        <div class="octagon-plane plane-one"></div>
-        <div class="octagon-plane plane-two"></div>
-        <div class="octagon-plane plane-three"></div>
-        <div class="octagon-plane plane-four"></div>
-        <div class="octagon-wireframe"></div>
-      </div>
+      <div class="hero-range-markers" aria-hidden="true"><i></i><i></i><i></i></div>
       <div class="hero-copy">
         <div class="eyebrow">MMA CIPHER · ADVANCED MULTI-MODEL AI</div>
         <h1>MMA CIPHER<br><span>PREDICTIONS.</span></h1>
@@ -57,24 +81,48 @@
     </section>
     <div class="sync-strip" aria-label="Data freshness">
       <div id="notice" class="notice" role="status">Last successful fight-data pull: 2026-11-01T19:07:14.870429+00:00</div>
-      <div id="odds-sync" class="odds-sync" role="status">Odds checked 2026-11-01T20:29:37.480506+00:00</div>
+      <div id="odds-sync" class="odds-sync" role="status">Odds checked 2026-11-08T00:32:51.728886+00:00</div>
     </div>
     <section class="metrics" aria-label="Model overview">
-      <div><span class="metric-label">HISTORICAL TEST ACCURACY</span><strong id="accuracy">62.7%</strong><small id="test-count">1580 chronological holdout bouts</small></div>
-      <div><span class="metric-label">RECORDED FIGHTS</span><strong id="fight-count">7,541</strong><small>Confirmed outcomes</small></div>
-      <div><span class="metric-label">LIVE PREDICTION RECORD</span><strong id="live-accuracy">50.0%</strong><small id="live-count">30 settled forecasts</small></div>
+      <div><span class="metric-label">HISTORICAL TEST ACCURACY</span><strong id="accuracy">62.7%</strong><small id="test-count">1586 chronological holdout bouts</small></div>
+      <div><span class="metric-label">RECORDED FIGHTS</span><strong id="fight-count">7,547</strong><small>Confirmed outcomes</small></div>
+      <div><span class="metric-label">MAIN CARD PREDICTION RECORD</span><strong id="live-accuracy">50.0%</strong><small id="live-count">14 settled main-card picks</small></div>
       <div><span class="metric-label">LAST SUCCESSFUL SYNC</span><strong class="date-metric" id="last-sync">2026-11-01 19:07 UTC</strong><small id="sync-state">Fight data every 6h · page checks every minute</small></div>
     </section>
     <nav class="tabs" aria-label="Dashboard sections">
-      <button class="tab active" data-tab="upcoming" aria-pressed="true">Upcoming fights <span id="card-count">45</span></button>
+      <button class="tab active" data-tab="upcoming" aria-pressed="true">Upcoming fights <span id="card-count">42</span></button>
       <button class="tab" data-tab="matchup" aria-pressed="false">Matchup lab</button>
       <button class="tab" data-tab="fighters" aria-pressed="false">Fighter database <span id="fighters-count" class="tab-badge">2570</span></button>
       <button class="tab" data-tab="analytics" aria-pressed="false">AI Analytics</button>
       <button class="tab" data-tab="results" aria-pressed="false">Prediction record</button>
       <button class="tab" data-tab="model" aria-pressed="false">Inside the Algorithm</button>
     </nav>
-    <nav class="public-nav" aria-label="Records and methods"><a href="/events/">Event cards</a><a href="/fighters/">Fighter profiles</a><a href="/fights/">Issued forecasts</a><a href="/model/">Model methods and limits</a><a href="/status/">Data status</a></nav>
     <section id="upcoming" class="panel">
+      <section class="event-shelf" aria-label="Upcoming event schedule"><div class="shelf-heading"><span class="eyebrow">ON THE CALENDAR</span><span class="schedule-hint">Swipe or select a card</span></div><div class="event-shelf-track"><a class="event-tile event-tile-compact" href="/events/2026-11-07-ufc-fight-night-cortes-acosta-vs-walker/" data-search-text="2026-11-07 UFC Fight Night: Cortes Acosta vs. Walker Karine Silva Murtazali Magomedov Austin Bashi Andre Petroski Seokhyeon Ko Jose Souza Waldo Cortes Acosta Tatiana Suarez Davey Grant Billy Elekana Priscila Cachoeira Mitch Raposo Keiichiro Nakamura Gabriel Lorenco Mantas Kondratavicius Jose Delano Austin Bashi Jonny Parsons Gabriella Fernandes Jose Delano Carlos Calderon Mantas Kondratavicius Wellington Turman Jonny Parsons Johnny Walker Virna Jandiroba Elijah Smith Lucas Fernando Nina Milosevic Marcos Degli Ollie Schmid Thomas Petersen Andre Petroski Murtazali Magomedov Lucas Brennan Jose Souza">
+  <time class="event-date-block" datetime="2026-11-07"><span>NOV</span><strong>7</strong><small>2026</small></time>
+  <span class="event-tile-copy"><span class="tile-kicker">UFC Fight Night</span><strong>Cortes Acosta vs. Walker</strong><span class="tile-meta">18 bouts <span aria-hidden="true">·</span> Upcoming card</span></span>
+<span class="tile-arrow" aria-hidden="true">↗</span>
+</a><a class="event-tile event-tile-compact" href="/events/2026-11-14-ufc-334-gane-vs-hokit/" data-search-text="2026-11-14 UFC 334: Gane vs. Hokit Ciryl Gane Kayla Harrison Caio Borralho Uros Medic Bilal Hasan Stephen Thompson Drew Dober Jim Miller Donte Johnson Jared Gordon Macy Chiasson Adrian Yanez Evan Elder Donte Johnson Nazim Sadykhov Josh Hokit Amanda Nunes Yousri Belgaroui Kevin Holland Luis Gurule Charles Radtke Chris Duncan Terrance McKinney Cesar Almeida Melquizael Costa Bia Mesquita Juan Diaz Samuel Sanches Baisangur Susurkaev Jefferson Nascimento">
+  <time class="event-date-block" datetime="2026-11-14"><span>NOV</span><strong>14</strong><small>2026</small></time>
+  <span class="event-tile-copy"><span class="tile-kicker">UFC 334</span><strong>Gane vs. Hokit</strong><span class="tile-meta">15 bouts <span aria-hidden="true">·</span> Upcoming card</span></span>
+<span class="tile-arrow" aria-hidden="true">↗</span>
+</a><a class="event-tile event-tile-compact" href="/events/2026-11-21-ufc-fight-night-prochazka-vs-stirling/" data-search-text="2026-11-21 UFC Fight Night: Prochazka vs. Stirling Jiri Prochazka Aljamain Sterling Dan Hooker Kyoji Horiguchi Jared Cannonier Aleksandre Topuria Shamil Gaziev Amir Albazi Jake Matthews Navajo Stirling Kevin Vallejos Brian Ortega Asu Almabayev Ikram Aliskerov Santiago Luna Tallison Teixeira Alessandro Costa Tahir Abdullayev">
+  <time class="event-date-block" datetime="2026-11-21"><span>NOV</span><strong>21</strong><small>2026</small></time>
+  <span class="event-tile-copy"><span class="tile-kicker">UFC Fight Night</span><strong>Prochazka vs. Stirling</strong><span class="tile-meta">9 bouts <span aria-hidden="true">·</span> Upcoming card</span></span>
+<span class="tile-arrow" aria-hidden="true">↗</span>
+</a><a class="event-tile event-tile-compact" href="/events/2026-12-12-ufc-335-oliveira-vs-lopes/" data-search-text="2026-12-12 UFC 335: Oliveira vs. Lopes Charles Oliveira Sergei Pavlovich Joe Pyfer Brandon Moreno Maycee Barber Quentin Pasley Diego Lopes Alex Pereira Bo Nickal Charles Johnson Carli Judice Junior Tafa">
+  <time class="event-date-block" datetime="2026-12-12"><span>DEC</span><strong>12</strong><small>2026</small></time>
+  <span class="event-tile-copy"><span class="tile-kicker">UFC 335</span><strong>Oliveira vs. Lopes</strong><span class="tile-meta">6 bouts <span aria-hidden="true">·</span> Upcoming card</span></span>
+<span class="tile-arrow" aria-hidden="true">↗</span>
+</a><a class="event-tile event-tile-compact" href="/events/2027-01-30-ufc-336-van-vs-kape/" data-search-text="2027-01-30 UFC 336: Van vs. Kape Joshua Van Carlos Prates Manel Kape Michael Morales">
+  <time class="event-date-block" datetime="2027-01-30"><span>JAN</span><strong>30</strong><small>2027</small></time>
+  <span class="event-tile-copy"><span class="tile-kicker">UFC 336</span><strong>Van vs. Kape</strong><span class="tile-meta">2 bouts <span aria-hidden="true">·</span> Upcoming card</span></span>
+<span class="tile-arrow" aria-hidden="true">↗</span>
+</a><a class="event-tile event-tile-compact" href="/events/2027-02-06-ufc-fight-night-salkilld-vs-saint-denis/" data-search-text="2027-02-06 UFC Fight Night: Salkilld vs. Saint Denis Quillan Salkilld Bogdan Guskov Marwan Rahiki Kaan Ofli Benoit Saint Denis Robert Whittaker JooSang Yoo Joanderson Brito">
+  <time class="event-date-block" datetime="2027-02-06"><span>FEB</span><strong>6</strong><small>2027</small></time>
+  <span class="event-tile-copy"><span class="tile-kicker">UFC Fight Night</span><strong>Salkilld vs. Saint Denis</strong><span class="tile-meta">4 bouts <span aria-hidden="true">·</span> Upcoming card</span></span>
+<span class="tile-arrow" aria-hidden="true">↗</span>
+</a></div></section>
       <div class="section-heading">
         <div>
           <div class="eyebrow">NEXT IN THE OCTAGON</div>
@@ -83,103 +131,107 @@
         <div class="upcoming-controls">
           <div class="filter-pills" role="toolbar" aria-label="Card filters">
             <button class="filter-pill active" data-filter="all">All Bouts</button>
-            <button class="filter-pill pill-upset" data-filter="upset"><svg class="art-icon" viewBox="0 0 48 48" aria-hidden="true"><use href="/icon-art.svg#bolt"></use></svg> Upset Radar <span class="pill-badge" id="upset-pill-count">0</span></button>
+            <button class="filter-pill pill-upset" data-filter="upset"><svg class="art-icon" viewBox="0 0 48 48" aria-hidden="true"><use href="/icon-art.svg#bolt"></use></svg> Model Watch <span class="pill-badge" id="upset-pill-count">0</span></button>
             <button class="filter-pill pill-fav" data-filter="favorites"><svg class="art-icon" viewBox="0 0 48 48" aria-hidden="true"><use href="/icon-art.svg#star"></use></svg> Favorites <span class="pill-badge" id="fav-pill-count">0</span></button>
           </div>
           <select id="event-filter" aria-label="Choose an event">
             <option value="all">All upcoming events</option>
-<option value="2026-11-07|UFC Fight Night: Cortes Acosta vs. Walker" selected>UFC Fight Night: Cortes Acosta vs. Walker</option><option value="2026-11-14|UFC 334: Gane vs. Hokit" >UFC 334: Gane vs. Hokit</option><option value="2026-11-21|UFC Fight Night: Prochazka vs. Stirling" >UFC Fight Night: Prochazka vs. Stirling</option><option value="2026-12-12|UFC 335: Oliveira vs. Lopes" >UFC 335: Oliveira vs. Lopes</option><option value="2027-01-30|UFC 336: Van vs. Kape" >UFC 336: Van vs. Kape</option>          </select>
+<option value="2026-11-07|UFC Fight Night: Cortes Acosta vs. Walker" selected>UFC Fight Night: Cortes Acosta vs. Walker</option><option value="2026-11-14|UFC 334: Gane vs. Hokit" >UFC 334: Gane vs. Hokit</option><option value="2026-11-21|UFC Fight Night: Prochazka vs. Stirling" >UFC Fight Night: Prochazka vs. Stirling</option><option value="2026-12-12|UFC 335: Oliveira vs. Lopes" >UFC 335: Oliveira vs. Lopes</option><option value="2027-01-30|UFC 336: Van vs. Kape" >UFC 336: Van vs. Kape</option><option value="2027-02-06|UFC Fight Night: Salkilld vs. Saint Denis" >UFC Fight Night: Salkilld vs. Saint Denis</option>          </select>
         </div>
       </div>
       <div id="cards" data-server-rendered="true">
         <div class="event-heading"><h3><a class="public-link" href="/events/2026-11-07-ufc-fight-night-cortes-acosta-vs-walker/">UFC Fight Night: Cortes Acosta vs. Walker</a></h3><time datetime="2026-11-07">2026-11-07</time></div>
 <section class="card-section" aria-label="Main card"><h4>Main card</h4><div class="fight-grid"><article class="fight-card published-card" data-fight-id="2067d4387a55c843a1e190f4">
-  <div class="fight-top"><span>Heavyweight</span><time datetime="2026-11-07">2026-11-07</time></div>
-  <h3><a href="/fighters/waldo-cortes-acosta/">Waldo Cortes Acosta</a> <span class="muted">vs.</span> <a href="/fighters/johnny-walker/">Johnny Walker</a></h3>
-<p class="published-pick">Model pick: <strong>Waldo Cortes Acosta</strong> · 50.7%</p>
-  <p class="muted">Estimate · not separately calibrated · Issued 2026-11-01</p>
-  <a class="public-link" href="/fights/2026-11-07-waldo-cortes-acosta-vs-johnny-walker-2067d438/">Forecast evidence and matchup details →</a>
-</article><article class="fight-card published-card" data-fight-id="65894a973febb428bd33c7ac">
-  <div class="fight-top"><span>Women&#39;s Strawweight</span><time datetime="2026-11-07">2026-11-07</time></div>
-  <h3><a href="/fighters/tatiana-suarez/">Tatiana Suarez</a> <span class="muted">vs.</span> <a href="/fighters/virna-jandiroba/">Virna Jandiroba</a></h3>
-<p class="published-pick">Model pick: <strong>Tatiana Suarez</strong> · 65.4%</p>
-  <p class="muted">Estimate · not separately calibrated · Issued 2026-11-01</p>
-  <a class="public-link" href="/fights/2026-11-07-tatiana-suarez-vs-virna-jandiroba-65894a97/">Forecast evidence and matchup details →</a>
-</article><article class="fight-card published-card" data-fight-id="3d186fdbedfdff81badb5ca5">
-  <div class="fight-top"><span>Bantamweight</span><time datetime="2026-11-07">2026-11-07</time></div>
-  <h3><a href="/fighters/davey-grant/">Davey Grant</a> <span class="muted">vs.</span> <a href="/fighters/elijah-smith/">Elijah Smith</a></h3>
-<p class="published-pick">Model pick: <strong>Elijah Smith</strong> · 64.3%</p>
-  <p class="muted">Estimate · not separately calibrated · Issued 2026-11-01</p>
-  <a class="public-link" href="/fights/2026-11-07-davey-grant-vs-elijah-smith-3d186fdb/">Forecast evidence and matchup details →</a>
-</article><article class="fight-card published-card" data-fight-id="8438b8f1ab3d7f7a72808888">
-  <div class="fight-top"><span>Welterweight</span><time datetime="2026-11-07">2026-11-07</time></div>
-  <h3><a href="/fighters/seokhyeon-ko/">Seokhyeon Ko</a> <span class="muted">vs.</span> <a href="/fighters/wellington-turman/">Wellington Turman</a></h3>
-<p class="published-pick">Model pick: <strong>Seokhyeon Ko</strong> · 57.7%</p>
-  <p class="muted">Estimate · not separately calibrated · Issued 2026-11-01</p>
-  <a class="public-link" href="/fights/2026-11-07-seokhyeon-ko-vs-wellington-turman-8438b8f1/">Forecast evidence and matchup details →</a>
-</article><article class="fight-card published-card" data-fight-id="d0811380ef5077c846be66a0">
-  <div class="fight-top"><span>Light Heavyweight</span><time datetime="2026-11-07">2026-11-07</time></div>
-  <h3><a href="/fighters/billy-elekana/">Billy Elekana</a> <span class="muted">vs.</span> <a href="/fighters/lucas-fernando/">Lucas Fernando</a></h3>
-<p class="published-pick">Model pick: <strong>Lucas Fernando</strong> · 53.4%</p>
-  <p class="muted">Estimate · not separately calibrated · Issued 2026-11-01</p>
-  <a class="public-link" href="/fights/2026-11-07-billy-elekana-vs-lucas-fernando-d0811380/">Forecast evidence and matchup details →</a>
-</article><article class="fight-card published-card" data-fight-id="945356597f5d459c8b434692">
-  <div class="fight-top"><span>Middleweight</span><time datetime="2026-11-07">2026-11-07</time></div>
-  <h3><a href="/fighters/mantas-kondratavicius/">Mantas Kondratavicius</a> <span class="muted">vs.</span> <a href="/fighters/andre-petroski/">Andre Petroski</a></h3>
-<p class="published-pick">Model pick: <strong>Mantas Kondratavicius</strong> · 63.3%</p>
-  <p class="muted">Estimate · not separately calibrated · Issued 2026-11-01</p>
-  <a class="public-link" href="/fights/2026-11-07-mantas-kondratavicius-vs-andre-petroski-94535659/">Forecast evidence and matchup details →</a>
-</article></div></section>
-<details class="undercard-dropdown card-section" aria-label="Undercard / Prelims"><summary class="undercard-summary"><span>Undercard / Prelims · 7 bouts</span><span>Click to show undercard</span></summary><div class="undercard-content fight-grid"><article class="fight-card published-card" data-fight-id="8f09391ce9d781cc27f09e0c">
-  <div class="fight-top"><span>Heavyweight</span><time datetime="2026-11-07">2026-11-07</time></div>
-  <h3><a href="/fighters/gabriel-lorenco/">Gabriel Lorenco</a> <span class="muted">vs.</span> <a href="/fighters/thomas-petersen/">Thomas Petersen</a></h3>
-<p class="published-pick">Model pick: <strong>Gabriel Lorenco</strong> · 52.4%</p>
-  <p class="muted">Estimate · not separately calibrated · Issued 2026-11-01</p>
-  <a class="public-link" href="/fights/2026-11-07-gabriel-lorenco-vs-thomas-petersen-8f09391c/">Forecast evidence and matchup details →</a>
-</article><article class="fight-card published-card" data-fight-id="1261f8532db8513c1cb92a7f">
-  <div class="fight-top"><span>Women&#39;s Flyweight</span><time datetime="2026-11-07">2026-11-07</time></div>
-  <h3><a href="/fighters/karine-silva/">Karine Silva</a> <span class="muted">vs.</span> <a href="/fighters/gabriella-fernandes/">Gabriella Fernandes</a></h3>
-<p class="published-pick">Model pick: <strong>Karine Silva</strong> · 56.1%</p>
-  <p class="muted">Estimate · not separately calibrated · Issued 2026-11-01</p>
-  <a class="public-link" href="/fights/2026-11-07-karine-silva-vs-gabriella-fernandes-1261f853/">Forecast evidence and matchup details →</a>
-</article><article class="fight-card published-card" data-fight-id="f02bda85ee8bfd06871394d6">
-  <div class="fight-top"><span>Flyweight</span><time datetime="2026-11-07">2026-11-07</time></div>
-  <h3><a href="/fighters/mitch-raposo/">Mitch Raposo</a> <span class="muted">vs.</span> <a href="/fighters/marcos-degli/">Marcos Degli</a></h3>
-<p class="published-pick">Model pick: <strong>Marcos Degli</strong> · 58.2%</p>
-  <p class="muted">Estimate · not separately calibrated · Issued 2026-11-01</p>
-  <a class="public-link" href="/fights/2026-11-07-mitch-raposo-vs-marcos-degli-f02bda85/">Forecast evidence and matchup details →</a>
-</article><article class="fight-card published-card" data-fight-id="69310fd90ae39196dc3b5361">
-  <div class="fight-top"><span>Featherweight</span><time datetime="2026-11-07">2026-11-07</time></div>
-  <h3><a href="/fighters/jose-delano/">Jose Delano</a> <span class="muted">vs.</span> <a href="/fighters/murtazali-magomedov/">Murtazali Magomedov</a></h3>
-<p class="published-pick">Model pick: <strong>Murtazali Magomedov</strong> · 57.0%</p>
-  <p class="muted">Estimate · not separately calibrated · Issued 2026-11-01</p>
-  <a class="public-link" href="/fights/2026-11-07-jose-delano-vs-murtazali-magomedov-69310fd9/">Forecast evidence and matchup details →</a>
-</article><article class="fight-card published-card" data-fight-id="7408ab77951df2e739803bb2">
-  <div class="fight-top"><span>Featherweight</span><time datetime="2026-11-07">2026-11-07</time></div>
-  <h3><a href="/fighters/keiichiro-nakamura/">Keiichiro Nakamura</a> <span class="muted">vs.</span> <a href="/fighters/ollie-schmid/">Ollie Schmid</a></h3>
-<p class="published-pick">Model pick: <strong>Keiichiro Nakamura</strong> · 59.8%</p>
-  <p class="muted">Estimate · not separately calibrated · Issued 2026-11-01</p>
-  <a class="public-link" href="/fights/2026-11-07-keiichiro-nakamura-vs-ollie-schmid-7408ab77/">Forecast evidence and matchup details →</a>
-</article><article class="fight-card published-card" data-fight-id="4ef088ff2f7dded03ef2f8de">
-  <div class="fight-top"><span>Featherweight</span><time datetime="2026-11-07">2026-11-07</time></div>
-  <h3><a href="/fighters/austin-bashi/">Austin Bashi</a> <span class="muted">vs.</span> <a href="/fighters/lucas-brennan/">Lucas Brennan</a></h3>
-<p class="published-pick">Model pick: <strong>Austin Bashi</strong> · 63.6%</p>
-  <p class="muted">Estimate · not separately calibrated · Issued 2026-11-01</p>
-  <a class="public-link" href="/fights/2026-11-07-austin-bashi-vs-lucas-brennan-4ef088ff/">Forecast evidence and matchup details →</a>
-</article><article class="fight-card published-card" data-fight-id="f51ea8974271938d0a73ebd7">
-  <div class="fight-top"><span>Women&#39;s Bantamweight</span><time datetime="2026-11-07">2026-11-07</time></div>
-  <h3><a href="/fighters/priscila-cachoeira/">Priscila Cachoeira</a> <span class="muted">vs.</span> <a href="/fighters/nina-milosevic/">Nina Milosevic</a></h3>
-<p class="published-pick">Model pick: <strong>Nina Milosevic</strong> · 68.3%</p>
-  <p class="muted">Estimate · not separately calibrated · Issued 2026-11-01</p>
-  <a class="public-link" href="/fights/2026-11-07-priscila-cachoeira-vs-nina-milosevic-f51ea897/">Forecast evidence and matchup details →</a>
-</article></div></details><details class="undercard-dropdown card-section" aria-label="Card placement pending"><summary class="undercard-summary"><span>Card placement pending · 1 bouts</span><span>Click to show undercard</span></summary><div class="undercard-content fight-grid"><article class="fight-card published-card" data-fight-id="dd8e5539750017dde0bdf774">
-  <div class="fight-top"><span>Welterweight</span><time datetime="2026-11-07">2026-11-07</time></div>
-  <h3><a href="/fighters/jonny-parsons/">Jonny Parsons</a> <span class="muted">vs.</span> <a href="/fighters/jose-souza/">Jose Souza</a></h3>
-<p class="published-pick">Model pick: <strong>Jose Souza</strong> · 57.8%</p>
-  <p class="muted">Estimate · not separately calibrated · Issued 2026-11-01</p>
-  <a class="public-link" href="/fights/2026-11-07-jonny-parsons-vs-jose-souza-dd8e5539/">Forecast evidence and matchup details →</a>
-</article></div></details>      </div>
-      <div class="published-events"><a class="public-link" href="/events/2026-11-07-ufc-fight-night-cortes-acosta-vs-walker/">2026-11-07 · UFC Fight Night: Cortes Acosta vs. Walker</a><a class="public-link" href="/events/2026-11-14-ufc-334-gane-vs-hokit/">2026-11-14 · UFC 334: Gane vs. Hokit</a><a class="public-link" href="/events/2026-11-21-ufc-fight-night-prochazka-vs-stirling/">2026-11-21 · UFC Fight Night: Prochazka vs. Stirling</a><a class="public-link" href="/events/2026-12-12-ufc-335-oliveira-vs-lopes/">2026-12-12 · UFC 335: Oliveira vs. Lopes</a><a class="public-link" href="/events/2027-01-30-ufc-336-van-vs-kape/">2027-01-30 · UFC 336: Van vs. Kape</a></div>
+  <div class="fight-top"><span>Heavyweight</span><time datetime="2026-11-07">Nov 07, 2026</time></div>
+  <div class="published-matchup"><a class="published-fighter red-corner" href="/fighters/waldo-cortes-acosta/"><span class="portrait" aria-hidden="true"><span class="portrait-initials">WA</span><img src="https://a.espncdn.com/i/headshots/mma/players/full/4903365.png" alt="" loading="lazy" decoding="async" data-fighter-portrait></span><strong>Waldo Cortes Acosta</strong></a><span class="published-vs">VS</span><a class="published-fighter blue-corner" href="/fighters/johnny-walker/"><span class="portrait" aria-hidden="true"><span class="portrait-initials">JW</span><img src="https://a.espncdn.com/i/headshots/mma/players/full/3146944.png" alt="" loading="lazy" decoding="async" data-fighter-portrait></span><strong>Johnny Walker</strong></a></div>
+<div class="published-pick"><span><small>MODEL PICK</small><strong>Waldo Cortes Acosta</strong></span><strong class="published-confidence">50.7<small>%</small></strong></div>
+  <p class="forecast-caption">Estimate · not separately calibrated<span>Issued Nov 01, 2026</span></p>
+<a class="forecast-card-link" href="/fights/2026-11-07-waldo-cortes-acosta-vs-johnny-walker-2067d438/">Forecast evidence and matchup details <span aria-hidden="true">↗</span></a></article><article class="fight-card published-card" data-fight-id="65894a973febb428bd33c7ac">
+  <div class="fight-top"><span>Women&#39;s Strawweight</span><time datetime="2026-11-07">Nov 07, 2026</time></div>
+  <div class="published-matchup"><a class="published-fighter red-corner" href="/fighters/tatiana-suarez/"><span class="portrait" aria-hidden="true"><span class="portrait-initials">TS</span><img src="https://a.espncdn.com/i/headshots/mma/players/full/4020435.png" alt="" loading="lazy" decoding="async" data-fighter-portrait></span><strong>Tatiana Suarez</strong></a><span class="published-vs">VS</span><a class="published-fighter blue-corner" href="/fighters/virna-jandiroba/"><span class="portrait" aria-hidden="true"><span class="portrait-initials">VJ</span><img src="https://a.espncdn.com/i/headshots/mma/players/full/4289516.png" alt="" loading="lazy" decoding="async" data-fighter-portrait></span><strong>Virna Jandiroba</strong></a></div>
+<div class="published-pick"><span><small>MODEL PICK</small><strong>Tatiana Suarez</strong></span><strong class="published-confidence">65.4<small>%</small></strong></div>
+  <p class="forecast-caption">Estimate · not separately calibrated<span>Issued Nov 01, 2026</span></p>
+<a class="forecast-card-link" href="/fights/2026-11-07-tatiana-suarez-vs-virna-jandiroba-65894a97/">Forecast evidence and matchup details <span aria-hidden="true">↗</span></a></article><article class="fight-card published-card" data-fight-id="3d186fdbedfdff81badb5ca5">
+  <div class="fight-top"><span>Bantamweight</span><time datetime="2026-11-07">Nov 07, 2026</time></div>
+  <div class="published-matchup"><a class="published-fighter red-corner" href="/fighters/davey-grant/"><span class="portrait" aria-hidden="true"><span class="portrait-initials">DG</span><img src="https://a.espncdn.com/i/headshots/mma/players/full/3070984.png" alt="" loading="lazy" decoding="async" data-fighter-portrait></span><strong>Davey Grant</strong></a><span class="published-vs">VS</span><a class="published-fighter blue-corner" href="/fighters/elijah-smith/"><span class="portrait" aria-hidden="true"><span class="portrait-initials">ES</span><img src="https://a.espncdn.com/i/headshots/mma/players/full/5144797.png" alt="" loading="lazy" decoding="async" data-fighter-portrait></span><strong>Elijah Smith</strong></a></div>
+<div class="published-pick"><span><small>MODEL PICK</small><strong>Elijah Smith</strong></span><strong class="published-confidence">64.3<small>%</small></strong></div>
+  <p class="forecast-caption">Estimate · not separately calibrated<span>Issued Nov 01, 2026</span></p>
+<a class="forecast-card-link" href="/fights/2026-11-07-davey-grant-vs-elijah-smith-3d186fdb/">Forecast evidence and matchup details <span aria-hidden="true">↗</span></a></article><article class="fight-card published-card" data-fight-id="d0811380ef5077c846be66a0">
+  <div class="fight-top"><span>Light Heavyweight</span><time datetime="2026-11-07">Nov 07, 2026</time></div>
+  <div class="published-matchup"><a class="published-fighter red-corner" href="/fighters/billy-elekana/"><span class="portrait" aria-hidden="true"><span class="portrait-initials">BE</span><img src="https://a.espncdn.com/i/headshots/mma/players/full/5078114.png" alt="" loading="lazy" decoding="async" data-fighter-portrait></span><strong>Billy Elekana</strong></a><span class="published-vs">VS</span><a class="published-fighter blue-corner" href="/fighters/lucas-fernando/"><span class="portrait" aria-hidden="true"><span class="portrait-initials">LF</span><img src="https://a.espncdn.com/i/headshots/mma/players/full/5119021.png" alt="" loading="lazy" decoding="async" data-fighter-portrait></span><strong>Lucas Fernando</strong></a></div>
+<div class="published-pick"><span><small>MODEL PICK</small><strong>Lucas Fernando</strong></span><strong class="published-confidence">53.4<small>%</small></strong></div>
+  <p class="forecast-caption">Estimate · not separately calibrated<span>Issued Nov 01, 2026</span></p>
+<a class="forecast-card-link" href="/fights/2026-11-07-billy-elekana-vs-lucas-fernando-d0811380/">Forecast evidence and matchup details <span aria-hidden="true">↗</span></a></article><article class="fight-card published-card" data-fight-id="f51ea8974271938d0a73ebd7">
+  <div class="fight-top"><span>Women&#39;s Bantamweight</span><time datetime="2026-11-07">Nov 07, 2026</time></div>
+  <div class="published-matchup"><a class="published-fighter red-corner" href="/fighters/priscila-cachoeira/"><span class="portrait" aria-hidden="true"><span class="portrait-initials">PC</span><img src="https://a.espncdn.com/i/headshots/mma/players/full/4277049.png" alt="" loading="lazy" decoding="async" data-fighter-portrait></span><strong>Priscila Cachoeira</strong></a><span class="published-vs">VS</span><a class="published-fighter blue-corner" href="/fighters/nina-milosevic/"><span class="portrait" aria-hidden="true"><span class="portrait-initials">NM</span><img src="https://a.espncdn.com/i/headshots/mma/players/full/5361791.png" alt="" loading="lazy" decoding="async" data-fighter-portrait></span><strong>Nina Milosevic</strong></a></div>
+<div class="published-pick"><span><small>MODEL PICK</small><strong>Nina Milosevic</strong></span><strong class="published-confidence">68.3<small>%</small></strong></div>
+  <p class="forecast-caption">Estimate · not separately calibrated<span>Issued Nov 01, 2026</span></p>
+<a class="forecast-card-link" href="/fights/2026-11-07-priscila-cachoeira-vs-nina-milosevic-f51ea897/">Forecast evidence and matchup details <span aria-hidden="true">↗</span></a></article><article class="fight-card published-card" data-fight-id="f02bda85ee8bfd06871394d6">
+  <div class="fight-top"><span>Flyweight</span><time datetime="2026-11-07">Nov 07, 2026</time></div>
+  <div class="published-matchup"><a class="published-fighter red-corner" href="/fighters/mitch-raposo/"><span class="portrait" aria-hidden="true"><span class="portrait-initials">MR</span><img src="https://a.espncdn.com/i/headshots/mma/players/full/4815978.png" alt="" loading="lazy" decoding="async" data-fighter-portrait></span><strong>Mitch Raposo</strong></a><span class="published-vs">VS</span><a class="published-fighter blue-corner" href="/fighters/marcos-degli/"><span class="portrait" aria-hidden="true"><span class="portrait-initials">MD</span><img src="https://a.espncdn.com/i/headshots/mma/players/full/5143890.png" alt="" loading="lazy" decoding="async" data-fighter-portrait></span><strong>Marcos Degli</strong></a></div>
+<div class="published-pick"><span><small>MODEL PICK</small><strong>Marcos Degli</strong></span><strong class="published-confidence">58.2<small>%</small></strong></div>
+  <p class="forecast-caption">Estimate · not separately calibrated<span>Issued Nov 01, 2026</span></p>
+<a class="forecast-card-link" href="/fights/2026-11-07-mitch-raposo-vs-marcos-degli-f02bda85/">Forecast evidence and matchup details <span aria-hidden="true">↗</span></a></article></div></section>
+<details class="undercard-dropdown card-section" aria-label="Undercard / Prelims"><summary class="undercard-summary"><span>Undercard / Prelims · 2 bouts</span><span>Click to show undercard</span></summary><div class="undercard-content fight-grid"><article class="fight-card published-card" data-fight-id="7408ab77951df2e739803bb2">
+  <div class="fight-top"><span>Featherweight</span><time datetime="2026-11-07">Nov 07, 2026</time></div>
+  <div class="published-matchup"><a class="published-fighter red-corner" href="/fighters/keiichiro-nakamura/"><span class="portrait" aria-hidden="true"><span class="portrait-initials">KN</span><img src="https://a.espncdn.com/i/headshots/mma/players/full/5327937.png" alt="" loading="lazy" decoding="async" data-fighter-portrait></span><strong>Keiichiro Nakamura</strong></a><span class="published-vs">VS</span><a class="published-fighter blue-corner" href="/fighters/ollie-schmid/"><span class="portrait" aria-hidden="true"><span class="portrait-initials">OS</span><img src="https://a.espncdn.com/i/headshots/mma/players/full/5346907.png" alt="" loading="lazy" decoding="async" data-fighter-portrait></span><strong>Ollie Schmid</strong></a></div>
+<div class="published-pick"><span><small>MODEL PICK</small><strong>Keiichiro Nakamura</strong></span><strong class="published-confidence">59.8<small>%</small></strong></div>
+  <p class="forecast-caption">Estimate · not separately calibrated<span>Issued Nov 01, 2026</span></p>
+<a class="forecast-card-link" href="/fights/2026-11-07-keiichiro-nakamura-vs-ollie-schmid-7408ab77/">Forecast evidence and matchup details <span aria-hidden="true">↗</span></a></article><article class="fight-card published-card" data-fight-id="8f09391ce9d781cc27f09e0c">
+  <div class="fight-top"><span>Heavyweight</span><time datetime="2026-11-07">Nov 07, 2026</time></div>
+  <div class="published-matchup"><a class="published-fighter red-corner" href="/fighters/gabriel-lorenco/"><span class="portrait" aria-hidden="true"><span class="portrait-initials">GL</span><img src="https://a.espncdn.com/i/headshots/mma/players/full/5215710.png" alt="" loading="lazy" decoding="async" data-fighter-portrait></span><strong>Gabriel Lorenco</strong></a><span class="published-vs">VS</span><a class="published-fighter blue-corner" href="/fighters/thomas-petersen/"><span class="portrait" aria-hidden="true"><span class="portrait-initials">TP</span><img src="https://a.espncdn.com/i/headshots/mma/players/full/4869702.png" alt="" loading="lazy" decoding="async" data-fighter-portrait></span><strong>Thomas Petersen</strong></a></div>
+<div class="published-pick"><span><small>MODEL PICK</small><strong>Gabriel Lorenco</strong></span><strong class="published-confidence">52.4<small>%</small></strong></div>
+  <p class="forecast-caption">Estimate · not separately calibrated<span>Issued Nov 01, 2026</span></p>
+<a class="forecast-card-link" href="/fights/2026-11-07-gabriel-lorenco-vs-thomas-petersen-8f09391c/">Forecast evidence and matchup details <span aria-hidden="true">↗</span></a></article></div></details><details class="undercard-dropdown card-section" aria-label="Card placement pending"><summary class="undercard-summary"><span>Card placement pending · 10 bouts</span><span>Click to show undercard</span></summary><div class="undercard-content fight-grid"><article class="fight-card published-card" data-fight-id="1261f8532db8513c1cb92a7f">
+  <div class="fight-top"><span>Women&#39;s Flyweight</span><time datetime="2026-11-07">Nov 07, 2026</time></div>
+  <div class="published-matchup"><a class="published-fighter red-corner" href="/fighters/karine-silva/"><span class="portrait" aria-hidden="true"><span class="portrait-initials">KS</span><img src="https://a.espncdn.com/i/headshots/mma/players/full/3309918.png" alt="" loading="lazy" decoding="async" data-fighter-portrait></span><strong>Karine Silva</strong></a><span class="published-vs">VS</span><a class="published-fighter blue-corner" href="/fighters/gabriella-fernandes/"><span class="portrait" aria-hidden="true"><span class="portrait-initials">GF</span><img src="https://a.espncdn.com/i/headshots/mma/players/full/4871203.png" alt="" loading="lazy" decoding="async" data-fighter-portrait></span><strong>Gabriella Fernandes</strong></a></div>
+<div class="published-pick"><span><small>MODEL PICK</small><strong>Karine Silva</strong></span><strong class="published-confidence">56.5<small>%</small></strong></div>
+  <p class="forecast-caption">Estimate · not separately calibrated<span>Issued Oct 11, 2026</span></p>
+<a class="forecast-card-link" href="/fights/2026-11-07-karine-silva-vs-gabriella-fernandes-1261f853/">Forecast evidence and matchup details <span aria-hidden="true">↗</span></a></article><article class="fight-card published-card" data-fight-id="69310fd90ae39196dc3b5361">
+  <div class="fight-top"><span>Featherweight</span><time datetime="2026-11-07">Nov 07, 2026</time></div>
+  <div class="published-matchup"><a class="published-fighter red-corner" href="/fighters/murtazali-magomedov/"><span class="portrait" aria-hidden="true"><span class="portrait-initials">MM</span><img src="https://a.espncdn.com/i/headshots/mma/players/full/5308768.png" alt="" loading="lazy" decoding="async" data-fighter-portrait></span><strong>Murtazali Magomedov</strong></a><span class="published-vs">VS</span><a class="published-fighter blue-corner" href="/fighters/jose-delano/"><span class="portrait" aria-hidden="true"><span class="portrait-initials">JD</span><img src="https://a.espncdn.com/i/headshots/mma/players/full/4969974.png" alt="" loading="lazy" decoding="async" data-fighter-portrait></span><strong>Jose Delano</strong></a></div>
+<div class="published-pick"><span><small>MODEL PICK</small><strong>Murtazali Magomedov</strong></span><strong class="published-confidence">51.8<small>%</small></strong></div>
+  <p class="forecast-caption">Estimate · not separately calibrated<span>Issued Oct 11, 2026</span></p>
+<a class="forecast-card-link" href="/fights/2026-11-07-murtazali-magomedov-vs-jose-delano-69310fd9/">Forecast evidence and matchup details <span aria-hidden="true">↗</span></a></article><article class="fight-card published-card" data-fight-id="03afb51fe1fe7ba2289b8440">
+  <div class="fight-top"><span>Featherweight</span><time datetime="2026-11-07">Nov 07, 2026</time></div>
+  <div class="published-matchup"><a class="published-fighter red-corner" href="/fighters/austin-bashi/"><span class="portrait" aria-hidden="true"><span class="portrait-initials">AB</span><img src="https://a.espncdn.com/i/headshots/mma/players/full/5120304.png" alt="" loading="lazy" decoding="async" data-fighter-portrait></span><strong>Austin Bashi</strong></a><span class="published-vs">VS</span><a class="published-fighter blue-corner" href="/fighters/carlos-calderon/"><span class="portrait" aria-hidden="true"><span class="portrait-initials">CC</span><img src="https://a.espncdn.com/i/headshots/mma/players/full/5125484.png" alt="" loading="lazy" decoding="async" data-fighter-portrait></span><strong>Carlos Calderon</strong></a></div>
+<p class="published-result"><span class="result-tag">RESULT</span><strong>Austin Bashi</strong><span>SUB Rear Naked Choke</span></p>
+<span class="forecast-card-link muted">Verified UFC record</span></article><article class="fight-card published-card" data-fight-id="945356597f5d459c8b434692">
+  <div class="fight-top"><span>Middleweight</span><time datetime="2026-11-07">Nov 07, 2026</time></div>
+  <div class="published-matchup"><a class="published-fighter red-corner" href="/fighters/andre-petroski/"><span class="portrait" aria-hidden="true"><span class="portrait-initials">AP</span><img src="https://a.espncdn.com/i/headshots/mma/players/full/4697476.png" alt="" loading="lazy" decoding="async" data-fighter-portrait></span><strong>Andre Petroski</strong></a><span class="published-vs">VS</span><a class="published-fighter blue-corner" href="/fighters/mantas-kondratavicius/"><span class="portrait" aria-hidden="true"><span class="portrait-initials">MK</span><img src="https://a.espncdn.com/i/headshots/mma/players/full/5264925.png" alt="" loading="lazy" decoding="async" data-fighter-portrait></span><strong>Mantas Kondratavicius</strong></a></div>
+<div class="published-pick"><span><small>MODEL PICK</small><strong>Mantas Kondratavicius</strong></span><strong class="published-confidence">53.4<small>%</small></strong></div>
+  <p class="forecast-caption">Estimate · not separately calibrated<span>Issued Nov 01, 2026</span></p>
+<a class="forecast-card-link" href="/fights/2026-11-07-andre-petroski-vs-mantas-kondratavicius-94535659/">Forecast evidence and matchup details <span aria-hidden="true">↗</span></a></article><article class="fight-card published-card" data-fight-id="8438b8f1ab3d7f7a72808888">
+  <div class="fight-top"><span>Welterweight</span><time datetime="2026-11-07">Nov 07, 2026</time></div>
+  <div class="published-matchup"><a class="published-fighter red-corner" href="/fighters/seokhyeon-ko/"><span class="portrait" aria-hidden="true"><span class="portrait-initials">SK</span><img src="https://a.espncdn.com/i/headshots/mma/players/full/4701954.png" alt="" loading="lazy" decoding="async" data-fighter-portrait></span><strong>Seokhyeon Ko</strong></a><span class="published-vs">VS</span><a class="published-fighter blue-corner" href="/fighters/wellington-turman/"><span class="portrait" aria-hidden="true"><span class="portrait-initials">WT</span><img src="https://a.espncdn.com/i/headshots/mma/players/full/4426282.png" alt="" loading="lazy" decoding="async" data-fighter-portrait></span><strong>Wellington Turman</strong></a></div>
+<div class="published-pick"><span><small>MODEL PICK</small><strong>Seokhyeon Ko</strong></span><strong class="published-confidence">51.3<small>%</small></strong></div>
+  <p class="forecast-caption">Estimate · not separately calibrated<span>Issued Oct 11, 2026</span></p>
+<a class="forecast-card-link" href="/fights/2026-11-07-seokhyeon-ko-vs-wellington-turman-8438b8f1/">Forecast evidence and matchup details <span aria-hidden="true">↗</span></a></article><article class="fight-card published-card" data-fight-id="dd8e5539750017dde0bdf774">
+  <div class="fight-top"><span>Welterweight</span><time datetime="2026-11-07">Nov 07, 2026</time></div>
+  <div class="published-matchup"><a class="published-fighter red-corner" href="/fighters/jose-souza/"><span class="portrait" aria-hidden="true"><span class="portrait-initials">JS</span><img src="https://a.espncdn.com/i/headshots/mma/players/full/5080485.png" alt="" loading="lazy" decoding="async" data-fighter-portrait></span><strong>Jose Souza</strong></a><span class="published-vs">VS</span><a class="published-fighter blue-corner" href="/fighters/jonny-parsons/"><span class="portrait" aria-hidden="true"><span class="portrait-initials">JP</span><img src="https://a.espncdn.com/i/headshots/mma/players/full/4880114.png" alt="" loading="lazy" decoding="async" data-fighter-portrait></span><strong>Jonny Parsons</strong></a></div>
+<div class="published-pick"><span><small>MODEL PICK</small><strong>Jose Souza</strong></span><strong class="published-confidence">57.8<small>%</small></strong></div>
+  <p class="forecast-caption">Estimate · not separately calibrated<span>Issued Oct 11, 2026</span></p>
+<a class="forecast-card-link" href="/fights/2026-11-07-jose-souza-vs-jonny-parsons-dd8e5539/">Forecast evidence and matchup details <span aria-hidden="true">↗</span></a></article><article class="fight-card published-card" data-fight-id="945356597f5d459c8b434692">
+  <div class="fight-top"><span>Middleweight</span><time datetime="2026-11-07">Nov 07, 2026</time></div>
+  <div class="published-matchup"><a class="published-fighter red-corner" href="/fighters/mantas-kondratavicius/"><span class="portrait" aria-hidden="true"><span class="portrait-initials">MK</span><img src="https://a.espncdn.com/i/headshots/mma/players/full/5264925.png" alt="" loading="lazy" decoding="async" data-fighter-portrait></span><strong>Mantas Kondratavicius</strong></a><span class="published-vs">VS</span><a class="published-fighter blue-corner" href="/fighters/andre-petroski/"><span class="portrait" aria-hidden="true"><span class="portrait-initials">AP</span><img src="https://a.espncdn.com/i/headshots/mma/players/full/4697476.png" alt="" loading="lazy" decoding="async" data-fighter-portrait></span><strong>Andre Petroski</strong></a></div>
+<div class="published-pick"><span><small>MODEL PICK</small><strong>Mantas Kondratavicius</strong></span><strong class="published-confidence">63.3<small>%</small></strong></div>
+  <p class="forecast-caption">Estimate · not separately calibrated<span>Issued Nov 01, 2026</span></p>
+<a class="forecast-card-link" href="/fights/2026-11-07-mantas-kondratavicius-vs-andre-petroski-94535659/">Forecast evidence and matchup details <span aria-hidden="true">↗</span></a></article><article class="fight-card published-card" data-fight-id="69310fd90ae39196dc3b5361">
+  <div class="fight-top"><span>Featherweight</span><time datetime="2026-11-07">Nov 07, 2026</time></div>
+  <div class="published-matchup"><a class="published-fighter red-corner" href="/fighters/jose-delano/"><span class="portrait" aria-hidden="true"><span class="portrait-initials">JD</span><img src="https://a.espncdn.com/i/headshots/mma/players/full/4969974.png" alt="" loading="lazy" decoding="async" data-fighter-portrait></span><strong>Jose Delano</strong></a><span class="published-vs">VS</span><a class="published-fighter blue-corner" href="/fighters/murtazali-magomedov/"><span class="portrait" aria-hidden="true"><span class="portrait-initials">MM</span><img src="https://a.espncdn.com/i/headshots/mma/players/full/5308768.png" alt="" loading="lazy" decoding="async" data-fighter-portrait></span><strong>Murtazali Magomedov</strong></a></div>
+<div class="published-pick"><span><small>MODEL PICK</small><strong>Murtazali Magomedov</strong></span><strong class="published-confidence">57.0<small>%</small></strong></div>
+  <p class="forecast-caption">Estimate · not separately calibrated<span>Issued Nov 01, 2026</span></p>
+<a class="forecast-card-link" href="/fights/2026-11-07-jose-delano-vs-murtazali-magomedov-69310fd9/">Forecast evidence and matchup details <span aria-hidden="true">↗</span></a></article><article class="fight-card published-card" data-fight-id="4ef088ff2f7dded03ef2f8de">
+  <div class="fight-top"><span>Featherweight</span><time datetime="2026-11-07">Nov 07, 2026</time></div>
+  <div class="published-matchup"><a class="published-fighter red-corner" href="/fighters/austin-bashi/"><span class="portrait" aria-hidden="true"><span class="portrait-initials">AB</span><img src="https://a.espncdn.com/i/headshots/mma/players/full/5120304.png" alt="" loading="lazy" decoding="async" data-fighter-portrait></span><strong>Austin Bashi</strong></a><span class="published-vs">VS</span><a class="published-fighter blue-corner" href="/fighters/lucas-brennan/"><span class="portrait" aria-hidden="true"><span class="portrait-initials">LB</span><img src="https://a.espncdn.com/i/headshots/mma/players/full/4795284.png" alt="" loading="lazy" decoding="async" data-fighter-portrait></span><strong>Lucas Brennan</strong></a></div>
+<div class="published-pick"><span><small>MODEL PICK</small><strong>Austin Bashi</strong></span><strong class="published-confidence">63.6<small>%</small></strong></div>
+  <p class="forecast-caption">Estimate · not separately calibrated<span>Issued Nov 01, 2026</span></p>
+<a class="forecast-card-link" href="/fights/2026-11-07-austin-bashi-vs-lucas-brennan-4ef088ff/">Forecast evidence and matchup details <span aria-hidden="true">↗</span></a></article><article class="fight-card published-card" data-fight-id="dd8e5539750017dde0bdf774">
+  <div class="fight-top"><span>Welterweight</span><time datetime="2026-11-07">Nov 07, 2026</time></div>
+  <div class="published-matchup"><a class="published-fighter red-corner" href="/fighters/jonny-parsons/"><span class="portrait" aria-hidden="true"><span class="portrait-initials">JP</span><img src="https://a.espncdn.com/i/headshots/mma/players/full/4880114.png" alt="" loading="lazy" decoding="async" data-fighter-portrait></span><strong>Jonny Parsons</strong></a><span class="published-vs">VS</span><a class="published-fighter blue-corner" href="/fighters/jose-souza/"><span class="portrait" aria-hidden="true"><span class="portrait-initials">JS</span><img src="https://a.espncdn.com/i/headshots/mma/players/full/5080485.png" alt="" loading="lazy" decoding="async" data-fighter-portrait></span><strong>Jose Souza</strong></a></div>
+<div class="published-pick"><span><small>MODEL PICK</small><strong>Jose Souza</strong></span><strong class="published-confidence">57.8<small>%</small></strong></div>
+  <p class="forecast-caption">Estimate · not separately calibrated<span>Issued Nov 01, 2026</span></p>
+<a class="forecast-card-link" href="/fights/2026-11-07-jonny-parsons-vs-jose-souza-dd8e5539/">Forecast evidence and matchup details <span aria-hidden="true">↗</span></a></article></div></details>      </div>
     </section>
     <section id="matchup" class="panel" hidden>
       <div class="section-heading">
@@ -201,9 +253,24 @@
       </div>
     </section>
     <section id="fighters" class="panel" hidden>
-      <div class="section-heading">
+<section class="records-library" aria-label="Fight archive">
+  <div class="library-heading"><div><p class="eyebrow">THE MMA CIPHER ARCHIVE</p><h3>Find the fighter. Follow the fight.</h3><p>Search profiles, event cards, and every published forecast in one place.</p></div><span class="library-heading-art" aria-hidden="true"><svg class="art-icon" viewBox="0 0 48 48" aria-hidden="true"><use href="/icon-art.svg#swords"></use></svg></span></div>
+  <div class="library-shortcuts">
+    <a class="library-shortcut" href="/events/"><svg class="art-icon" viewBox="0 0 48 48" aria-hidden="true"><use href="/icon-art.svg#glove"></use></svg><span><strong>Event cards</strong><small>Upcoming lineups &amp; past results</small></span><span class="tile-arrow" aria-hidden="true">↗</span></a>
+    <a class="library-shortcut" href="/fighters/"><svg class="art-icon" viewBox="0 0 48 48" aria-hidden="true"><use href="/icon-art.svg#crown"></use></svg><span><strong>Fighter profiles</strong><small>Records, form &amp; opponent history</small></span><span class="tile-arrow" aria-hidden="true">↗</span></a>
+    <a class="library-shortcut" href="/fights/"><svg class="art-icon" viewBox="0 0 48 48" aria-hidden="true"><use href="/icon-art.svg#swords"></use></svg><span><strong>Issued forecasts</strong><small>Published picks &amp; supporting evidence</small></span><span class="tile-arrow" aria-hidden="true">↗</span></a>
+    <a class="library-shortcut" href="/model/"><svg class="art-icon" viewBox="0 0 48 48" aria-hidden="true"><use href="/icon-art.svg#chart"></use></svg><span><strong>Model methods &amp; limits</strong><small>Inputs, performance &amp; uncertainty</small></span><span class="tile-arrow" aria-hidden="true">↗</span></a>
+  </div>
+  <a class="record-index-link" href="/sitemap/">Browse the complete record index <span aria-hidden="true">↗</span></a>
+  <div class="archive-finder" data-archive-finder>
+    <label class="archive-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><span class="sr-only">Search all fight records</span><input type="search" id="archive-query" placeholder="Search a fighter, matchup, event, or date…" autocomplete="off"><kbd>/</kbd></label>
+    <div class="archive-filters" role="group" aria-label="Search record types"><button type="button" data-archive-kind="all" aria-pressed="true" class="active">All records</button><button type="button" data-archive-kind="fighters" aria-pressed="false" class="">Fighters</button><button type="button" data-archive-kind="events" aria-pressed="false" class="">Event cards</button><button type="button" data-archive-kind="forecasts" aria-pressed="false" class="">Forecasts</button></div>
+    <p class="archive-search-status" id="archive-search-status" role="status">Try a fighter’s name, “UFC 334”, or an event date.</p>
+    <div id="archive-search-results" class="archive-search-results"></div><button type="button" class="archive-more" id="archive-more" hidden>Show more matches ↓</button>
+  </div>
+</section>      <div class="section-heading">
         <div>
-          <div class="eyebrow">OFFICIAL UFC ROSTER &amp; CAREER INTELLIGENCE</div>
+          <div class="eyebrow">UFC ROSTER &amp; CAREER INTELLIGENCE</div>
           <h2>Fighter Database</h2>
         </div>
         <div class="fighter-controls">
@@ -323,7 +390,8 @@
       <div class="section-heading">
         <div>
           <div class="eyebrow">ACCOUNTABILITY &amp; VERIFIED TRACK RECORD</div>
-          <h2>The prediction record</h2>
+          <h2>Main-card prediction record</h2>
+          <p class="muted">Only original main-card picks are graded. Prelims and bouts without verified card placement are excluded; draws and no contests are unscored.</p>
         </div>
       </div>
       <div id="results-list"></div>
@@ -337,19 +405,19 @@
       </div>
       <div id="model-info" class="public-section"><p class="lead">6 fitted estimators combine 37 pre-bout inputs. Serving models: Extra Trees, Random Forest, XGBoost, LightGBM, HistGradientBoosting, Logistic Regression.</p>
 <div class="evidence-note"><strong>Probability calibration: no separate transform</strong><p>Probabilities are model estimates and have not been separately calibrated. Holdout reliability bins measure agreement with outcomes; they do not apply a calibration transform.</p></div>
-<dl class="public-facts"><div><dt>Model version</dt><dd>309f5a8c604c</dd></div><div><dt>Actual inputs</dt><dd>37</dd></div><div><dt>Results through</dt><dd>2026-10-31</dd></div><div><dt>Training rows</dt><dd>7528</dd></div></dl>
-<h3>Measured chronological holdout</h3>
-<p>1580 decided bouts, 2023-10-21 through 2026-10-31. These are retrospective held-out measurements, separate from the live issued-pick record.</p>
-<div class="table-scroll"><table><thead><tr><th scope="col">Accuracy</th><th scope="col">Brier score</th><th scope="col">Log loss</th><th scope="col">Elo baseline accuracy</th></tr></thead><tbody><tr><td>62.7%</td><td>0.2338</td><td>0.6601</td><td>55.4%</td></tr></tbody></table></div>
-<h3>Serving estimators and blend weights</h3>
-<ul><li>MMA Cipher Extra Trees · 16.13%</li><li>MMA Cipher Random Forest · 36.73%</li><li>MMA Cipher XGBoost · 13.39%</li><li>MMA Cipher LightGBM · 25.31%</li><li>MMA Cipher HistGradientBoosting · 4.94%</li><li>MMA Cipher Logistic Regression · 3.51%</li></ul>
+<dl class="public-facts"><div><dt>Model version</dt><dd>1f7a9ef3196a</dd></div><div><dt>Actual inputs</dt><dd>37</dd></div><div><dt>Results through</dt><dd>2026-11-07</dd></div><div><dt>Training rows</dt><dd>7534</dd></div></dl>
+<h3 id="model-holdout">Measured chronological holdout</h3>
+<p>1586 decided bouts, 2023-10-21 through 2026-11-07. These are retrospective held-out measurements, separate from the live issued-pick record.</p>
+<div class="table-scroll"><table><thead><tr><th scope="col">Accuracy</th><th scope="col">Brier score</th><th scope="col">Log loss</th><th scope="col">Elo baseline accuracy</th></tr></thead><tbody><tr><td>62.7%</td><td>0.2337</td><td>0.6601</td><td>55.4%</td></tr></tbody></table></div>
+<h3 id="model-blend">Serving estimators and blend weights</h3>
+<ul class="estimator-list"><li><span>Extra Trees</span><strong>16.13%</strong></li><li><span>Random Forest</span><strong>36.73%</strong></li><li><span>XGBoost</span><strong>13.39%</strong></li><li><span>LightGBM</span><strong>25.31%</strong></li><li><span>HistGradientBoosting</span><strong>4.94%</strong></li><li><span>Logistic Regression</span><strong>3.51%</strong></li></ul>
 <p>Validation accuracy minus 0.25 times Brier score, transformed to softmax weights; the logistic component is capped before normalization. The final chronological holdout does not choose these weights.</p>
-<h3>Observed probability reliability</h3>
+<h3 id="model-reliability">Observed probability reliability</h3>
 <p>These bins measure forecast reliability on the holdout. They do not calibrate the serving probabilities; small bins have limited support.</p>
-<div class="table-scroll"><table><thead><tr><th>Probability bin</th><th>Mean confidence</th><th>Observed pick accuracy</th><th>Bouts</th></tr></thead><tbody><tr><td>50–60%</td><td>54.4%</td><td>59.3%</td><td>1242</td></tr><tr><td>60–70%</td><td>62.7%</td><td>75.0%</td><td>336</td></tr><tr><td>70–80%</td><td>70.4%</td><td>100.0%</td><td>2</td></tr></tbody></table></div>
-<h3>37 model inputs</h3><ol class="feature-list"><li>Elo</li><li>Striking Elo</li><li>Grappling Elo</li><li>Recorded wins</li><li>Recorded losses</li><li>Win streak</li><li>Recent form</li><li>KO win rate</li><li>Submission win rate</li><li>Experience</li><li>Days since last fight</li><li>Recent overperformance</li><li>Smoothed win rate</li><li>Finish loss rate</li><li>Recent three form</li><li>Log inactivity</li><li>Age differential</li><li>Height differential</li><li>Reach differential</li><li>Stance advantage</li><li>Sig strike rate differential</li><li>Sig strike accuracy differential</li><li>Takedown rate differential</li><li>Takedown accuracy differential</li><li>Submission attempt differential</li><li>Total rounds differential</li><li>Age cliff differential</li><li>Longest win streak differential</li><li>Title bouts differential</li><li>KO wins differential</li><li>Submission wins differential</li><li>Decision dominance differential</li><li>Reach stance interaction</li><li>Takedown threat interaction</li><li>Ranking differential</li><li>Five round experience</li><li>Ape index differential</li></ol>
+<div class="table-scroll"><table><thead><tr><th>Probability bin</th><th>Mean confidence</th><th>Observed pick accuracy</th><th>Bouts</th></tr></thead><tbody><tr><td>50–60%</td><td>54.4%</td><td>59.3%</td><td>1248</td></tr><tr><td>60–70%</td><td>62.7%</td><td>75.0%</td><td>336</td></tr><tr><td>70–80%</td><td>70.4%</td><td>100.0%</td><td>2</td></tr></tbody></table></div>
+<h3 id="model-inputs">37 model inputs</h3><ol class="feature-list"><li>Elo</li><li>Striking Elo</li><li>Grappling Elo</li><li>Recorded wins</li><li>Recorded losses</li><li>Win streak</li><li>Recent form</li><li>KO win rate</li><li>Submission win rate</li><li>Experience</li><li>Days since last fight</li><li>Recent overperformance</li><li>Smoothed win rate</li><li>Finish loss rate</li><li>Recent three form</li><li>Log inactivity</li><li>Age differential</li><li>Height differential</li><li>Reach differential</li><li>Stance advantage</li><li>Sig strike rate differential</li><li>Sig strike accuracy differential</li><li>Takedown rate differential</li><li>Takedown accuracy differential</li><li>Submission attempt differential</li><li>Total rounds differential</li><li>Age cliff differential</li><li>Longest win streak differential</li><li>Title bouts differential</li><li>KO wins differential</li><li>Submission wins differential</li><li>Decision dominance differential</li><li>Reach stance interaction</li><li>Takedown threat interaction</li><li>Ranking differential</li><li>Five round experience</li><li>Ape index differential</li></ol>
 <h3>Market-information policy</h3><p>The serving model is market-free: untimestamped archive moneylines cannot improve its backtest while being absent at prediction time. Eligible refreshed profiles are normalized and merged only before issue time and event start.</p>
-<p>Paired market comparison: insufficient_data. Eligible timestamped bouts: 0 across 0 event dates. At least 100 timestamp-verified bouts across 10 event dates are required. Untimestamped CSV odds are excluded.</p><h3>Data and evaluation limits</h3><p>Chronological replay reduces outcome leakage. Historical source completeness and the timestamps of imported attributes are not independently audited. Missing inputs use baseline values.</p><p>Replay builds fighter histories before each event day, and a chronological holdout measures later outcomes. Missing measurements are imputed. Agreement between estimators is not a calibrated uncertainty interval.</p>
+<p>Paired market comparison: insufficient_data. Eligible timestamped bouts: 0 across 0 event dates. At least 100 timestamp-verified bouts across 10 event dates are required. Untimestamped CSV odds are excluded.</p><h3 id="model-limits">Data and evaluation limits</h3><p>Chronological replay reduces outcome leakage. Historical source completeness and the timestamps of imported attributes are not independently audited. Missing inputs use baseline values.</p><p>Replay builds fighter histories before each event day, and a chronological holdout measures later outcomes. Missing measurements are imputed. Agreement between estimators is not a calibrated uncertainty interval.</p>
 </div>
     </section>
     <dialog id="share-modal" class="share-modal" aria-label="Share MMA Cipher prediction card">
@@ -400,7 +468,7 @@
         </div>
       </div>
       <div class="bottom-disclaimer">
-        <span class="footer-brand">MMA CIPHER PREDICTIONS</span>
+        <a class="footer-brand" href="/about/">ABOUT MMA CIPHER</a>
         <span>Probabilities are model estimates and have not been separately calibrated. Historical data has completeness and timestamp limitations.</span>
       </div>
     </footer>

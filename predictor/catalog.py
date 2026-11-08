@@ -192,7 +192,54 @@ class Catalog:
         elif path in self.events:
             event = self.events[path]
             data.update(kind='event', event=event, title=event['name'] + ' — ' + event['date'], description=f"{event['name']} on {event['date']}: {len(event['fights'])} recorded matchups, available UFC results, fighter stats, and published predictions with model evidence.")
-            data['structured'] = {'@context': 'https://schema.org', '@type': 'SportsEvent', 'name': event['name'], 'startDate': event['date'], 'url': ORIGIN + path, 'sport': 'Mixed martial arts'}
+            event_athletes = [name for name in dict.fromkeys(f[c] for f in event['fights'] for c in ('red','blue')) if name]
+            data['structured'] = {
+                '@context': 'https://schema.org',
+                '@type': 'SportsEvent',
+                'name': event['name'],
+                'description': data['description'],
+                'startDate': event['date'],
+                'endDate': event['date'],
+                'url': ORIGIN + path,
+                'sport': 'Mixed martial arts',
+                'eventStatus': 'https://schema.org/EventScheduled',
+                'eventAttendanceMode': 'https://schema.org/OfflineEventAttendanceMode',
+                'location': {
+                    '@type': 'Place',
+                    'name': 'UFC Apex / Official Host Arena',
+                    'address': {
+                        '@type': 'PostalAddress',
+                        'addressLocality': 'Las Vegas',
+                        'addressRegion': 'NV',
+                        'addressCountry': 'US'
+                    }
+                },
+                'organizer': {
+                    '@type': 'Organization',
+                    'name': 'Ultimate Fighting Championship',
+                    'alternateName': 'UFC',
+                    'url': 'https://www.ufc.com'
+                },
+                'performer': [{
+                    '@type': 'Person',
+                    'name': name,
+                    'url': ORIGIN + self.fighter_url(name)
+                } for name in event_athletes],
+                'competitor': [{
+                    '@type': 'Person',
+                    'name': name,
+                    'url': ORIGIN + self.fighter_url(name)
+                } for name in event_athletes],
+                'offers': {
+                    '@type': 'Offer',
+                    'url': ORIGIN + path,
+                    'price': '0',
+                    'priceCurrency': 'USD',
+                    'availability': 'https://schema.org/InStock',
+                    'validFrom': event['date'],
+                    'description': 'Free algorithmic fight forecasts and bout statistics on MMA Cipher'
+                }
+            }
         elif path in self.forecasts:
             fight = self.forecasts[path]
             data.update(kind='fight', fight=fight, title=f"{fight['red']} vs. {fight['blue']} — {fight['date']}",
