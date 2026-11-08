@@ -65,3 +65,22 @@ def test_unavailable_historical_placement_does_not_guess_a_main_card(tmp_path):
     assert service.dashboard()['results'] == []
     assert service.dashboard()['scored_predictions'] == 0
     assert service.dashboard()['live_accuracy'] is None
+
+
+def test_betting_roi_and_profit_calculation(tmp_path):
+    from predictor.odds import odds_identity
+    store = Store(tmp_path); service = Service(store)
+    win = save_pick(store, 'Fighter A', winner='red', section='main')
+    loss = save_pick(store, 'Fighter B', winner='blue', section='main')
+    store.set_meta('pre_fight_markets', {
+        win['id']: dict(prices={odds_identity('Fighter A'): 150, odds_identity('Opponent'): -180}),
+        loss['id']: dict(prices={odds_identity('Fighter B'): -200, odds_identity('Opponent'): 170})
+    })
+    dashboard = service.dashboard()
+    assert dashboard['scored_predictions'] == 2
+    assert dashboard['betting_picks_count'] == 2
+    # Win at +150 -> profit = +1.5 units
+    # Loss at -200 -> profit = -1.0 unit
+    # Total profit = +0.5 units on 2 bets -> ROI = +25.0%
+    assert dashboard['betting_profit_units'] == 0.5
+    assert dashboard['betting_roi'] == 25.0

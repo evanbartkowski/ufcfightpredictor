@@ -362,20 +362,46 @@ h1 span {
 /* Metrics Overview Strip */
 .metrics {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   padding: 22px 0;
   border-bottom: 1px solid var(--line);
   gap: 0;
 }
 .metrics > div {
   border-right: 1px solid var(--line);
-  padding: 0 20px;
+  padding: 0 16px;
 }
 .metrics > div:first-child {
   padding-left: 0;
 }
 .metrics > div:last-child {
   border: 0;
+}
+.metric-clickable {
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+  user-select: none;
+}
+.metric-clickable:hover {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+}
+.roi-pos {
+  color: #10b981 !important;
+  text-shadow: 0 0 14px rgba(16, 185, 129, 0.45);
+}
+.roi-neg {
+  color: #f43f5e !important;
+  text-shadow: 0 0 14px rgba(244, 63, 94, 0.45);
+}
+.roi-ev-pill {
+  color: #00f0ff;
+  font-weight: 700;
+}
+.roi-toggle-hint {
+  font-size: 8px;
+  color: #64748b;
+  margin-left: 4px;
 }
 .metric-label {
   font: 700 9px monospace;
@@ -1650,6 +1676,32 @@ input {
 .badge.miss {
   background: #2a141a;
   color: #ff668a;
+}
+.result-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.profit-unit-badge {
+  font: 700 10px monospace;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+.profit-unit-badge.gain {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.profit-unit-badge.loss {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+.profit-unit-badge.flat {
+  background: rgba(148, 163, 184, 0.15);
+  color: #94a3b8;
+  border: 1px solid rgba(148, 163, 184, 0.3);
 }
 
 /* Model Info Grid */

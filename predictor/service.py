@@ -414,6 +414,7 @@ class Service:
                 upcoming.append(dict(f, prediction_pending=True, locked=not forecast_open(f, market),
                                      odds=display_odds(f, market, self.odds_interval, odds_failed)))
         results = []
+        pre_markets = meta('pre_fight_markets', {})
         for p in saved.values():
             f = fights.get(p['id'])
             if f:
@@ -422,10 +423,50 @@ class Service:
                 if section != 'main':
                     continue
                 winner = f.get(f['winner']) if f['winner'] in ('red', 'blue') else None
-                results.append(dict(p, actual_winner=winner, correct=p['pick']==winner if winner else None,
+                correct = p['pick']==winner if winner else None
+
+                # Pre-fight market odds & betting return statistics
+                market_snap = pre_markets.get(p['id'])
+                pick_odds = None
+                opp_odds = None
+                decimal_odds = None
+                ev = None
+                profit_units = None
+                if market_snap and p.get('pick'):
+                    prices = market_snap.get('prices', {})
+                    pick_odds = prices.get(odds_identity(p['pick']))
+                    opp_fighter = p['blue'] if p.get('pick') == p.get('red') else p.get('red')
+                    opp_odds = prices.get(odds_identity(opp_fighter)) if opp_fighter else None
+                    if pick_odds is not None:
+                        if pick_odds > 0:
+                            dec = 1.0 + (pick_odds / 100.0)
+                        else:
+                            dec = 1.0 + (100.0 / abs(pick_odds))
+                        decimal_odds = round(dec, 3)
+                        pick_prob = p.get('red_probability') if p.get('pick') == p.get('red') else p.get('blue_probability')
+                        if pick_prob is None:
+                            pick_prob = p.get('confidence', 0.5)
+                        ev = round((pick_prob * dec - 1.0) * 100.0, 1)
+                        if winner is not None:
+                            profit_units = round((dec - 1.0) if correct else -1.0, 2)
+
+                results.append(dict(p, actual_winner=winner, correct=correct,
                                     method=f.get('method'), card_section='main',
-                                    section_source=placement.get('section_source') or f.get('section_source') or p.get('section_source')))
+                                    section_source=placement.get('section_source') or f.get('section_source') or p.get('section_source'),
+                                    pick_odds=pick_odds, opp_odds=opp_odds, decimal_odds=decimal_odds,
+                                    ev=ev, profit_units=profit_units))
         scored = [r for r in results if r['correct'] is not None]
+        scored_with_odds = [r for r in scored if r.get('pick_odds') is not None and r.get('profit_units') is not None]
+        total_staked = len(scored_with_odds)
+        total_profit = sum(r['profit_units'] for r in scored_with_odds)
+        betting_roi = round((total_profit / total_staked) * 100.0, 1) if total_staked else None
+        betting_profit_units = round(total_profit, 2) if total_staked else None
+
+        value_bets = [r for r in scored_with_odds if r.get('ev') is not None and r['ev'] >= 0.0]
+        value_staked = len(value_bets)
+        value_profit = sum(r['profit_units'] for r in value_bets)
+        value_roi = round((value_profit / value_staked) * 100.0, 1) if value_staked else None
+        value_profit_units = round(value_profit, 2) if value_staked else None
         for fight in upcoming + results:
             fight.update(path=fight_path(fight), event_path=event_path(fight),
                          red_path=fighter_path(fight['red']), blue_path=fighter_path(fight['blue']))
@@ -491,7 +532,13 @@ class Service:
                                      last_sync=meta('odds_last_sync'), error=meta('odds_error')),
                     profile_errors=meta('profile_errors', []),
                     live_accuracy=sum(r['correct'] for r in scored)/len(scored) if scored else None,
-                    scored_predictions=len(scored), record_scope='main_card', total_fights=len(fights))
+                    scored_predictions=len(scored), record_scope='main_card', total_fights=len(fights),
+                    betting_roi=betting_roi,
+                    betting_profit_units=betting_profit_units,
+                    betting_picks_count=total_staked,
+                    value_betting_roi=value_roi,
+                    value_betting_profit_units=value_profit_units,
+                    value_picks_count=value_staked)
 
     def update_revision(self, snapshot=None):
         keys = ('last_sync','sync_error','odds_checked_at','odds_error','profile_errors')

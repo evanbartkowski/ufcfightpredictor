@@ -1166,6 +1166,56 @@ function attachCardListeners() {
 // ==========================================
 // Main Dashboard Render
 // ==========================================
+let roiDisplayMode = 'all';
+
+function updateRoiMetricDisplay(d) {
+  const roiBox = $('metric-roi-box');
+  const roiEl = $('live-roi');
+  const labelEl = $('live-roi-label');
+  const detailEl = $('live-roi-detail');
+  if (!roiEl || !d) return;
+
+  const allRoi = d.betting_roi;
+  const allUnits = d.betting_profit_units;
+  const allCount = d.betting_picks_count || 0;
+  const valRoi = d.value_betting_roi;
+  const valUnits = d.value_betting_profit_units;
+  const valCount = d.value_picks_count || 0;
+
+  if (allRoi === null || allRoi === undefined) {
+    roiEl.textContent = 'Pending';
+    roiEl.className = '';
+    if (detailEl) detailEl.textContent = 'Awaiting settled bouts with odds';
+    return;
+  }
+
+  if (roiDisplayMode === 'value') {
+    if (labelEl) labelEl.textContent = '+EV VALUE RETURN (ROI)';
+    if (valRoi !== null && valRoi !== undefined) {
+      roiEl.textContent = `${valRoi > 0 ? '+' : ''}${valRoi.toFixed(1)}%`;
+      roiEl.className = valRoi > 0 ? 'roi-pos' : valRoi < 0 ? 'roi-neg' : '';
+      if (detailEl) detailEl.innerHTML = `<span>${valUnits > 0 ? '+' : ''}${valUnits.toFixed(2)}u</span> on ${valCount} +EV picks · <span class="roi-ev-pill">All: ${allRoi > 0 ? '+' : ''}${allRoi.toFixed(1)}%</span><span class="roi-toggle-hint">(click)</span>`;
+    } else {
+      roiEl.textContent = 'N/A';
+      roiEl.className = '';
+      if (detailEl) detailEl.textContent = 'No settled +EV picks yet';
+    }
+  } else {
+    if (labelEl) labelEl.textContent = 'BETTING RETURN (ROI)';
+    roiEl.textContent = `${allRoi > 0 ? '+' : ''}${allRoi.toFixed(1)}%`;
+    roiEl.className = allRoi > 0 ? 'roi-pos' : allRoi < 0 ? 'roi-neg' : '';
+    if (detailEl) detailEl.innerHTML = `<span>${allUnits > 0 ? '+' : ''}${allUnits.toFixed(2)}u</span> on ${allCount} picks · <span class="roi-ev-pill">+EV: ${valRoi !== null && valRoi !== undefined ? (valRoi > 0 ? '+' : '') + valRoi.toFixed(1) + '%' : 'N/A'}</span><span class="roi-toggle-hint">(click)</span>`;
+  }
+
+  if (roiBox && !roiBox._hasClickListener) {
+    roiBox._hasClickListener = true;
+    roiBox.addEventListener('click', () => {
+      roiDisplayMode = (roiDisplayMode === 'all') ? 'value' : 'all';
+      updateRoiMetricDisplay(data);
+    });
+  }
+}
+
 function render() {
   if (!data) return;
   data = currentDashboard(data);
@@ -1183,6 +1233,7 @@ function render() {
   $('fight-count').textContent = data.total_fights.toLocaleString();
   $('live-accuracy').textContent = pct(data.live_accuracy);
   $('live-count').textContent = data.scored_predictions ? `${data.scored_predictions} settled main-card picks` : 'Awaiting settled main-card picks';
+  updateRoiMetricDisplay(data);
   $('last-sync').textContent = data.status.last_sync ? stamp(data.status.last_sync) : 'Not yet';
   $('sync-state').textContent = data.status.running ? data.status.phase : 'Fight data every 6h · page checks every minute';
   const stale = !Number.isFinite(Date.parse(data.status.last_sync)) || Date.now() - Date.parse(data.status.last_sync) > ((data.refresh?.stats_seconds || 21600) + 900) * 1000;
@@ -1242,7 +1293,23 @@ function render() {
   attachCardListeners();
 
   $('fighter-list').innerHTML = data.fighters.map(f => `<option value="${esc(f.name)}"></option>`).join('');
-  $('results-list').innerHTML = data.results.length ? data.results.map(r => `<article class="result"><div><h3>${esc(r.red)} vs. ${esc(r.blue)}</h3><p>${esc(day(r.date))} · Main card · Predicted ${esc(r.pick)} (${pct(r.confidence)}) · ${r.actual_winner ? 'Winner: ' + esc(r.actual_winner) : 'Draw / no contest — unscored'}</p></div><span class="badge ${r.correct===false?'miss':''}">${r.correct===null?'UNSCORED':r.correct?'CORRECT':'MISSED'}</span></article>`).join('') : empty('The main-card record starts here', 'Settled original picks appear once main-card placement is verified. Prelims are excluded. Historical model test scores are tracked separately.');
+  $('results-list').innerHTML = data.results.length ? data.results.map(r => {
+    const oddsStr = r.pick_odds ? (r.pick_odds > 0 ? `+${r.pick_odds}` : `${r.pick_odds}`) : null;
+    const evStr = (r.ev !== null && r.ev !== undefined) ? `${r.ev >= 0 ? '+' : ''}${r.ev.toFixed(1)}% EV` : null;
+    const profitUnit = (r.profit_units !== null && r.profit_units !== undefined) ? `${r.profit_units >= 0 ? '+' : ''}${r.profit_units.toFixed(2)}u` : null;
+    const profitClass = (r.profit_units !== null && r.profit_units !== undefined) ? (r.profit_units > 0 ? 'gain' : r.profit_units < 0 ? 'loss' : 'flat') : '';
+
+    return `<article class="result">
+      <div>
+        <h3>${esc(r.red)} vs. ${esc(r.blue)}</h3>
+        <p>${esc(day(r.date))} · Main card · Predicted ${esc(r.pick)} (${pct(r.confidence)})${oddsStr ? ` · Line: ${oddsStr}${evStr ? ` (${evStr})` : ''}` : ''} · ${r.actual_winner ? 'Winner: ' + esc(r.actual_winner) : 'Draw / no contest — unscored'}</p>
+      </div>
+      <div class="result-badges">
+        <span class="badge ${r.correct===false?'miss':''}">${r.correct===null?'UNSCORED':r.correct?'CORRECT':'MISSED'}</span>
+        ${profitUnit ? `<span class="profit-unit-badge ${profitClass}">${profitUnit}</span>` : ''}
+      </div>
+    </article>`;
+  }).join('') : empty('The main-card record starts here', 'Settled original picks appear once main-card placement is verified. Prelims are excluded. Historical model test scores are tracked separately.');
   
   if (m) {
     const weights = m.weights || {};

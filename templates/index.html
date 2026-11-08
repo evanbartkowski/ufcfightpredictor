@@ -41,6 +41,11 @@
       <div><span class="metric-label">HISTORICAL TEST ACCURACY</span><strong id="accuracy">{{ pct(model.metrics.accuracy) if model else 'Unavailable' }}</strong><small id="test-count">{{ model.metrics.test_fights if model else 0 }} chronological holdout bouts</small></div>
       <div><span class="metric-label">RECORDED FIGHTS</span><strong id="fight-count">{{ '{:,}'.format(dashboard.total_fights) }}</strong><small>Confirmed outcomes</small></div>
       <div><span class="metric-label">MAIN CARD PREDICTION RECORD</span><strong id="live-accuracy">{{ pct(dashboard.live_accuracy) }}</strong><small id="live-count">{{ dashboard.scored_predictions }} settled main-card picks</small></div>
+      <div id="metric-roi-box" class="metric-clickable" title="Click to toggle between all settled picks and +EV profit value picks">
+        <span class="metric-label" id="live-roi-label">BETTING RETURN (ROI)</span>
+        <strong id="live-roi" class="{{ 'roi-pos' if (dashboard.betting_roi and dashboard.betting_roi > 0) else 'roi-neg' if (dashboard.betting_roi and dashboard.betting_roi < 0) else '' }}">{{ '%+.1f%%'|format(dashboard.betting_roi) if dashboard.betting_roi is not none else 'Pending' }}</strong>
+        <small id="live-roi-detail"><span id="live-roi-units">{{ '%+.2fu'|format(dashboard.betting_profit_units) if dashboard.betting_profit_units is not none else '0.00u' }}</span> on <span id="live-roi-count">{{ dashboard.betting_picks_count or 0 }}</span> picks · <span class="roi-ev-pill" id="live-roi-ev">+EV: {{ '%+.1f%%'|format(dashboard.value_betting_roi) if dashboard.value_betting_roi is not none else 'N/A' }}</span></small>
+      </div>
       <div><span class="metric-label">LAST SUCCESSFUL SYNC</span><strong class="date-metric" id="last-sync">{{ (dashboard.status.last_sync[:16]|replace('T', ' ')) + ' UTC' if dashboard.status.last_sync else 'Unreported' }}</strong><small id="sync-state">Fight data every 6h · page checks every minute</small></div>
     </section>
     <nav class="tabs" aria-label="Dashboard sections">

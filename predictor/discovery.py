@@ -35,7 +35,7 @@ def signature(catalog, path, layout):
         value = [profile,catalog.bouts[identity(profile['name'])],catalog.fighter(path)['upcoming']]
     elif path in catalog.events: value = catalog.events[path]
     elif path in catalog.forecasts: value = catalog.forecasts[path]
-    elif path == '/': value = {k:catalog.dashboard.get(k) for k in ('upcoming','live_accuracy','scored_predictions','model','total_fights')}
+    elif path == '/': value = {k:catalog.dashboard.get(k) for k in ('upcoming','live_accuracy','scored_predictions','model','total_fights','betting_roi','betting_profit_units','value_betting_roi')}
     elif path == '/fighters/': value = list(catalog.fighters.values())
     elif path == '/events/': value = catalog.event_list
     elif path == '/fights/': value = list(catalog.forecasts.values())
