@@ -92,10 +92,13 @@ def test_event_page_has_complete_google_structured_data(public_app):
     assert event['eventAttendanceMode'] == 'https://schema.org/OfflineEventAttendanceMode'
     assert event['location']['@type'] == 'Place'
     assert event['location']['address']['@type'] == 'PostalAddress'
+    assert event['location']['address']['streetAddress'] == '3211 S Buffalo Dr'
+    assert event['location']['address']['postalCode'] == '89117'
     assert event['organizer']['@type'] == 'Organization'
     assert isinstance(event['performer'], list) and len(event['performer']) > 0
     assert event['performer'][0]['@type'] == 'Person'
     assert event['offers']['@type'] == 'Offer'
     assert event['offers']['availability'] == 'https://schema.org/InStock'
     assert event['offers']['price'] == '0'
+    assert isinstance(event['image'], list) and len(event['image']) > 0
 

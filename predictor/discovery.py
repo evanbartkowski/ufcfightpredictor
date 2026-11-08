@@ -126,8 +126,10 @@ def metadata(catalog, path, context, state):
                 'name':'UFC Apex / Official Host Arena',
                 'address':{
                     '@type':'PostalAddress',
+                    'streetAddress':'3211 S Buffalo Dr',
                     'addressLocality':'Las Vegas',
                     'addressRegion':'NV',
+                    'postalCode':'89117',
                     'addressCountry':'US'
                 }
             },

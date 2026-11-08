@@ -209,8 +209,10 @@ class Catalog:
                     'name': 'UFC Apex / Official Host Arena',
                     'address': {
                         '@type': 'PostalAddress',
+                        'streetAddress': '3211 S Buffalo Dr',
                         'addressLocality': 'Las Vegas',
                         'addressRegion': 'NV',
+                        'postalCode': '89117',
                         'addressCountry': 'US'
                     }
                 },
@@ -238,7 +240,8 @@ class Catalog:
                     'availability': 'https://schema.org/InStock',
                     'validFrom': event['date'],
                     'description': 'Free algorithmic fight forecasts and bout statistics on MMA Cipher'
-                }
+                },
+                'image': [ORIGIN + '/social-preview.png']
             }
         elif path in self.forecasts:
             fight = self.forecasts[path]
