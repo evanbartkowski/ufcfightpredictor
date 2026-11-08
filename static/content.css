@@ -9,7 +9,7 @@
 .skip-link { position:fixed; left:16px; top:-80px; z-index:100; padding:12px 18px; background:var(--accent); color:var(--bg); border-radius:8px; }
 .skip-link:focus { top:12px; }
 .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
-.site-topbar .topbar-inner { gap:24px; max-width:1680px; margin:auto; }
+.site-topbar .topbar-inner { gap:24px; max-width:100%; width:100%; margin:0 auto; justify-content:space-between; }
 .site-topbar .brand { flex-shrink:0; }
 .site-navigation { display:flex; align-items:center; gap:4px; min-width:0; }
 .site-navigation a { position:relative; padding:9px 13px; border-radius:7px; font-size:12px; font-weight:650; color:var(--muted); white-space:nowrap; transition:color .2s,background .2s; }
@@ -277,7 +277,7 @@ a.forecast-card-link:hover { color:var(--accent); }
   .event-featured .event-portraits { display:flex; }
   .site-topbar .topbar-inner { gap:12px; }
   .site-navigation a { padding:9px 8px; font-size:11px; }
-  .site-topbar .next-event-link { display:none; }
+  .site-topbar .next-event-link { display:flex; }
   .event-directory-grid,.fighter-directory-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
   .public-facts { grid-template-columns:repeat(2,minmax(0,1fr)); }
   .method-layout { grid-template-columns:170px minmax(0,1fr); gap:20px; }
@@ -293,9 +293,9 @@ a.forecast-card-link:hover { color:var(--accent); }
   .directory-workbench-controls .directory-search { width:100%; }
   .directory-filter-row { align-items:stretch; flex-direction:column; }
   .directory-filter-row>.section-count { align-self:flex-start; }
-  .site-topbar .topbar-inner { height:auto; min-height:72px; padding:14px 20px 0; display:flex; flex-wrap:wrap; gap:13px 12px; }
-  .site-topbar .brand { flex:1; }
-  .site-topbar .next-event-link { display:flex; }
+  .site-topbar .topbar-inner { height:60px; min-height:60px; padding:0 12px; display:flex; flex-wrap:nowrap; align-items:center; justify-content:space-between; gap:12px; }
+  .site-topbar .brand { flex:0 1 auto; }
+  .site-topbar .next-event-link { display:flex; flex-shrink:0; }
   .site-navigation { order:3; width:100%; overflow-x:auto; gap:4px; padding-bottom:0; scrollbar-width:none; }
   .site-navigation::-webkit-scrollbar { display:none; }
   .site-navigation a { font-size:11px; padding:10px 10px 13px; }
@@ -367,7 +367,7 @@ a.forecast-card-link:hover { color:var(--accent); }
   .fighter-name { overflow-wrap:anywhere; }
   .site-navigation { justify-content:space-between; gap:0; }
   .site-navigation a { font-size:10px; padding-left:5px; padding-right:5px; }
-  .site-topbar .topbar-inner { padding-left:16px; padding-right:16px; }
+  .site-topbar .topbar-inner { padding-left:12px; padding-right:12px; }
   .site-topbar .next-event-link strong { font-size:10px; }
   .site-topbar .brand-wordmark { font-size:14px; }
   .site-topbar .brand-logo { width:32px; height:32px; }
