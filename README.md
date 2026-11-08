@@ -1,6 +1,6 @@
 # MMA Cipher
 
-UFC fight forecasts, source records, and a personal pick tracker. The production site is https://mma-oracle.web.app.
+UFC fight forecasts, source records, and a personal pick tracker. The production site is https://mmacipher.com (also hosted at https://mma-oracle.web.app).
 
 ## Model claims and the deployed version
 
@@ -28,6 +28,15 @@ Original issued forecasts remain immutable. Latest forecasts may update before t
 
 The live prediction record grades original **main-card picks only**. Prelims, early prelims, and bouts without verified card placement are excluded. Main-card draws and no contests appear as unscored and do not affect accuracy. Card placement is archived from matched ESPN broadcast blocks, with historical lookups for older issued picks; this metadata survives fresh updater runs without editing the original forecasts. Historical model holdout metrics still describe the full chronological evaluation sample.
 
+## Betting return (ROI) and gain/loss statistics
+
+Next to the main-card prediction record in the overview metrics strip is the live **BETTING RETURN (ROI)** field. This statistic computes the real-world return on investment if betting flat 1-unit stakes ($100 per bout) across all settled main-card predictions with verified pre-fight sportsbook odds:
+
+- **Net Profit & ROI**: Realized percentage gain or loss (`%+.1f%%`) and total net unit return (`%+.2fu`) across all settled bouts with closing odds.
+- **Positive Expected Value (+EV) Value Bets**: Separately calculates the realized ROI on bouts identified by the model as having positive expected return (`ev >= 0.0`), comparing AI win probability against sportsbook break-even implied odds.
+- **Interactive Mode Toggle**: Clicking the metric card flips between overall settled picks ROI and +EV value picks ROI.
+- **Itemized Bout Ledger**: The prediction record ledger details each bout's closing line, EV%, and net unit profit or loss (e.g., `+0.77u`, `-1.00u`).
+
 ## Personal picks
 
 Picks are stored only in the current browser using `mma_cipher_user_picks`. Selecting a fighter records a personal choice; selecting it again clears it. There is no shared voting backend, synthetic starting vote count, or claimed community consensus. Existing personal selections are preserved.
@@ -51,6 +60,17 @@ MMA Cipher is also branded as **MMACipher**. Public pages include canonical URLs
 Sitemap modification dates are based on persistent hashes of meaningful page content, not every refresh timestamp. `discovery_state` travels with the published fight-state snapshot. After deployment, CI submits only changed/deleted URLs through IndexNow and caches accepted submission hashes. The public ownership key is deliberately hosted as a text file; it is not an account credential. Submission errors retain the previous notification state for retry and do not roll back a successful site deployment.
 
 Google can discover the XML sitemap through `robots.txt`. Search Console submission requires a Google account authorized for that property; the existing Firebase CLI authorization does not grant Search Console access. Do not use Google's retired sitemap-ping URL or its restricted Indexing API for these ordinary fight pages. IndexNow acceptance is a delivery acknowledgment and does not promise indexing or rankings.
+
+Event pages adhere to Google Search Central's full `SportsEvent` schema specifications. All 656+ generated event pages include complete structured data:
+- **`location`**: Structured `Place` with `name` and full `PostalAddress` (`streetAddress`, `addressLocality`, `addressRegion`, `postalCode`, `addressCountry`).
+- **`performer` & `competitor`**: Complete athlete roster as Schema.org `Person` entities with canonical profile links.
+- **`eventStatus`**: `https://schema.org/EventScheduled`.
+- **`eventAttendanceMode`**: `https://schema.org/OfflineEventAttendanceMode`.
+- **`description`**: Event summary with matchup and forecast counts.
+- **`organizer`**: `Ultimate Fighting Championship` (UFC) organization profile.
+- **`offers`**: Admission offer (`price: "0"`, `USD`, `InStock`, `validFrom`).
+- **`image`**: 1200×630px high-resolution banner.
+- **`startDate` & `endDate`**: Standard ISO 8601 event dates.
 
 ```powershell
 .\.venv\Scripts\python scripts/render_brand_assets.py
